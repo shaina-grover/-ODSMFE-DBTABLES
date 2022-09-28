@@ -5,6 +5,7 @@
    <DEVC>
     <CTEXT>ODS: My Form Engine Tables</CTEXT>
     <TPCLASS>X</TPCLASS>
+    <COMPONENT>/ODSMFE/DBTABLES</COMPONENT>
    </DEVC>
   </asx:values>
  </asx:abap>
