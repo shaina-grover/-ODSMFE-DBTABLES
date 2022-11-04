@@ -1,0 +1,469 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "ODS MFE: Facade Method to call the get EntitySet methods",
+    "originalLanguage": "en"
+  },
+  "descriptions": {
+    "methods": [
+      {
+        "name": "GMIB_GET_ENTITYSET_CONFIG_DATA",
+        "description": "Get Application Configuration Data",
+        "parameters": [
+          {
+            "name": "EX_PARAM_VALUE",
+            "description": "ODS MFE: Parameter Value"
+          },
+          {
+            "name": "IM_PARAM_NAME",
+            "description": "ODS MFE: Parameter Name"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_ENTITYSET_DATA",
+        "description": "Get EntitySet Data",
+        "parameters": [
+          {
+            "name": "EX_PARAM_VALUE",
+            "description": "ODS MFE: Parameter Value"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT_ENTITY",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_PARAM_NAME",
+            "description": "ODS MFE: Parameter Name"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENTITY",
+            "description": "Request Details for Entity Read Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_C",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Entity Delete Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_U",
+            "description": "Request Details for Entity Update Operation"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_ENTITYSET_FILTER_DATA",
+        "description": "Get Entityset Filter Data",
+        "parameters": [
+          {
+            "name": "EX_PARAM_VALUE",
+            "description": "ODS MFE: Parameter Value"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT_ENTITY",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_ENTITY_SET_NAME",
+            "description": "Short description of table (shortened)"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_PARAM_NAME",
+            "description": "ODS MFE: Parameter Name"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENTITY",
+            "description": "Request Details for Entity Read Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_C",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Entity Delete Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_U",
+            "description": "Request Details for Entity Update Operation"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_ENTITYSET_SERV_CONFIG",
+        "description": "Get Service Config Data",
+        "parameters": [
+          {
+            "name": "EX_PARAM_VALUE",
+            "description": "ODS MFE: Parameter Value"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT_ENTITY",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_ENTITY_SET_NAME",
+            "description": "Short description of table (shortened)"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_PARAM_NAME",
+            "description": "ODS MFE: Parameter Name"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENTITY",
+            "description": "Request Details for Entity Read Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_C",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Entity Delete Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_U",
+            "description": "Request Details for Entity Update Operation"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_USER_PARAMETERS",
+        "description": "Get User Parameter Values",
+        "parameters": [
+          {
+            "name": "EX_PARAMETER_VALUE",
+            "description": "Parameter value"
+          },
+          {
+            "name": "EX_PARAMETER_VALUES",
+            "description": "Range table"
+          },
+          {
+            "name": "EX_PARAM_VALUE",
+            "description": "ODS MFE: Parameter Value"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT_ENTITY",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_ENTITY_SET_NAME",
+            "description": "Short description of table (shortened)"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_PARAMETER",
+            "description": "Set/Get parameter ID"
+          },
+          {
+            "name": "IM_PARAM_NAME",
+            "description": "ODS MFE: Parameter Name"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENTITY",
+            "description": "Request Details for Entity Read Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_C",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Entity Delete Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_U",
+            "description": "Request Details for Entity Update Operation"
+          },
+          {
+            "name": "IM_USER",
+            "description": "User Name"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_SET_GLOBAL_VARIABLE",
+        "description": "Set Gloabl Variable",
+        "parameters": [
+          {
+            "name": "EX_PARAMETER_VALUE",
+            "description": "Parameter value"
+          },
+          {
+            "name": "EX_PARAMETER_VALUES",
+            "description": "Range table"
+          },
+          {
+            "name": "EX_PARAM_VALUE",
+            "description": "ODS MFE: Parameter Value"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT_ENTITY",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_CONTEXT",
+            "description": "OData Channel - Data Provider Context"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_ENTITY_SET_NAME",
+            "description": "Short description of table (shortened)"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_INJECTION",
+            "description": "DPC Injection interface"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_PARAMETER",
+            "description": "Set/Get parameter ID"
+          },
+          {
+            "name": "IM_PARAM_NAME",
+            "description": "ODS MFE: Parameter Name"
+          },
+          {
+            "name": "IM_REQUEST_DETAILS",
+            "description": "OData Channel - Core Runtime Interface - Framework"
+          },
+          {
+            "name": "IM_SERVICE_VERSION",
+            "description": "Count parameters"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENTITY",
+            "description": "Request Details for Entity Read Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_C",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Entity Delete Operation"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_U",
+            "description": "Request Details for Entity Update Operation"
+          },
+          {
+            "name": "IM_USER",
+            "description": "User Name"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      }
+    ]
+  }
+}

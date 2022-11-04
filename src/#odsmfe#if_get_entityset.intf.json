@@ -1,0 +1,735 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "ODS MFE: Data Provider for ODATA Services",
+    "originalLanguage": "en"
+  },
+  "descriptions": {
+    "methods": [
+      {
+        "name": "GMIB_EXECUTE_ADDTIONAL_LOGIC",
+        "description": "Execute the additional bus. logic as reqired"
+      },
+      {
+        "name": "GMIB_EXECUTE_QUERY",
+        "description": "Execute the select query",
+        "parameters": [
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_EXPORT_DATA",
+        "description": "Export the data back to the caller",
+        "parameters": [
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_ADDITIONAL_WHERE",
+        "description": "Get the Additional where Clause",
+        "parameters": [
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_ENTITYSET_DATA",
+        "description": "Get The Entity Data",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_FROM_CLAUSE",
+        "description": "Fetch the from Clause from th econfig",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_MODEL_INSTANCE",
+        "description": "Get the instanc  for  the model Class",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_ODATA_PARAMETER",
+        "description": "Get all the parameters from ODATA service as required",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_SELECTION_FIELDS",
+        "description": "Get the fields to be selected",
+        "parameters": [
+          {
+            "name": "CH_SELECT_FLD",
+            "description": "EDIC: Program editor line"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_GET_WHERE_CLAUSE",
+        "description": "Build the SQL Where Clause for the",
+        "parameters": [
+          {
+            "name": "CH_SELECT_FLD",
+            "description": "EDIC: Program editor line"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_SET_GLOBAL_VARIABLE",
+        "description": "Set the Global Variable in the class",
+        "parameters": [
+          {
+            "name": "CH_SELECT_FLD",
+            "description": "EDIC: Program editor line"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_SORT_DATA",
+        "description": "Sort Entityset data",
+        "parameters": [
+          {
+            "name": "CH_SELECT_FLD",
+            "description": "EDIC: Program editor line"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_AND_OR",
+            "description": "R/2 table"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_FNAM",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_FVAL",
+            "description": "30 Characters"
+          },
+          {
+            "name": "IM_JOIN_NAME",
+            "description": "Table Name"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_OPERATOR",
+            "description": "3-Byte field"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_QUERY_INDEX",
+            "description": "index of the query rank"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      }
+    ]
+  }
+}

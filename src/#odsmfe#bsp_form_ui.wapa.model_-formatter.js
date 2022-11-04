@@ -1,0 +1,2 @@
+sap.ui.define([],function(){"use strict";return{boolean:function(e){var t;if(e==="X"){t=true}else{t=false}return t},button:function(e){var t;if(e==="Edit"){t=true}else if(e==="Display"){t=false}return t},IsDraft:function(e){var t;if(e==="X"){t="YES"}else+
+{t="NO"}return t}}});                                                                                                                                                                                                                                          

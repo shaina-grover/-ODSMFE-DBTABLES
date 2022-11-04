@@ -1,0 +1,303 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Get Entityset Data using BAPI",
+    "originalLanguage": "en"
+  },
+  "descriptions": {
+    "methods": [
+      {
+        "name": "GMIB_BAPI_TRANSACTION_COMMIT",
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_CREATE_ENTITYSET",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_DELETE_ENTITYSET",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_ERROR_HANDLING",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_RETURN",
+            "description": "Return Parameter"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_MODIFY_ENTITYSET",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_CHANGESET_REQUEST",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_RETURN",
+            "description": "Return Parameter"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_READ_ENTITYSET",
+        "parameters": [
+          {
+            "name": "EX_RESPONSE_CONTEXT",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "EX_RESPONSE_CONTEXT_ENTITY",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_CHANGESET_REQUEST",
+            "description": "Feed request response information (EntitySet)"
+          },
+          {
+            "name": "IM_DATA_PROVIDER",
+            "description": "MGW Entry Data Provider"
+          },
+          {
+            "name": "IM_FILTER_SELECT_OPTIONS",
+            "description": "table of select options"
+          },
+          {
+            "name": "IM_KEY_TAB",
+            "description": "table for name value pairs"
+          },
+          {
+            "name": "IM_NAVIGATION_PATH",
+            "description": "table of navigation paths"
+          },
+          {
+            "name": "IM_ORDER",
+            "description": "the sorting order"
+          },
+          {
+            "name": "IM_PAGING",
+            "description": "paging structure"
+          },
+          {
+            "name": "IM_RETURN",
+            "description": "Return Parameter"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENTITY",
+            "description": "Request Details for Read Feed"
+          },
+          {
+            "name": "IM_TECH_REQUEST_CONTEXT_ENT_D",
+            "description": "Request Details for Read Feed"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      }
+    ]
+  }
+}

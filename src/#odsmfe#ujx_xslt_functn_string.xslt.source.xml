@@ -1,0 +1,417 @@
+<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:sap="http://www.sap.com/sapxsl" xmlns:sapxfs="http://www.sap.com/tools/XSLT/functions/string" version="1.0">
+
+  <!--                                                 -->
+  <!-- ends-with(value, substring) comes with XSLT 2.0 -->
+  <!--                                                 -->
+  <xsl:function name="sapxfs:ends-with">
+    <xsl:param name="v"/>
+    <xsl:param name="s"/>
+    <!--xsl:result select="substring($v, (string-length($v) - string-length($s)) + 1) = $s"/-->
+    <xsl:result select="sap:ends-with($v,$s)"/>
+  </xsl:function>
+
+  <!--                                                   -->
+  <!-- index-of get index of a substring within a string -->
+  <!--                                                   -->
+  <xsl:function name="sapxfs:index-of">
+    <xsl:param name="str"/>
+    <xsl:param name="substr"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:index-of">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+        <xsl:with-param name="substr">
+          <xsl:value-of select="$substr"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+  <xsl:template name="sapxfs:index-of">
+    <xsl:param name="str"/>
+    <xsl:param name="substr"/>
+    <xsl:choose>
+      <xsl:when test="contains($str, $substr)">
+        <xsl:value-of select="string-length(substring-before($str, $substr))+1"/>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--                                -->
+  <!-- upper-case comes with XSLT 2.0 -->
+  <!--                                -->
+  <xsl:function name="sapxfs:upper-case">
+    <xsl:param name="str"/>
+    <!--xsl:result select="translate($str,'abcdefghijklmnopqrstuvwxyzäöü','ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ')"/-->
+    <xsl:result select="sap:upper-case($str)"/>
+  </xsl:function>
+
+  <!--                                -->
+  <!-- lower-case comes with XSLT 2.0 -->
+  <!--                                -->
+  <xsl:function name="sapxfs:lower-case">
+    <xsl:param name="str"/>
+    <!--xsl:result select="translate($str,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü')"/-->
+    <xsl:result select="sap:lower-case($str)"/>
+  </xsl:function>
+
+  <!--                                                      -->
+  <!-- delete-whitespace delete all whitespaces in a string -->
+  <!--                                                      -->
+  <xsl:function name="sapxfs:delete-whitespace">
+    <xsl:param name="str"/>
+    <xsl:result select="translate($str,' &#x9;&#xA;&#xA;', '')"/>
+  </xsl:function>
+
+  <!--                                                                  -->
+  <!-- delete-non-numeric delete all non numeric characters in a string -->
+  <!--                                                                  -->
+  <xsl:function name="sapxfs:delete-non-numeric">
+    <xsl:param name="str"/>
+    <xsl:result select="translate($str, translate($str,'0123456789', ''),'')"/>
+  </xsl:function>
+
+  <!--                                   -->
+  <!-- normalize-char delete duplicates  -->
+  <!--                                   -->
+  <xsl:function name="sapxfs:normalize-char">
+    <xsl:param name="str"/>
+    <xsl:param name="char"/>
+    <xsl:variable name="c1" select="concat(' ',$char)"/>
+    <xsl:variable name="c2" select="concat($char, ' ')"/>
+    <xsl:result select="translate(normalize-space(translate($str,$c2,$c1)),$c2,$c1)"/>
+  </xsl:function>
+
+  <!--                        -->
+  <!-- substring-before-last  -->
+  <!--                        -->
+  <xsl:function name="sapxfs:substring-before-last">
+    <xsl:param name="str"/>
+    <xsl:param name="substr"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:substring-before-last">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+        <xsl:with-param name="substr">
+          <xsl:value-of select="$substr"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+  <xsl:template name="sapxfs:substring-before-last">
+    <xsl:param name="str"/>
+    <xsl:param name="substr"/>
+    <xsl:if test="$substr and contains($str, $substr)">
+      <xsl:variable name="tmp" select="substring-after($str, $substr)"/>
+      <xsl:value-of select="substring-before($str, $substr)"/>
+      <xsl:if test="contains($tmp, $substr)">
+        <xsl:value-of select="$substr"/>
+        <xsl:call-template name="sapxfs:substring-before-last">
+          <xsl:with-param name="str" select="$tmp"/>
+          <xsl:with-param name="substr" select="$substr"/>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
+  <!--                       -->
+  <!-- substring-after-last  -->
+  <!--                       -->
+  <xsl:function name="sapxfs:substring-after-last">
+    <xsl:param name="str"/>
+    <xsl:param name="substr"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:substring-after-last">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+        <xsl:with-param name="substr">
+          <xsl:value-of select="$substr"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+  <xsl:template name="sapxfs:substring-after-last">
+    <xsl:param name="str"/>
+    <xsl:param name="substr"/>
+    <xsl:variable name="tmp" select="substring-after($str,$substr)"/>
+    <xsl:choose>
+      <xsl:when test="$substr and contains($tmp,$substr)">
+        <xsl:call-template name="sapxfs:substring-after-last">
+          <xsl:with-param name="str" select="$tmp"/>
+          <xsl:with-param name="substr" select="$substr"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$tmp"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--                                             -->
+  <!-- duplicate  duplicates string multiple times -->
+  <!--                                             -->
+  <xsl:function name="sapxfs:duplicate">
+    <xsl:param name="str"/>
+    <xsl:param name="cnt"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:duplicate">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+        <xsl:with-param name="cnt">
+          <xsl:value-of select="$cnt"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+  <xsl:template name="sapxfs:duplicate">
+    <xsl:param name="str"/>
+    <xsl:param name="cnt" select="2"/>
+    <xsl:choose>
+      <xsl:when test="not($cnt) or not($str)"/>
+      <xsl:when test="$cnt = 1">
+        <xsl:value-of select="$str"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="$cnt mod 2">
+          <xsl:value-of select="$str"/>
+        </xsl:if>
+        <xsl:call-template name="sapxfs:duplicate">
+          <xsl:with-param name="str" select="concat($str,$str)"/>
+          <xsl:with-param name="cnt" select="floor($cnt div 2)"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--                            -->
+  <!-- reverse  reverses a string -->
+  <!--                            -->
+  <xsl:function name="sapxfs:reverse">
+    <xsl:param name="str"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:reverse">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+  <xsl:template name="sapxfs:reverse">
+    <xsl:param name="str"/>
+    <xsl:variable name="len" select="string-length($str)"/>
+    <xsl:choose>
+      <xsl:when test="$len &lt; 2">
+        <!-- do nothing -->
+        <xsl:value-of select="$str"/>
+      </xsl:when>
+      <xsl:when test="$len = 2">
+        <!-- reverse the two characters -->
+        <xsl:value-of select="substring($str,2,1)"/>
+        <xsl:value-of select="substring($str,1,1)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- recusive replace 1st half with 2nd half -->
+        <xsl:variable name="mid" select="floor($len div 2)"/>
+        <xsl:call-template name="sapxfs:reverse">
+          <xsl:with-param name="str" select="substring($str,$mid+1,$mid+1)"/>
+        </xsl:call-template>
+        <xsl:call-template name="sapxfs:reverse">
+          <xsl:with-param name="str" select="substring($str,1,$mid)"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--                                                                -->
+  <!-- serach-and-replace replace all incidence of string with string -->
+  <!--                                                                -->
+  <xsl:function name="sapxfs:search-and-replace">
+    <xsl:param name="str"/>
+    <xsl:param name="search"/>
+    <xsl:param name="replace"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:search-and-replace">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+        <xsl:with-param name="search">
+          <xsl:value-of select="$search"/>
+        </xsl:with-param>
+        <xsl:with-param name="replace">
+          <xsl:value-of select="$replace"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+  <xsl:template name="sapxfs:search-and-replace">
+    <xsl:param name="str"/>
+    <xsl:param name="search"/>
+    <xsl:param name="replace"/>
+    <xsl:variable name="len" select="string-length($str)"/>
+    <xsl:choose>
+      <xsl:when test="$search and contains($str,$search)">
+        <xsl:value-of select="substring-before($str,$search)"/>
+        <xsl:value-of select="$replace"/>
+        <xsl:call-template name="sapxfs:search-and-replace">
+          <xsl:with-param name="str">
+            <xsl:value-of select="substring-after($str,$search)"/>
+          </xsl:with-param>
+          <xsl:with-param name="search">
+            <xsl:value-of select="$search"/>
+          </xsl:with-param>
+          <xsl:with-param name="replace">
+            <xsl:value-of select="$replace"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$str"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--                                                                            -->
+  <!-- search-and-replace-whole-words replace all incidence of string with string -->
+  <!--                                                                            -->
+  <xsl:function name="sapxfs:search-and-replace-whole-words">
+    <xsl:param name="str"/>
+    <xsl:param name="search"/>
+    <xsl:param name="replace"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:search-and-replace-whole-words">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+        <xsl:with-param name="search">
+          <xsl:value-of select="$search"/>
+        </xsl:with-param>
+        <xsl:with-param name="replace">
+          <xsl:value-of select="$replace"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+  <xsl:template name="sapxfs:search-and-replace-whole-words">
+    <xsl:param name="str"/>
+    <xsl:param name="search"/>
+    <xsl:param name="replace"/>
+    <xsl:variable name="punc" select="concat('.,;:()[ ]!?$@&amp;&quot;',&quot;'&quot;)"/>
+    <xsl:choose>
+      <xsl:when test="contains($str,$search)">
+        <xsl:variable name="before" select="substring-before($str,$search)"/>
+        <xsl:variable name="before-char" select="substring(concat(' ',$before),string-length($before) +1, 1)"/>
+        <xsl:variable name="after" select="substring-after($str,$search)"/>
+        <xsl:variable name="after-char" select="substring($after,1,1)"/>
+        <xsl:value-of select="$before"/>
+        <xsl:choose>
+          <xsl:when test="(not(normalize-space($before-char)) or contains($punc,$before-char)) and (not(normalize-space($after-char)) or contains($punc,$after-char))">
+            <xsl:value-of select="$replace"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$search"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:call-template name="sapxfs:search-and-replace-whole-words">
+          <xsl:with-param name="str">
+            <xsl:value-of select="$after"/>
+          </xsl:with-param>
+          <xsl:with-param name="search">
+            <xsl:value-of select="$search"/>
+          </xsl:with-param>
+          <xsl:with-param name="replace">
+            <xsl:value-of select="$replace"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$str"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- node-set tokenize(string str, string delimiters)  -->
+  <!-- tokenize delivers all tokens of a string as nodes -->
+  <!--                                                   -->
+  <xsl:function name="sapxfs:tokenize">
+    <xsl:param name="str"/>
+    <xsl:param name="delimiters"/>
+    <xsl:result>
+      <xsl:call-template name="sapxfs:tokenize">
+        <xsl:with-param name="str">
+          <xsl:value-of select="$str"/>
+        </xsl:with-param>
+        <xsl:with-param name="delimiters">
+          <xsl:value-of select="$delimiters"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:result>
+  </xsl:function>
+
+  <xsl:template name="sapxfs:tokenize">
+    <xsl:param name="str" select="''"/>
+    <xsl:param name="delimiters" select="' &#x9;&#xA;'"/>
+    <xsl:choose>
+      <xsl:when test="not($str)"/>
+      <xsl:when test="not($delimiters)">
+        <xsl:call-template name="_tokenize-char">
+          <xsl:with-param name="str" select="$str"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="_tokenize-delimiters">
+          <xsl:with-param name="str" select="$str"/>
+          <xsl:with-param name="delimiters" select="$delimiters"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="_tokenize-char">
+    <xsl:param name="str"/>
+    <xsl:if test="$str">
+      <token>
+        <xsl:value-of select="substring($str,1,1)"/>
+      </token>
+      <xsl:call-template name="_tokenize-char">
+        <xsl:with-param name="str" select="substring($str,2)"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="_tokenize-delimiters">
+    <xsl:param name="str"/>
+    <xsl:param name="delimiters"/>
+    <xsl:param name="last-delimit"/>
+    <xsl:variable name="deli" select="substring($delimiters,1,1)"/>
+    <xsl:choose>
+      <xsl:when test="not($deli)">
+        <token>
+          <xsl:value-of select="$str"/>
+        </token>
+      </xsl:when>
+      <xsl:when test="contains($str, $deli)">
+        <xsl:if test="not(starts-with($str,$deli))">
+          <xsl:call-template name="_tokenize-delimiters">
+            <xsl:with-param name="str" select="substring-before($str,$deli)"/>
+            <xsl:with-param name="delimiters" select="substring($delimiters,2)"/>
+          </xsl:call-template>
+        </xsl:if>
+        <xsl:call-template name="_tokenize-delimiters">
+          <xsl:with-param name="str" select="substring-after($str,$deli)"/>
+          <xsl:with-param name="delimiters" select="$delimiters"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="_tokenize-delimiters">
+          <xsl:with-param name="str" select="$str"/>
+          <xsl:with-param name="delimiters" select="substring($delimiters,2)"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+</xsl:transform>

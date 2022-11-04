@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/ODSMFE/CL_ALV_GRAPHICS</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>ALV Graphic (Integration with GFW)</DESCRIPT>
+    <STATE>1</STATE>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>ALV Graphic</ENTRY>
+     <LENGTH>40</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>002</KEY>
+     <ENTRY>Close Graphic</ENTRY>
+     <LENGTH>16</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>003</KEY>
+     <ENTRY>Close</ENTRY>
+     <LENGTH>9</LENGTH>
+    </item>
+   </TPOOL>
+   <I18N_TPOOL>
+    <item>
+     <LANGUAGE>D</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>I</ID>
+       <KEY>001</KEY>
+       <ENTRY>ALV Grafik</ENTRY>
+       <LENGTH>40</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>002</KEY>
+       <ENTRY>Grafik schließen</ENTRY>
+       <LENGTH>16</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>003</KEY>
+       <ENTRY>Schließen</ENTRY>
+       <LENGTH>9</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
+   </I18N_TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Constructor</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>CONVERT_CURRFIELD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Convert Currency Field to Float</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>DEFAULT_TITLES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Determine Default Titles for X/Y Axis</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FILL_DATA_CONTAINER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Fill Data Into Data Container</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>FREE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Destructor</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_ATTRIBUTES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Returns Attributes Which are Used for Saving the Layout</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_CHAR_AND_FIGURES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Determine Characteristics/Key Figures of Selected Columns</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Graphic as Export/Picture</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_PROPERTY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Property: Displayed Title</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_XY_FIELDS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Analyse Selected Columns and Determine X/Y Fields</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HANDLE_DBOX_ON_CLOSE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Handle DBox On-Close</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HANDLE_ON_CUSTOM_CHANGED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Handle Change of Customizing Objects</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>HANDLE_TOOLBAR_SELECT_FC</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Toolbar Handler</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_CU</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Customizing Objects</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_DC</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Data Container</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_DIALOGBOX_CONTAINER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container for Custom Controls in the Screen Area</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_GP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Graphic Proxy</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_ID_AT_DC</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Appl. ID for Data Container</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_SPLITTER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Splitter Container</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MR_TOOLBAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Toolbar</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MS_VARIANT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Variant Key</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MT_COLUMNS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Selected Columns</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MT_FIELDCATALOG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Field Catalog</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MT_OUTTAB</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Output (Data) Table</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MT_ROWS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Table of Row IDs</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MT_XFIELDNAMES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>X Fields</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MT_YFIELDNAMES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Y Fields</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_CU_GUID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>GUID for Loading CU Objects</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_PARENT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>M_XVALUES</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Number of X Values (Categories)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>REFRESH</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Refresh Graphic</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>SET_PROPERTY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Set Property: Display Title</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>IS_VARIANT</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Obsolete</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>IT_COLUMNS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Selected Columns</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>IT_FIELDCATALOG</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Field Catalog</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>IT_OUTTAB</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Output (Data) Table</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>IT_PROPERTIES</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Properties Set by Application</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>IT_ROWS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Table of Row IDs</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>I_CU_GUID</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Load CU Objects Using this GUID</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>I_PARENT</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Container</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <SCONAME>I_WEB_MODE</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Flag: Web Mode (MiniALV etc.)</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>FILL_DATA_CONTAINER</CMPNAME>
+     <SCONAME>ERROR_INSERT_VALUES</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Data Container Insert Failed</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>FREE</CMPNAME>
+     <SCONAME>ERROR</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Error</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_ATTRIBUTES</CMPNAME>
+     <SCONAME>E_GUID</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>GUID in &apos;CHAR&apos; Format in Uppercase</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>E_CONTENT</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Export (Picture) of Graphic</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>E_CONTENT_LENGTH</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Length of Export</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>E_CONTENT_TYPE</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Format of Exported Graphic</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>E_RETVAL</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>CL_GFW=&gt;OK, if Export was Successful</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>I_FORMAT</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Requested Target Format (CO_FORMAT_*)</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>I_HEIGHT</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Requested Height of Picture (in Pixels)</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>I_NAME</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Name of Picture</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PICTURE</CMPNAME>
+     <SCONAME>I_WIDTH</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Requested Width of Picture (in Pixels)</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PROPERTY</CMPNAME>
+     <SCONAME>E_VALUE</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Value</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_PROPERTY</CMPNAME>
+     <SCONAME>I_ID</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ID (See Constants in CL_ALV_GRAPHICS_CU)</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_XY_FIELDS</CMPNAME>
+     <SCONAME>E_YFIELDNAMES_DELETED</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Flag: File Rows have been Removed</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>REFRESH</CMPNAME>
+     <SCONAME>IT_COLUMNS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Selected Columns</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>REFRESH</CMPNAME>
+     <SCONAME>IT_FIELDCATALOG</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Field Catalog</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>REFRESH</CMPNAME>
+     <SCONAME>IT_OUTTAB</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Output (Data) Table</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>REFRESH</CMPNAME>
+     <SCONAME>IT_PROPERTIES_APPL</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Properties Set by Application</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>REFRESH</CMPNAME>
+     <SCONAME>IT_ROWS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Table of Row IDs</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>REFRESH</CMPNAME>
+     <SCONAME>I_CU_GUID</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Load CU Objects Using this GUID</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>SET_PROPERTY</CMPNAME>
+     <SCONAME>I_ID</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ID (See Constants in CL_ALV_GRAPHICS_CU)</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>SET_PROPERTY</CMPNAME>
+     <SCONAME>I_VALUE</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Value</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
+  </asx:values>
+ </asx:abap>
+</abapGit>

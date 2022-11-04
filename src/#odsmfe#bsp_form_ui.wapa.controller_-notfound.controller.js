@@ -1,0 +1,2 @@
+sap.ui.define(["sap/ui/core/mvc/Controller","sap/ui/core/routing/History"],function(o,e){"use strict";return o.extend("odsmfe.FormUI.controller.NotFound",{onInit:function(){},getRouter:function(){return sap.ui.core.UIComponent.getRouterFor(this)},onNavBa+
+ck:function(o){var t,n;t=e.getInstance();n=t.getPreviousHash();if(n!==undefined){window.history.go(-1)}else{this.getRouter().navTo("appHome",{},true)}}})});                                                                                                   

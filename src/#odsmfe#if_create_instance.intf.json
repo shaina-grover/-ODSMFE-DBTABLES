@@ -1,0 +1,37 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Create Instance Factory Method",
+    "originalLanguage": "en"
+  },
+  "descriptions": {
+    "attributes": [
+      {
+        "name": "GS_CLASS_CONFIG",
+        "description": "Table to Control the Classes Linked with a Entityset"
+      }
+    ],
+    "methods": [
+      {
+        "name": "CREATE_OBJECT_FACTORY",
+        "description": "Method to Create Instance",
+        "parameters": [
+          {
+            "name": "IM_ENTITY",
+            "description": "Importity entity type for path"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_BUSI_EXCEPTION",
+            "description": "Business Exception"
+          },
+          {
+            "name": "/IWBEP/CX_MGW_TECH_EXCEPTION",
+            "description": "Technical Exception"
+          }
+        ]
+      }
+    ]
+  }
+}

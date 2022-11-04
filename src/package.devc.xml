@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>ODS: My Form Engine Tables</CTEXT>
+    <CTEXT>ODS: My Form Engine</CTEXT>
     <TPCLASS>X</TPCLASS>
    </DEVC>
   </asx:values>

@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/ODSMFE/CL_CONFIG_UTILI</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>ODS MFE: Config Utitlity Class</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_INSTANCE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Instantiate Class</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_MOBILE_FILTERS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Mobile Filters</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GET_TABLE_CONFIG</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Get Tables - Active/Inactive</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>GV_INST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ODS Config Utitlity Class</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_INSTANCE</CMPNAME>
+     <SCONAME>RO_INST</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ODS Config Utitlity Class</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_MOBILE_FILTERS</CMPNAME>
+     <SCONAME>ET_FILTERS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ODS Mobile Filters</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_MOBILE_FILTERS</CMPNAME>
+     <SCONAME>LV_ACTIVE</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Indicator</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_MOBILE_FILTERS</CMPNAME>
+     <SCONAME>LV_TABNAME</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Table Name</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>GET_TABLE_CONFIG</CMPNAME>
+     <SCONAME>IT_FILTER_SELECT_OPTIONS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>table of select options</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
+  </asx:values>
+ </asx:abap>
+</abapGit>

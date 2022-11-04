@@ -1,0 +1,106 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Interface for model Extension Class",
+    "originalLanguage": "en"
+  },
+  "descriptions": {
+    "methods": [
+      {
+        "name": "GMIB_ADD_PROPERTIES",
+        "parameters": [
+          {
+            "name": "IM_MDL",
+            "description": "Model Provider Class Extentions"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_MED_EXCEPTION",
+            "description": "Meta data exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_ADD_PROPERTY",
+        "parameters": [
+          {
+            "name": "IM_MDL",
+            "description": "Model Provider Class Extentions"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_MED_EXCEPTION",
+            "description": "Meta data exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_FETCH_ENTITY_MODIFICATION",
+        "parameters": [
+          {
+            "name": "IM_MDL",
+            "description": "Model Provider Class Extentions"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_MED_EXCEPTION",
+            "description": "Meta data exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_MODIFY_ENTITY",
+        "parameters": [
+          {
+            "name": "IM_MDL",
+            "description": "Model Provider Class Extentions"
+          },
+          {
+            "name": "IM_MODEL",
+            "description": "Interface for a Script-Based Model"
+          },
+          {
+            "name": "IM_PROJECT",
+            "description": "Abstract Push Model Provider"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_MED_EXCEPTION",
+            "description": "Meta data exception"
+          }
+        ]
+      },
+      {
+        "name": "GMIB_PROCESS_ENTITY",
+        "parameters": [
+          {
+            "name": "IM_MDL",
+            "description": "Model Provider Class Extentions"
+          },
+          {
+            "name": "IM_MODEL",
+            "description": "Interface for a Script-Based Model"
+          },
+          {
+            "name": "IM_PROJECT",
+            "description": "Abstract Push Model Provider"
+          },
+          {
+            "name": "IM_SRV_NAME",
+            "description": "Service Builder: Node Name"
+          }
+        ],
+        "exceptions": [
+          {
+            "name": "/IWBEP/CX_MGW_MED_EXCEPTION",
+            "description": "Meta data exception"
+          }
+        ]
+      }
+    ]
+  }
+}

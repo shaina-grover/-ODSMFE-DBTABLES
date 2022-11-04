@@ -1,0 +1,3 @@
+sap.ui.define(["sap/ui/core/util/MockServer"],function(e){"use strict";return{init:function(){var a=new e({rootUri:"/sap/opu/odata/ODSMFE/PR_FORMUI_SRV/"});a.simulate("../localService/metadata.xml",{sMockdataBaseUrl:"../localService/mockdata",bGenerateMi+
+ssingMockData:true});var r=function(e){var a=e.getParameter("oXhr");jQuery.sap.log.setLevel(jQuery.sap.log.Level.INFO);jQuery.sap.log.info("URL Parameters"+a.url);jQuery.sap.log.setLevel(jQuery.sap.log.Level.ERROR)};a.attachAfter("GET",r,"");a.start();jQ+
+uery.sap.log.setLevel(jQuery.sap.log.Level.INFO);jQuery.sap.log.info("Running the app with mock data");jQuery.sap.log.setLevel(jQuery.sap.log.Level.ERROR)}}});                                                                                                

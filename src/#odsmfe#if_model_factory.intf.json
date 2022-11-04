@@ -1,0 +1,21 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Factory Class to Provide Model Instance",
+    "originalLanguage": "en"
+  },
+  "descriptions": {
+    "methods": [
+      {
+        "name": "GMIB_GET_INSTANCE_MODEL",
+        "description": "Factory Method To Provide Data Model Instance",
+        "parameters": [
+          {
+            "name": "RE_OBJ",
+            "description": "Provide Data to FramewrkSet"
+          }
+        ]
+      }
+    ]
+  }
+}
