@@ -159,9 +159,10 @@ CLASS /ODSMFE/CL_GET_WORKORDER_DATA IMPLEMENTATION.
           lo_ref_exch_data TYPE REF TO data.
 
 * Constants
-    CONSTANTS: lc_tzone TYPE tznzonesys VALUE 'UTC',
-               lc_i     TYPE string VALUE 'I',
-               lc_u     TYPE string VALUE 'U'.
+    CONSTANTS: lc_tzone     TYPE tznzonesys VALUE 'UTC',
+               lc_i         TYPE string VALUE 'I',
+               lc_u         TYPE string VALUE 'U',
+               lc_createdby TYPE string VALUE 'CREATEDBY'. "Added by ODS-VSANAGALA
 
 * Field Symbols
     FIELD-SYMBOLS: <lfsit_delta_tab> TYPE STANDARD TABLE,
@@ -191,7 +192,9 @@ CLASS /ODSMFE/CL_GET_WORKORDER_DATA IMPLEMENTATION.
       LOOP AT im_filter_select_options INTO lst_filter.
         TRANSLATE lst_filter-property TO UPPER CASE.
         CASE lst_filter-property.
-          WHEN text-003."EnteredBy
+            "/SOC by ODS-VSANAGALA.
+          WHEN lc_createdby."EnteredBy
+            "/EOC by ODS-VSANAGALA.
             READ TABLE lst_filter-select_options INTO lst_filter_range INDEX 1.
             IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL .
               lv_mobileuser = lst_filter_range-low.

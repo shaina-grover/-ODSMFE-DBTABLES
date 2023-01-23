@@ -378,6 +378,27 @@ bindings as well as body, otherwise it will certainly be messed up).
       </xsl:if>
     </div>
   </xsl:template>
+  <!-- Added str-replace function by ODS -->
+    <xsl:template name="str-replace">
+        <xsl:param name="string"/>
+        <xsl:param name="target"/>
+        <xsl:param name="with"/>
+        <xsl:choose>
+            <xsl:when test="contains($string, $target)">
+                <xsl:value-of select="substring-before($string, $target)"/>
+                <xsl:value-of select="$with"/>
+                <xsl:call-template name="str-replace">
+                    <xsl:with-param name="string" select="substring-after($string, $target)"/>
+                    <xsl:with-param name="target" select="$target"/>
+                    <xsl:with-param name="with" select="$with"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$string"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <!-- End changes str-replace function by ODS -->
   <xsl:template name="appearance">
     <xsl:variable name="select-type">
       <xsl:if test="local-name() = 'select' or local-name() = 'select1'">
@@ -412,6 +433,29 @@ bindings as well as body, otherwise it will certainly be messed up).
                 </xsl:if>
             </xsl:for-each> -->
       <!-- End comment by ods -->
+       <!-- Added By Ods for multi appearance attribute-->
+      <xsl:choose>
+              <!-- str:tokenize browser support is poor (only Firefox) -->
+              <xsl:when test="function-available('str:tokenize')">
+                  <xsl:variable name="appearances" select="str:tokenize(@appearance)" />
+                  <xsl:for-each select="exsl:node-set($appearances)">
+                      <xsl:value-of select="concat('or-appearance-', normalize-space(translate(., $upper-case, $lower-case)), ' ')"/>
+                  </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                  <xsl:if test="@appearance">
+                      <xsl:value-of select="'or-appearance-'"/>
+                      <xsl:call-template name="str-replace">
+                          <xsl:with-param name="string" select="@appearance"/>
+                          <xsl:with-param name="target" select="' '"/>
+                          <xsl:with-param name="with" select="' or-appearance-'"/>
+                      </xsl:call-template>
+                      <!-- append space to maintain consistency with output of str:tokenize above -->
+                      <xsl:value-of select="' '"/>
+                  </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
+        <!-- End Changes By Ods for multi appearance attribute-->
     </xsl:if>
     <!-- turn rows attribute into an appearance (which is what it should have been in the first place imho)-->
     <xsl:if test="./@rows">
@@ -705,7 +749,8 @@ bindings as well as body, otherwise it will certainly be messed up).
     <xsl:variable name="iwq" select="substring-before(substring-after(@nodeset, 'instance('),')/')"/>
     <!-- Needs to also deal with randomize(instance("id")/path/to/node), randomize(instance("id")/path/to/node, 3) -->
     <!-- Super inelegant and not robust without regexp:match -->
-    <xsl:variable name="instance-path-temp">
+    <!-- Start of lookup table changes by ODS -->
+    <!-- <xsl:variable name="instance-path-temp">
       <xsl:choose>
         <xsl:when test="contains(@nodeset, 'randomize(') and contains(@nodeset, ',')">
           <xsl:value-of select="substring-before(substring-after(@nodeset, ')'), ',')"/>
@@ -723,39 +768,41 @@ bindings as well as body, otherwise it will certainly be messed up).
       <xsl:call-template name="strip-filter">
         <xsl:with-param name="string" select="$instance-path"/>
       </xsl:call-template>
-    </xsl:variable>
+    </xsl:variable> -->
+    <!-- End of lookup table changes by ODS -->
     <xsl:variable name="instance-id" select="substring($iwq, 2, string-length($iwq)-2)"/>
     <span class="itemset-labels">
-      <xsl:attribute name="data-value-ref">
-        <xsl:value-of select="$value-ref"/>
-      </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="contains($label-ref, 'jr:itext(')">
-          <xsl:attribute name="data-label-type">
-            <xsl:value-of select="'itext'"/>
-          </xsl:attribute>
-          <xsl:variable name="label-node-name" select="substring(substring-after($label-ref, 'itext('),1,string-length(substring-after($label-ref, 'itext('))-1)"/>
-          <xsl:attribute name="data-label-ref">
-            <xsl:value-of select="$label-node-name"/>
-          </xsl:attribute>
-          <xsl:for-each select="dyn:evaluate(concat('/h:html/h:head/xf:model/xf:instance[@id=&quot;', $instance-id, '&quot;]', $instance-path-nofilter))">
-            <!-- so this is support for itext(node) (not itext(path/to/node)), but only 'ad-hoc' for itemset labels for now -->
-            <xsl:variable name="id" select="./*[name()=$label-node-name]"/>
-            <xsl:call-template name="translations">
-              <xsl:with-param name="id" select="$id"/>
-              <xsl:with-param name="class" select="'option-label'"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="data-label-ref">
-            <xsl:value-of select="$label-ref"/>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:text>
+            <xsl:attribute name="data-value-ref">
+                <xsl:value-of select="$value-ref"/>
+            </xsl:attribute>
+            <xsl:choose>
+                <xsl:when test="contains($label-ref, 'jr:itext(')">
+                    <xsl:attribute name="data-label-type">
+                        <xsl:value-of select="'itext'"/>
+                    </xsl:attribute>
+                    <xsl:variable name="label-node-name"
+                        select="substring(substring-after($label-ref, 'itext('),1,string-length(substring-after($label-ref, 'itext('))-1)"/>
+                    <xsl:attribute name="data-label-ref">
+                        <xsl:value-of select="$label-node-name"/>
+                    </xsl:attribute>
+                    <xsl:for-each select="/h:html/h:head/xf:model/xf:instance[@id=$instance-id]/xf:root/xf:item">
+                        <!-- so this is support for itext(node) (not itext(path/to/node)), but only 'ad-hoc' for itemset labels for now -->
+                        <xsl:variable name="id" select="./*[name()=$label-node-name]" />
+                        <xsl:call-template name="translations">
+                            <xsl:with-param name="id" select="$id"/>
+                            <xsl:with-param name="class" select="'option-label'"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="data-label-ref">
+                        <xsl:value-of select="$label-ref"/>
+                    </xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:text>
             </xsl:text>
-    </span>
+        </span>
   </xsl:template>
 
   <!--

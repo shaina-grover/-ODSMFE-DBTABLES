@@ -25,12 +25,6 @@
     </item>
     <item>
      <ID>I</ID>
-     <KEY>008</KEY>
-     <ENTRY>Base URL</ENTRY>
-     <LENGTH>132</LENGTH>
-    </item>
-    <item>
-     <ID>I</ID>
      <KEY>010</KEY>
      <ENTRY>keys</ENTRY>
      <LENGTH>132</LENGTH>
@@ -43,32 +37,44 @@
     </item>
     <item>
      <ID>I</ID>
-     <KEY>012</KEY>
-     <ENTRY>EntitySet</ENTRY>
-     <LENGTH>132</LENGTH>
-    </item>
-    <item>
-     <ID>I</ID>
      <KEY>013</KEY>
      <ENTRY>ClassName</ENTRY>
      <LENGTH>132</LENGTH>
     </item>
     <item>
      <ID>I</ID>
-     <KEY>014</KEY>
+     <KEY>016</KEY>
+     <ENTRY>DisplayName</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>017</KEY>
+     <ENTRY>EntitySet</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>018</KEY>
      <ENTRY>Store ID</ENTRY>
      <LENGTH>132</LENGTH>
     </item>
     <item>
      <ID>I</ID>
-     <KEY>015</KEY>
+     <KEY>019</KEY>
      <ENTRY>Store Name</ENTRY>
      <LENGTH>132</LENGTH>
     </item>
     <item>
      <ID>I</ID>
-     <KEY>016</KEY>
-     <ENTRY>DisplayName</ENTRY>
+     <KEY>020</KEY>
+     <ENTRY>Base URL</ENTRY>
+     <LENGTH>132</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>021</KEY>
+     <ENTRY>EnteredBy</ENTRY>
      <LENGTH>132</LENGTH>
     </item>
    </TPOOL>

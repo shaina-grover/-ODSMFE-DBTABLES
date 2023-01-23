@@ -24,7 +24,7 @@ ENDCLASS.
 CLASS /ODSMFE/CL_APPCONFIG IMPLEMENTATION.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_EXECUTE_QUERY.
+  METHOD /odsmfe/if_get_entityset~gmib_execute_query.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -33,10 +33,10 @@ CLASS /ODSMFE/CL_APPCONFIG IMPLEMENTATION.
 * Program Description    :Method to Execute the select query
 ***********************************************************************
 ********************** CHANGE HISTORY **********************
-* Program Author (SID)   :
-* Change Date            :
-* Transport No.          :
-* Change Description     :
+* Program Author (SID)   :ODS-VSANAGALA
+* Change Date            :02.01.2023
+* Transport No.          :ES1K903398
+* Change Description     :Mapping system userid to the related parameter to get the relevant data based on the UserID in the related services.
 ***********************************************************************
 * -----------------------------------------------------------------------*
 *                   D A T A   D E C L A R A T I O N                    *
@@ -49,7 +49,8 @@ CLASS /ODSMFE/CL_APPCONFIG IMPLEMENTATION.
           lst_filter_range TYPE /iwbep/s_cod_select_option,
           lit_appconfig    TYPE /odsmfe/cl_pr_appstore_mpc=>tt_applicationconfig.
 
-    FIELD-SYMBOLS: <lfsst_select> TYPE /odsmfe/if_get_entityset~gtyt_select.
+    FIELD-SYMBOLS: <lfsst_select> TYPE /odsmfe/if_get_entityset~gtyt_select,
+                   <lfsst_entity> TYPE /odsmfe/tb_apcon.
 
     DATA: lv_active  TYPE string.
 
@@ -94,8 +95,17 @@ CLASS /ODSMFE/CL_APPCONFIG IMPLEMENTATION.
             INTO CORRESPONDING FIELDS OF TABLE gitii_entityset
             FROM (lv_from)
             WHERE (lv_where_clause).
+
             IF sy-subrc EQ 0.
               me->/odsmfe/if_get_entityset~gmib_sort_data( ).
+
+*SOC by ODS-VSANAGALA - ES1K903398
+              "/ Mapping userid to the related parameter.
+              READ TABLE gitii_entityset ASSIGNING <lfsst_entity> WITH KEY param_name = 'BackEndUser'.
+              IF sy-subrc = 0 .
+                <lfsst_entity>-param_value = sy-uname.
+              ENDIF.
+*EOC by ODS-VSANAGALA - ES1K903398
 
               "/ Data Provider for ODATA Services
               GET REFERENCE OF gitii_entityset INTO ch_entityset.
@@ -104,7 +114,7 @@ CLASS /ODSMFE/CL_APPCONFIG IMPLEMENTATION.
             CHECK sy-subrc EQ 0.
         ENDTRY.
     ENDTRY.
-  endmethod.
+  ENDMETHOD.
 
 
   METHOD /odsmfe/if_get_entityset~gmib_get_additional_where.

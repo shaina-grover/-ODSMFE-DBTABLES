@@ -52,8 +52,10 @@ CLASS /ODSMFE/CL_WORKORDER IMPLEMENTATION.
 *    field-SYMBOLS
     FIELD-SYMBOLS : <lfsst_ls_return> TYPE /iwbep/s_mgw_select_option.
 * constants
-    CONSTANTS: lc_workordernumber TYPE string VALUE 'WorkOrderNumber',
-               lc_ordertype       TYPE string VALUE 'OrderType'.
+    CONSTANTS: lc_workordernumber TYPE string VALUE 'WorkOrderNumber', "WorkOrderNumber
+               lc_ordertype       TYPE string VALUE 'OrderType',
+               lc_i               TYPE char1  VALUE 'I',
+               lc_eq              TYPE char2  VALUE 'EQ'.
 *-------------------------------------------------------------
 * Main Section
 *-------------------------------------------------------------
@@ -78,9 +80,9 @@ CLASS /ODSMFE/CL_WORKORDER IMPLEMENTATION.
                 IMPORTING
                   output = lv_aufnr.
 
-              lrs_workorder-sign = text-002.
-              lrs_workorder-option = text-003.
-              lrs_workorder-low = lv_aufnr.
+              lrs_workorder-sign   = lc_i.
+              lrs_workorder-option = lc_eq.
+              lrs_workorder-low    = lv_aufnr.
               APPEND lrs_workorder TO lrs_filter_values-aufnr[].
               CLEAR: lst_select_options, lv_aufnr.
             ENDIF.
@@ -88,9 +90,10 @@ CLASS /ODSMFE/CL_WORKORDER IMPLEMENTATION.
         ENDIF.
       ENDIF.
     ENDIF.
-* Maps key fields to function module parameters
+
+    "/ Maps key fields to function module parameters
     IF im_key_tab IS NOT INITIAL.
-      READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = text-001.
+      READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_workordernumber.
       IF sy-subrc = 0 AND lst_key_tab-value IS NOT INITIAL.
         lv_aufnr = lst_key_tab-value.
 
@@ -101,19 +104,22 @@ CLASS /ODSMFE/CL_WORKORDER IMPLEMENTATION.
             IMPORTING
               output = lv_aufnr.
         ENDIF.
-        lrs_workorder-sign = text-002.
-        lrs_workorder-option = text-003.
-        lrs_workorder-low = lv_aufnr.
+        lrs_workorder-sign   = lc_i.
+        lrs_workorder-option = lc_eq.
+        lrs_workorder-low    = lv_aufnr.
         APPEND lrs_workorder TO lrs_filter_values-aufnr[].
       ENDIF.
     ENDIF.
+
     SELECT DISTINCT aufnr auart ktext
            FROM aufk
            INTO TABLE gitib_entity
            WHERE aufnr IN lrs_filter_values-aufnr[].
+
     IF sy-subrc NE 0.
       CLEAR gitib_entity.
     ENDIF.
+
     IF im_key_tab IS NOT INITIAL.
       READ TABLE gitib_entity INTO gstib_entity INDEX 1.
       GET REFERENCE OF gstib_entity INTO ex_entity.

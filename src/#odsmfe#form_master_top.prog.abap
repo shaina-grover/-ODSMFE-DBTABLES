@@ -55,7 +55,8 @@ DATA : git_int_tab1              TYPE STANDARD TABLE OF gtyt_int_tab1,
        gst_code_shorttexttab     TYPE bapiqpgr_qpct,
        git_code_shorttexttab     TYPE STANDARD TABLE OF bapiqpgr_qpct,
        git_code_longtexttab      TYPE STANDARD TABLE OF bapiqpgr_cd_ltxt,
-       gst_code_longtexttab      TYPE bapiqpgr_cd_ltxt.
+       gst_code_longtexttab      TYPE bapiqpgr_cd_ltxt,
+       gst_xml_tag               TYPE /odsmfe/tb_apcon.
 
 DATA: git_list  TYPE vrm_values,
       gst_list  TYPE vrm_value,
@@ -82,8 +83,9 @@ DATA :  go_ref_xsltp        TYPE REF TO cl_xslt_processor,
         go_doc_model_string TYPE REF TO string,
         gv_msg_count        TYPE i,
         gv_xml_form_string  TYPE xstring,
-        gv_xml_model_string TYPE xstring.
-DATA:   gv_selected_value   TYPE char30.
+        gv_xml_model_string TYPE xstring,
+        gv_selected_value   TYPE char30.
+
 * Variables
 DATA :                gv_subrc          TYPE sy-subrc , " ##NEEDED 701-nshyamala,
                       gv_xml_string     TYPE xstring,
@@ -137,9 +139,11 @@ DATA :                gv_subrc          TYPE sy-subrc , " ##NEEDED 701-nshyamala
                       gv_plnty          TYPE afko-plnty,
                       gv_plnnr          TYPE afko-plnnr,
                       gv_plnal          TYPE afko-plnal,
-                      gv_zaehl          TYPE afko-zaehl.
+                      gv_zaehl          TYPE afko-zaehl,
 *   EOC by ODS
-
+                      gv_xml_cb         TYPE char1,
+                      gv_cvalue         TYPE char255,
+                      gv_cvalue1        TYPE char255.
 
 * Constants
 CONSTANTS: gc_wild                TYPE char1 VALUE '%',
@@ -175,6 +179,7 @@ CONSTANTS: gc_wild                TYPE char1 VALUE '%',
            gc_a                   TYPE string VALUE 'A',
            gc_ref                 TYPE string VALUE 'ref',
            gc_end                 TYPE string VALUE 'end',
+           gc_group               TYPE string VALUE '_group',
            gc_p                   TYPE string VALUE 'P',
            gc_x                   TYPE char01 VALUE 'X',
            gc_s                   TYPE string VALUE 'S',
@@ -194,4 +199,10 @@ CONSTANTS: gc_wild                TYPE char1 VALUE '%',
            gc_equip               TYPE vrm_value-text VALUE 'EQUIPMENT', "++
            gc_floc                TYPE vrm_value-text VALUE 'FUNCTIONALLOC', "++
            gc_tasklist            TYPE vrm_value-text VALUE 'TASK LIST', "++ ES1K902363
-           gc_themegrid           TYPE string VALUE 'theme-grid'. "++ ES1K902363
+           gc_themegrid           TYPE string VALUE 'theme-grid', "++ ES1K902363
+           gc_xml_tag             TYPE string     VALUE 'CB_XML_TAG',
+           gc_label1              TYPE string     VALUE '-label',
+           gc_inst_id             TYPE string     VALUE 'instanceID',
+           gc_text                TYPE string     VALUE 'text',
+           gc_id                  TYPE string     VALUE 'id',
+           gc_value               TYPE string     VALUE 'value'.

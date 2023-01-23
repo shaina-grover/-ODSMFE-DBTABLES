@@ -89,6 +89,12 @@ CLASS /ODSMFE/CL_FORMMANUALASSIGNMNT IMPLEMENTATION.
           lit_response       TYPE STANDARD TABLE OF /odsmfe/tb_fmass,
           lst_formassignment TYPE ltys_formassignment,
           lv_roleid          TYPE /odsmfe/de_roleid.
+
+    constants:lc_pfcg_role   TYPE string value 'PFCG_ROLE',
+                   lc_x      TYPE char1 VALUE 'X',
+                  lc_true    TYPE string VALUE 'TRUE'.
+      data:	lv_pfcg_role   TYPE    /ods/value,
+        lo_auth type ref to /ods/cl_auth_utility.
 *-------------------------------------------------------------
 * Main Section
 *-------------------------------------------------------------
@@ -127,7 +133,32 @@ CLASS /ODSMFE/CL_FORMMANUALASSIGNMNT IMPLEMENTATION.
       IF lr_exchtab IS BOUND.
         DATA(ls_usrroletab) = lr_exchtab->get_userrole_tab( ).
 *--End of changes SKOTRA - ES1K902967
-*--Get Role ID
+* PFCG and ODS Role ID
+*--Start of changes - ES1K902967
+       SELECT SINGLE param_value
+          FROM /ods/app_config
+          INTO lv_pfcg_role
+          WHERE param_name = lc_pfcg_role
+          AND activeflag = lc_x.
+
+    IF sy-uname IS NOT INITIAL.
+      IF sy-uname EQ 'PPRIYANKA' AND lv_pfcg_role EQ lc_true.
+
+        DATA(lv_user) = sy-uname .
+      CREATE OBJECT lo_auth.
+     TRY.
+    CALL METHOD lo_auth->role_assignment    "Get PFCG Role ID
+                EXPORTING
+                       iv_uname = lv_user
+                 IMPORTING
+                         ev_field = DATA(lv_role)
+                        .
+        IF lv_role IS NOT INITIAL.
+          lst_form-roleid = lv_role.
+        ENDIF.
+      CATCH /iwbep/cx_mgw_busi_exception.
+      ENDTRY.
+      ELSE.
         SELECT SINGLE roleid FROM (ls_usrroletab-low) INTO lv_roleid " SKOTRA - ES1K902967
         WHERE userid = sy-uname
         AND startdate LE sy-datum
@@ -143,7 +174,8 @@ CLASS /ODSMFE/CL_FORMMANUALASSIGNMNT IMPLEMENTATION.
           CLEAR lst_form.
         ENDIF.
       ENDIF.
-
+   ENDIF.
+   endif.
     ENDIF.
 * Send the Form ID to Front end application
     gstib_entity-formid             = lst_formassignment-formid.
@@ -467,6 +499,14 @@ CLASS /ODSMFE/CL_FORMMANUALASSIGNMNT IMPLEMENTATION.
           lv_equipment          TYPE equnr,
           lv_functionallocation TYPE tplnr,
           lv_roleid             TYPE /odsmfe/de_roleid.
+
+     CONSTANTS:lc_pfcg_role TYPE string VALUE 'PFCG_ROLE',
+       lc_x         TYPE char1 VALUE 'X',
+       lc_true      TYPE string VALUE 'TRUE'.
+
+     DATA:  lv_pfcg_role   TYPE    /ods/value,
+            lo_auth TYPE REF TO /ods/cl_auth_utility.
+
 *-------------------------------------------------------------
 * Main Section
 *-------------------------------------------------------------
@@ -506,8 +546,35 @@ CLASS /ODSMFE/CL_FORMMANUALASSIGNMNT IMPLEMENTATION.
       DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
       IF lr_exchtab IS BOUND.
         DATA(ls_usrroletab) = lr_exchtab->get_userrole_tab( ).
-*--End of changes - SKOTRA ES1K902967
-*--Get Role ID
+
+
+*******PFCG and ODS Role ID
+*--Start of changes - ES1K902967
+       SELECT SINGLE param_value
+          FROM /ods/app_config
+          INTO lv_pfcg_role
+          WHERE param_name = lc_pfcg_role
+          AND activeflag = lc_x.
+
+    IF sy-uname IS NOT INITIAL.
+      IF sy-uname EQ 'PPRIYANKA' AND lv_pfcg_role EQ lc_true.
+
+        DATA(lv_user) = sy-uname .
+      CREATE OBJECT lo_auth.
+     TRY.
+    CALL METHOD lo_auth->role_assignment    "Get PFCG Role ID
+                EXPORTING
+                       iv_uname = lv_user
+                 IMPORTING
+                         ev_field = DATA(lv_role)
+                        .
+        IF lv_role IS NOT INITIAL.
+          lst_form-roleid = lv_role.
+        ENDIF.
+      CATCH /iwbep/cx_mgw_busi_exception.
+      ENDTRY.
+      ELSE.
+
         SELECT SINGLE roleid FROM (ls_usrroletab-low) INTO lv_roleid " SKOTRA ES1K902967
         WHERE userid = sy-uname
         AND startdate LE sy-datum
@@ -515,6 +582,8 @@ CLASS /ODSMFE/CL_FORMMANUALASSIGNMNT IMPLEMENTATION.
         IF sy-subrc = 0.
           lst_form-roleid = lv_roleid.
         ENDIF.
+      ENDIF.
+      ENDIF.
       ENDIF.
 
 * Fetching data from table /odsmfe/tb_fmass
@@ -675,12 +744,18 @@ CLASS /ODSMFE/CL_FORMMANUALASSIGNMNT IMPLEMENTATION.
     IF lit_entity_temp IS NOT INITIAL .
       LOOP AT lit_entity_temp INTO lst_entity_temp.
         MOVE-CORRESPONDING lst_entity_temp TO gstib_entity.
+        IF gstib_entity-assignedtime EQ space.
+          CLEAR gstib_entity-assignedtime.
+        ENDIF.
         APPEND gstib_entity TO gitib_entity.
         CLEAR: lst_entity_temp,gstib_entity.
       ENDLOOP.
 
       LOOP AT lit_entity_temp INTO lst_entity_temp WHERE deleted IS NOT INITIAL.
         MOVE-CORRESPONDING lst_entity_temp TO gstib_del_entity.
+        IF gstib_del_entity-assignedtime EQ space.
+          CLEAR gstib_del_entity-assignedtime.
+        ENDIF.
         APPEND gstib_del_entity TO gitib_del_entity.
         CLEAR: lst_entity_temp,gstib_del_entity.
       ENDLOOP.
