@@ -41,6 +41,12 @@ CLASS /ODSMFE/CL_FORMASSINGMENT IMPLEMENTATION.
 * Transport No.          :  ES1K902969
 * Change Description     :  Refactoring SP07
 ***********************************************************************
+********************** CHANGE HISTORY **********************************
+* Program Author (SID)   :PPRIYANKA
+* Change Date            :03/03/2023
+* Transport No.          :ES1K903619
+* Change Description     :Logic to fetch userrole via PFCG
+************************************************************************
 *-------------------------------------------------------------
 *  Data declaration
 *-------------------------------------------------------------
@@ -57,29 +63,77 @@ CLASS /ODSMFE/CL_FORMASSINGMENT IMPLEMENTATION.
           lst_filter_vals TYPE /odsmfe/tb_filtr.
 
     FIELD-SYMBOLS:  <lfsst_entity> TYPE /odsmfe/cl_pr_formui_mpc=>ts_formassingment. "++ES1K902499
+**********Data and Constant declartion - To fetch userrole via PFCG************
+*    Check if table is active or not in table odsmfe/tb_apcon
+
+    CONSTANTS:lc_pfcg_role TYPE string VALUE 'PFCG_ROLE',
+              lc_meth      TYPE string VALUE 'ROLE_ASSIGNMENT',
+              lc_true      TYPE string VALUE 'TRUE'.
+
+    DATA :  lv_pfcg_role TYPE  /odsmfe/de_mfe_value,
+            lv_class     TYPE  /odsmfe/de_mfe_value,
+            lo_auth      TYPE REF TO object,
+            lv_user      TYPE uname,
+            lv_role      TYPE agval.       "agrfield
+
+**********End of Data and Constant declartion - To fetch userrole via PFCG ***********
 *-------------------------------------------------------------
 * Main Section
 *-------------------------------------------------------------
 
 * Get the Logged in User details
     lv_mobileuser = sy-uname.
+**********Start of Modificaion- TO fetch userrole via PFCG *************
+    SELECT SINGLE param_value
+       FROM /odsmfe/tb_apcon
+       INTO lv_pfcg_role
+       WHERE param_name = lc_pfcg_role
+       AND active = lc_x.
+
+    IF sy-subrc = 0.
+      IF lv_pfcg_role EQ lc_true.
+        lv_user = lv_mobileuser.
+        SELECT SINGLE param_value
+                FROM /odsmfe/tb_apcon
+                INTO lv_class
+                WHERE param_name = lc_meth
+                AND active = lc_x.
+        IF sy-subrc EQ 0.
+          CREATE OBJECT lo_auth TYPE (lv_class).
+        ENDIF.
+        TRY.
+            CALL METHOD lo_auth->(lc_meth)    "Get PFCG Role ID
+              EXPORTING
+                iv_uname = lv_user
+              IMPORTING
+                ev_field = lv_role.
+            IF lv_role IS NOT INITIAL.
+              lv_userrole = lv_role.
+            ENDIF.
+          CATCH /iwbep/cx_mgw_busi_exception.
+        ENDTRY.
+      ENDIF.
+**********End of Modificaion- TO fetch userrole via PFCG - ES1K903522*****************
+    ELSE.
 *--Start of changes SKOTRA - ES1K902967
 *--Get reference for fetching value of user role table
-    DATA: ls_usrroletab TYPE /odsmfe/cl_exchmechwo=>gty_roles.
-    DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
-    IF lr_exchtab IS BOUND.
-      ls_usrroletab = lr_exchtab->get_userrole_tab( ).
-      CONCATENATE ls_usrroletab-low 'AS a INNER JOIN' ls_usrroletab-high 'AS b ON a~roleid = b~roleid' INTO DATA(lv_userroles) SEPARATED BY space.
+      DATA: ls_usrroletab TYPE /odsmfe/cl_exchmechwo=>gty_roles.
+      DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
+      IF lr_exchtab IS BOUND.
+        ls_usrroletab = lr_exchtab->get_userrole_tab( ).
+        CONCATENATE ls_usrroletab-low 'AS a INNER JOIN' ls_usrroletab-high 'AS b ON a~roleid = b~roleid' INTO DATA(lv_userroles) SEPARATED BY space.
 *--End of changes SKOTRA - ES1K902967
 * check User Roles, Assignment type and Dashboard ID
-      SELECT SINGLE a~roleid
-            FROM  (lv_userroles) "Changes SKOTRA - ES1K902969
-            INTO lv_userrole
-            WHERE a~userid = lv_mobileuser.
-      IF sy-subrc NE 0.
-        CLEAR lv_userrole.
-      ENDIF.
-    ENDIF. "Changes SKOTRA - ES1K902969
+        SELECT SINGLE a~roleid
+              FROM  (lv_userroles) "Changes SKOTRA - ES1K902969
+              INTO lv_userrole
+              WHERE a~userid = lv_mobileuser.
+        IF sy-subrc NE 0.
+          CLEAR lv_userrole.
+        ENDIF.
+      ENDIF. "Changes SKOTRA - ES1K902969
+    ENDIF.
+
     SELECT * FROM /odsmfe/tb_foass
              INTO TABLE gitib_entity
              WHERE formid NE space

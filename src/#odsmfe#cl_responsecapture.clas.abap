@@ -108,6 +108,18 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 * Change Description     : Added logic to check postnotification and
 *                          Enabling forms for task list assignment .
 ***********************************************************************
+********************** CHANGE HISTORY **********************************
+* Program Author (SID)   :PPRIYANKA
+* Change Date            :27/01/2023
+* Transport No.          :ES1K903522
+* Change Description     :Logic to fetch userrole via PFCG
+************************************************************************
+********************** CHANGE HISTORY **********************************
+* Program Author (SID)   : ODS-VSANAGALA
+* Change Date            : 24.02.2023
+* Transport No.          : ES1K903619
+* Change Description     : Added logic to update the Notification exchange table and Create the Response for the Notification.
+************************************************************************
 *-------------------------------------------------------------
 *  Data declaration
 *-------------------------------------------------------------
@@ -135,6 +147,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
              isdraft      TYPE c LENGTH 1,
              counter      TYPE /odsmfe/de_counter,
              remarks      TYPE /odsmfe/de_remark,
+             auart        TYPE aufart, "Added by ODS-VSANAGALA - ES1K903619
            END OF ltys_responsecapture.
 
     DATA: lst_response     TYPE /odsmfe/tb_forsp,
@@ -176,10 +189,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
                lc_a    TYPE char1 VALUE 'A',
                lc_low1 TYPE char1 VALUE '1',
                lc_low2 TYPE char1 VALUE '2',
-               lc_low3 TYPE char1 VALUE '3',
-               lc_pfcg_role TYPE string VALUE 'PFCG_ROLE',
-               lc_x   TYPE char1 VALUE 'X',
-               lc_true TYPE string VALUE 'TRUE'.
+               lc_low3 TYPE char1 VALUE '3'.
 
     DATA : lv_date1           TYPE datum,        "Date
            lv_time1           TYPE uzeit,        "Time
@@ -191,11 +201,22 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
            lv_wo              TYPE aufnr,
            lv_form_date       TYPE datum,
            lv_form_time       TYPE uzeit,
-           lt_return_email    TYPE TABLE OF bapiret2,
-           lv_pfcg_role       TYPE    /ods/value.
+           lt_return_email    TYPE TABLE OF bapiret2.
+* **********Data and Constant declartion - To fetch userrole via PFCG - ES1K903522
+*    Check if table is active or not in table odsmfe/tb_apcon
+    CONSTANTS:lc_pfcg_role TYPE string VALUE 'PFCG_ROLE',
+              lc_meth      TYPE string VALUE 'ROLE_ASSIGNMENT',
+              lc_x         TYPE char1 VALUE 'X',
+              lc_true      TYPE string VALUE 'TRUE'.
 
-     DATA: lo_auth TYPE REF TO /ods/cl_auth_utility."Reference to class for calling role assinment method
+    DATA :  lv_pfcg_role TYPE  /odsmfe/de_mfe_value,
+            lv_class     TYPE  /odsmfe/de_mfe_value,
+            lo_auth      TYPE REF TO object,
+            lv_user      TYPE uname,
+            lv_role      TYPE agval,       "agrfield
+            lv_workorder TYPE aufnr.  "Added by ODS-VSANAGALA - ES1K903619
 
+**********End of Data and Constant declartion - To fetch userrole via PFCG - ES1K903522
 
 *-------------------------------------------------------------
 * Main Section
@@ -218,11 +239,29 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
         CONCATENATE lv_date1 lv_time1 INTO lv_sys_time_token1.
 
         lv_wo = lst_formresponse-wo_num.
-        CALL FUNCTION 'CONVERSION_EXIT_ALPHA_OUTPUT'
-          EXPORTING
-            input  = lv_wo
-          IMPORTING
-            output = lv_wo.
+
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        SELECT SINGLE aufnr FROM aufk INTO lv_workorder
+          WHERE aufnr = lv_wo.
+
+        IF sy-subrc = 0.
+          "/ Conversion for the Work Order
+          CALL FUNCTION 'CONVERSION_EXIT_ALPHA_OUTPUT'
+            EXPORTING
+              input  = lv_wo
+            IMPORTING
+              output = lv_wo.
+        ELSE.
+          IF lv_wo IS NOT INITIAL.
+            "/ Conversion for the Notification
+            CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+              EXPORTING
+                input  = lv_wo
+              IMPORTING
+                output = lv_wo.
+          ENDIF. "/ IF lv_wo IS NOT INITIAL.
+        ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 
         CONCATENATE 'SAP' lv_wo lv_sys_time_token1 INTO lst_formresponse-instanceid SEPARATED BY '_'.
         CONCATENATE 'SAP' lv_wo lv_sys_time_token1 INTO lst_response-instanceid SEPARATED BY '_'.
@@ -252,47 +291,57 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
       lst_response-counter     = lst_formresponse-counter.
       lst_response-isdraft     = lst_formresponse-isdraft.      "for saving form in Draft
       lst_response-remarks     = lst_formresponse-remarks.
-* Get PFCG and ODS Role ID
-*--Start of changes - ES1K902967
+      "/ SOC by ODS-VSANAGALA
+      lst_response-order_type  = lst_formresponse-auart.
+      "/ EOC by ODS-VSANAGALA
+
+**********Start of Modificaion- TO fetch userrole via PFCG - ES1K903522*************
       SELECT SINGLE param_value
-          FROM /ods/app_config
+          FROM /odsmfe/tb_apcon
           INTO lv_pfcg_role
           WHERE param_name = lc_pfcg_role
-          AND activeflag = lc_x.
+          AND active = lc_x.
 
-    IF sy-uname IS NOT INITIAL.
-      IF sy-uname EQ 'PPRIYANKA' AND lv_pfcg_role EQ lc_true.
-
-        DATA(lv_user) = sy-uname .
-      CREATE OBJECT lo_auth.
-     TRY.
-    CALL METHOD lo_auth->role_assignment    "Get PFCG Role ID
+      IF sy-subrc = 0.
+        IF lv_pfcg_role EQ lc_true.
+          lv_user = sy-uname .
+          SELECT SINGLE param_value
+           FROM /odsmfe/tb_apcon
+           INTO lv_class
+           WHERE param_name = lc_meth
+           AND active = lc_x.
+          IF sy-subrc EQ 0.
+            CREATE OBJECT lo_auth TYPE (lv_class).
+          ENDIF.
+          TRY.
+              CALL METHOD lo_auth->(lc_meth)    "Get PFCG Role ID
                 EXPORTING
-                       iv_uname = lv_user
-                 IMPORTING
-                         ev_field = DATA(lv_role)
-                        .
-        IF lv_role IS NOT INITIAL.
-          lst_response-roleid = lv_role.
-        ENDIF.
-      CATCH /iwbep/cx_mgw_busi_exception.
-      ENDTRY.
-      ELSE.
+                  iv_uname = lv_user
+                IMPORTING
+                  ev_field = lv_role.
+              IF lv_role IS NOT INITIAL.
+                lst_response-roleid = lv_role.
+              ENDIF.
+            CATCH /iwbep/cx_mgw_busi_exception.
+          ENDTRY.
+**********End of Modificaion- TO fetch userrole via PFCG - ES1K903522***************
+        ELSE.
 *--Get reference for fetching value of user role table
-      DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
-      DATA(lv_usrroletab) = lr_exchtab->get_userrole_tab( ).
-      IF lr_exchtab IS BOUND.
-*--Get Role ID
-        SELECT SINGLE roleid FROM (lv_usrroletab-low) INTO lv_roleid
-            WHERE userid = sy-uname
-            AND startdate LE sy-datum
-            AND enddate GE sy-datum.
-        IF sy-subrc = 0.
-          lst_response-roleid = lv_roleid.
+          DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
+          DATA(lv_usrroletab) = lr_exchtab->get_userrole_tab( ).
+          IF lr_exchtab IS BOUND.
+* Get  ODS Role ID
+*--Start of changes - ES1K902967
+            SELECT SINGLE roleid FROM (lv_usrroletab-low) INTO lv_roleid
+                WHERE userid = sy-uname
+                AND startdate LE sy-datum
+                AND enddate GE sy-datum.
+            IF sy-subrc = 0.
+              lst_response-roleid = lv_roleid.
+            ENDIF.
+          ENDIF.
         ENDIF.
-      ENDIF.
-     ENDIF.
-     ENDIF.
+      ENDIF. "/IF sy-subrc = 0.
 *--End of changes - ES1K902967
 
       IF lst_formresponse-created_on IS NOT INITIAL.
@@ -355,15 +404,31 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
             CLEAR lst_response.
           ENDIF.
         ENDIF.
-        " updating work order exchange table
-        IF lst_response-wo_num IS NOT INITIAL.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        SELECT SINGLE aufnr FROM aufk INTO lv_workorder WHERE aufnr = lst_response-wo_num.
+        IF sy-subrc = 0 AND lv_workorder IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+*        IF lst_response-wo_num IS NOT INITIAL.      "Commented by ODS-VSANAGALA - ES1K903619
 *--Start of changes - ES1K902967
+          " updating work order exchange table
           IF lr_exchtab IS BOUND.
-            lr_exchtab->exch_table_update( lst_response-wo_num ).
+            lr_exchtab->exch_table_update( lv_workorder ).
           ENDIF.
 *--End of changes - ES1K902967
-        ENDIF.
 
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        ELSE.
+          SELECT SINGLE qmnum INTO lv_qmnum FROM qmel WHERE qmnum = lst_response-wo_num.
+          IF sy-subrc = 0 AND lv_qmnum IS NOT INITIAL.
+            "/ Updating notification exchange table
+            IF lr_exchtab IS BOUND.
+              lr_exchtab->exch_table_update_notification( lv_qmnum ).
+            ENDIF.
+          ENDIF. "/ IF sy-subrc = 0 AND lv_qmnum IS NOT INITIAL.
+        ENDIF. "/ IF sy-subrc = 0 AND lst_response-wo_num IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
       ENDIF.
 
       IF lst_formresponse-nonobjtype IS INITIAL.
@@ -371,12 +436,18 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
         SELECT SINGLE low FROM /odsmfe/tb_filtr INTO lv_postnotification
              WHERE entitysetname = 'ResponseCaptureSet' AND field = 'POSTNOTIFICATION'.
 
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        IF lv_workorder IS NOT INITIAL.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 * Wo Number
-        lv_aufnr = lst_response-wo_num.
+          lv_aufnr = lst_response-wo_num.
 
 * Get the Notification number from work order number
-        SELECT SINGLE qmnum INTO lv_qmnum FROM afih
-        WHERE aufnr = lv_aufnr.
+          SELECT SINGLE qmnum INTO lv_qmnum FROM afih
+          WHERE aufnr = lv_aufnr.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        ENDIF.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 
 * Update Work Order Notification
         IF lv_postnotification = abap_true AND lv_qmnum IS NOT INITIAL.
@@ -391,12 +462,13 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
           ENDIF."++ ODS  ES1K902363
 *         EOC ODS ++ ES1K902363
 
-          IF lst_response-isdraft IS INITIAL OR lv_postnotif IS NOT INITIAL.                        "Do not update notification activity if flag is set as 'X'
+          IF lst_response-isdraft IS INITIAL OR lv_postnotif IS NOT INITIAL.  "Do not update notification activity if flag is set as 'X'
 
             CALL METHOD me->gmib_parse_responsedata
               EXPORTING
                 im_responsedata = lst_response-responsedata
-                im_wonum        = lst_response-wo_num
+*               im_wonum        = lst_response-wo_num         "Commented by ODS-VSANAGALA - ES1K903619
+                im_wonum        = lv_workorder
                 im_qmnum        = lv_qmnum
                 im_formid       = lst_response-formid
                 im_version      = lst_response-version
@@ -425,12 +497,481 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 * Send the instance ID to Front end application
       gstib_entity-instanceid = lst_response-instanceid.
       GET REFERENCE OF gstib_entity INTO ex_entity.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      IF lv_workorder IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 *--Update Equipment Characterstics
 *--Update the characterstics of Equipment based on the table content
 *--KMADHURI
+        SELECT SINGLE postcharacteristics FROM /odsmfe/tb_foass INTO lv_postchar
+         WHERE formid EQ lst_formresponse-formid
+           AND version EQ lst_formresponse-version.
+        IF sy-subrc = 0 AND lv_postchar IS NOT INITIAL.
+          DATA: lt_return   TYPE bapiret2,
+                lt_return1  TYPE bapiret2_t,
+                lt_xml_data TYPE TABLE OF smum_xmltb,
+                lt_char     TYPE /odsmfe/eq_char_tt,
+                ls_char     TYPE /odsmfe/eq_char,
+                lo_msg1     TYPE REF TO cx_root,
+                lo_msg      TYPE REF TO cx_root,
+                lv_msg1     TYPE string,
+                lt_return2  TYPE STANDARD TABLE OF bapiret2.                    "Return Parameter
+*
+          SELECT *
+            FROM /odsmfe/tb_focha INTO TABLE @DATA(lt_char1)
+                              WHERE formid EQ @lst_formresponse-formid
+                              AND version EQ @lst_formresponse-version.
+          IF sy-subrc = 0.
+            IF NOT lt_char1 IS INITIAL.
+*--Convert the repsonse data to internal table data
+              CLEAR: lt_return1.
+              TRY.
+                  CALL METHOD me->gmib_get_xml_content
+                    EXPORTING
+                      im_responsedata = lst_response-responsedata
+                    IMPORTING
+                      ex_xml_data     = lt_xml_data
+                      ex_return       = lt_return1.
+                  IF lt_return1 IS NOT INITIAL.
+*--Catch exceptions
+                    DELETE lt_return1 WHERE type NE lc_e OR type = lc_a.
+                    IF lt_return1 IS NOT INITIAL.
+                      lo_error = /iwbep/cl_mgw_msg_container=>get_mgw_msg_container( ).
+
+                      lo_error->add_messages_from_bapi( EXPORTING it_bapi_messages = lt_return2
+                        iv_determine_leading_msg = /iwbep/if_message_container=>gcs_leading_msg_search_option-first
+                        iv_add_to_response_header = abap_true ).
+
+                      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                        EXPORTING
+                          message_container = lo_error.
+                    ENDIF.
+                  ENDIF.
+
+
+                CATCH /iwbep/cx_mgw_busi_exception INTO lo_msg. " Business Exception
+                  CLEAR lv_msg.
+                  lo_msg->get_text( RECEIVING result = lv_msg ).
+                  lo_msg->get_longtext( RECEIVING result = lv_msg ).
+                  MESSAGE lv_msg TYPE 'I'.
+
+                CATCH /iwbep/cx_mgw_tech_exception INTO lo_msg1. " Technical Exception
+                  CLEAR lv_msg1.
+                  lo_msg1->get_text( RECEIVING result = lv_msg1 ).
+                  lo_msg1->get_longtext( RECEIVING result = lv_msg1 ).
+                  MESSAGE lv_msg1 TYPE 'I'.
+              ENDTRY.
+*--Prepare internal table to send to new class for equipment char update
+              LOOP AT lt_xml_data INTO DATA(ls_xml).
+                MOVE ls_xml-cname TO ls_char-name.
+                MOVE ls_xml-cvalue TO ls_char-value.
+                TRANSLATE ls_xml-cname TO UPPER CASE.
+                LOOP AT lt_char1 INTO DATA(ls_char1) WHERE field = ls_xml-cname.
+                  MOVE ls_xml-cvalue  TO ls_char-value.
+                  MOVE-CORRESPONDING ls_char1 TO ls_char.
+                  APPEND ls_char TO lt_char.
+                  CLEAR : ls_char1.
+                ENDLOOP.
+
+              ENDLOOP.
+*--Method to update characterstics
+              CALL METHOD me->equipment_char_update
+                EXPORTING
+                  im_workorder = lst_response-wo_num
+                  im_char      = lt_char
+                IMPORTING
+                  ex_return    = lt_return.
+              CLEAR: lt_return, lt_char.
+*--Update Equipment
+            ENDIF.
+          ENDIF.
+*--end of changes
+        ENDIF.
+      ENDIF.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+    ENDIF. "/ IF lv_workorder IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+  ENDMETHOD.
+
+
+  METHOD /odsmfe/if_get_entityset_bapi~gmib_delete_entityset.
+
+    DATA: lit_key_tab TYPE /iwbep/t_mgw_name_value_pair,
+          lst_key_tab TYPE /iwbep/s_mgw_name_value_pair.
+
+    DATA: lv_instanceid TYPE /odsmfe/de_instanceid,
+          lv_aufnr      TYPE aufnr,
+          lv_deleted    TYPE char1.
+
+    lit_key_tab = im_key_tab.
+    SORT lit_key_tab BY name.
+
+    "/Work Order Num
+    READ TABLE lit_key_tab INTO lst_key_tab WITH KEY name = 'InstanceID' BINARY SEARCH.
+    IF sy-subrc = 0 AND lst_key_tab-value IS NOT INITIAL.
+      lv_instanceid = lst_key_tab-value.
+    ENDIF.
+
+    "/Update entry from Response capture as deleted
+    lv_deleted = abap_true.
+    UPDATE /odsmfe/tb_forsp SET deleted = lv_deleted
+      WHERE instanceid =  lv_instanceid.
+
+* Update Exchange Table
+    SELECT SINGLE wo_num FROM /odsmfe/tb_forsp INTO lv_aufnr
+      WHERE instanceid = lv_instanceid.
+
+    IF lv_aufnr IS NOT INITIAL.
+      DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
+      IF lr_exchtab IS BOUND.
+        lr_exchtab->exch_table_update( lv_aufnr ).
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD /odsmfe/if_get_entityset_bapi~gmib_modify_entityset.
+
+***********************************************************************
+********************** CREATED HISTORY ********************************
+* Program Author (SID)   :  ODS
+* Creation Date          :  12/05/2020
+* Transport No.          : ES1K901774
+* Program Description    : updates forms data in service
+***********************************************************************
+********************** CHANGE HISTORY *********************************
+* Program Author (SID)   : ODS
+* Change Date            : 29/09/2020
+* Transport No.          : ES1K902140
+* Change Description     : Added logic to update work order exchange table
+***********************************************************************
+* Program Author (SID)   : ODS
+* Change Date            : 14/12/2020
+* Transport No.          : ES1K902363
+* Change Description     : Enabling forms for task list assignment
+***********************************************************************
+********************** CHANGE HISTORY **********************************
+* Program Author (SID)   :PPRIYANKA
+* Change Date            :27/01/2023
+* Transport No.          :ES1K903522
+* Change Description     :Logic to fetch userrole via PFCG
+************************************************************************
+********************** CHANGE HISTORY **********************************
+* Program Author (SID)   : ODS-VSANAGALA
+* Change Date            : 24.02.2023
+* Transport No.          : ES1K903619
+* Change Description     : Added logic to update the Notification exchange table and update the order type.
+************************************************************************
+*----------------------------------------------------------------------
+*  Data declaration
+*----------------------------------------------------------------------
+    TYPES:
+      BEGIN OF ltys_responsecapture,
+        instanceid      TYPE c LENGTH 50,
+        formid          TYPE /odsmfe/tb_forsp-formid, "++ES1K902499
+        version         TYPE c LENGTH 3,
+        wo_num          TYPE c LENGTH 12,
+        vornr           TYPE c LENGTH 4,
+*  SOC by ODS ++ES1K902363
+        tasklisttype    TYPE  plnty,
+        group           TYPE plnnr,
+        groupcounter    TYPE  plnal,
+*        internalcounter TYPE cim_count, "++ES1K902499
+        internalcounter TYPE char8,      "++ES1K902499
+* EOC by ODS ++ES1K902363
+        equnr           TYPE c LENGTH 18,
+        tplnr           TYPE c LENGTH 30, "ODS- ES1K902140
+        responsedata    TYPE string,
+        created_on      TYPE timestamp,
+        created_by      TYPE c LENGTH 50,
+        modified_on     TYPE timestamp,
+        modified_by     TYPE c LENGTH 50,
+        nonobjtype      TYPE /odsmfe/tb_forsp-nonobjtype,
+        isdraft         TYPE c LENGTH 1,
+        counter         TYPE /odsmfe/de_counter,
+        remarks         TYPE /odsmfe/de_remark,
+        auart           TYPE aufart, " Added by ODS-VSANAGALA - For DRL-ES1K903619
+      END OF ltys_responsecapture.
+
+    DATA: lst_response     TYPE /odsmfe/tb_forsp,
+          lst_formresponse TYPE ltys_responsecapture,
+          lit_return       TYPE STANDARD TABLE OF bapiret2,
+          lit_return1      TYPE STANDARD TABLE OF bapiret2,
+          lt_return_email  TYPE STANDARD TABLE OF bapiret2.
+
+
+* Class
+    DATA: lo_error           TYPE REF TO /iwbep/if_message_container.
+* Variables
+    DATA: lv_message          TYPE bapi_msg,
+          lv_msg              TYPE char128,
+          lv_postnotification TYPE char1,
+          lv_cdate            TYPE sy-datlo,
+          lv_mdate            TYPE sy-datlo,
+          lv_ctime            TYPE sy-timlo,
+          lv_mtime            TYPE sy-timlo,
+          lv_roleid           TYPE /odsmfe/de_roleid,
+          lv_instanceid       TYPE char50,
+          " soc "++ES1K902140
+          lv_date             TYPE datum,        "Date
+          lv_time             TYPE uzeit,        "Time
+          lv_sys_time_token   TYPE string,
+          lv_count            TYPE i,
+          lv_sys_tzone        TYPE tznzonesys,   "System Time Zone
+          lv_postchar         TYPE char1,
+          lv_timestamp        TYPE timestamp.    "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)
+    " eoc "++ES1K902140
+    DATA: lv_aufnr     TYPE aufnr,
+          lv_qmnum     TYPE qmnum,
+          lv_workorder TYPE aufnr. " Added by ODS-VSANAGALA - ES1K903619
+
+    DATA: lv_form_date TYPE datum,
+          lv_form_time TYPE uzeit.
+* Constants
+    CONSTANTS: lc_i                  TYPE char1 VALUE 'I',
+               lc_wi                 TYPE char2 VALUE 'WI',
+               lc_aewi               TYPE char4 VALUE 'AEWI',
+               lc_w                  TYPE char1 VALUE 'W',
+               lc_e                  TYPE char1 VALUE 'E',
+               lc_a                  TYPE char1 VALUE 'A',
+               lc_low1               TYPE char1 VALUE '1',
+               lc_low2               TYPE char1 VALUE '2',
+               lc_low3               TYPE char1 VALUE '3',
+               lc_responsecaptureset TYPE /iwbep/sbdm_node_name VALUE 'ResponseCaptureSet',
+               lc_postnotification   TYPE /odsmfe/de_mfe_fieldname VALUE 'POSTNOTIFICATION'.
+**********Data and Constant declartion - To fetch userrole via PFCG - ES1K903522
+*    Check if table is active or not in table odsmfe/tb_apcon
+
+    CONSTANTS:  lc_pfcg_role TYPE string VALUE 'PFCG_ROLE',
+                lc_meth      TYPE string VALUE 'ROLE_ASSIGNMENT',
+                lc_x         TYPE char1 VALUE 'X',
+                lc_true      TYPE string VALUE 'TRUE'.
+
+    DATA :  lv_pfcg_role TYPE  /odsmfe/de_mfe_value,
+            lv_class     TYPE  /odsmfe/de_mfe_value,
+            lo_auth      TYPE REF TO object,
+            lv_user      TYPE uname,
+            lv_role      TYPE agval.       "agrfield
+**********End of Data and Constant declartion - To fetch userrole via PFCG - ES1K903522
+*-------------------------------------------------------------
+* Main Section
+*-------------------------------------------------------------
+    im_data_provider->read_entry_data( IMPORTING es_data = lst_formresponse ).
+    IF lst_formresponse IS NOT INITIAL.
+      lst_response-instanceid = lst_formresponse-instanceid.
+      lst_response-formid     = lst_formresponse-formid.
+      lst_response-version    = lst_formresponse-version.
+      TRANSLATE lst_formresponse-responsedata TO UPPER CASE.
+      lst_response-responsedata = lst_formresponse-responsedata.
+      lst_response-wo_num       = lst_formresponse-wo_num.
+      lst_response-vornr        = lst_formresponse-vornr.
+* SOC by ODS ++ES1K902363
+      lst_response-plnty = lst_formresponse-tasklisttype.
+      lst_response-plnnr = lst_formresponse-group.
+      lst_response-plnal = lst_formresponse-groupcounter.
+      lst_response-zaehl = lst_formresponse-internalcounter.
+* EOC by ODS ++ES1K902363
+      lst_response-equnr        = lst_formresponse-equnr.
+      lst_response-tplnr = lst_formresponse-tplnr."++ES1K902140
+      lst_response-created_on   = lst_formresponse-created_on.
+      TRANSLATE lst_formresponse-created_by TO UPPER CASE.
+      lst_response-created_by  = sy-uname."++ES1K902140
+      lst_response-modified_on = lst_formresponse-modified_on.
+      TRANSLATE lst_formresponse-modified_by TO UPPER CASE.
+      lst_response-modified_by = sy-uname.
+      lst_response-nonobjtype  = lst_formresponse-nonobjtype.
+      lst_response-counter     = lst_formresponse-counter.
+      lst_response-isdraft     = lst_formresponse-isdraft.
+      lst_response-remarks     = lst_formresponse-remarks.
+      lst_response-order_type  = lst_formresponse-auart. "Added by ODS-VSANAGALA - ES1K903619
+**********Start of Modificaion- TO fetch userrole via PFCG - ES1K903522*****************
+      SELECT SINGLE param_value
+         FROM /odsmfe/tb_apcon
+         INTO lv_pfcg_role
+         WHERE param_name = lc_pfcg_role
+         AND active = lc_x.
+
+      IF sy-subrc = 0.
+        IF lv_pfcg_role EQ lc_true.
+          lv_user = sy-uname .
+          SELECT SINGLE param_value
+              FROM /odsmfe/tb_apcon
+              INTO lv_class
+              WHERE param_name = lc_meth
+              AND active = lc_x.
+          IF sy-subrc EQ 0.
+            CREATE OBJECT lo_auth TYPE (lv_class).
+          ENDIF.
+          TRY.
+              CALL METHOD lo_auth->(lc_meth)    "Get PFCG Role ID
+                EXPORTING
+                  iv_uname = lv_user
+                IMPORTING
+                  ev_field = lv_role.
+              IF lv_role IS NOT INITIAL.
+                lst_response-roleid = lv_role.
+              ENDIF.
+            CATCH /iwbep/cx_mgw_busi_exception.
+          ENDTRY.
+**********End of Modificaion- TO fetch userrole via PFCG - ES1K903522*****************
+        ELSE.
+* ODS Role ID
+*--Start of changes - ES1K902967
+*--Get reference for fetching value of user role table
+          DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
+          IF lr_exchtab IS BOUND.
+            DATA(lv_usrroletab) = lr_exchtab->get_userrole_tab( ).
+*--End of changes - ES1K902967
+*--Get Role ID
+            SELECT SINGLE roleid FROM (lv_usrroletab-low) INTO lv_roleid " ES1K902967
+            WHERE userid = sy-uname
+            AND startdate LE sy-datum
+            AND enddate GE sy-datum.
+            IF sy-subrc = 0.
+              lst_response-roleid = lv_roleid.
+            ENDIF.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+
+      IF lst_formresponse-created_on IS NOT INITIAL.
+* Converting timestamp into date and time
+        CALL FUNCTION 'ABI_TIMESTAMP_CONVERT_FROM'
+          EXPORTING
+            iv_timestamp     = lst_formresponse-created_on
+          IMPORTING
+            o_date           = lv_cdate
+            o_time           = lv_ctime
+          EXCEPTIONS
+            conversion_error = 1
+            OTHERS           = 2.
+        IF sy-subrc = 0.
+          lst_response-created_date = lv_cdate.
+          lst_response-created_time = lv_ctime.
+          lv_form_date  = lv_cdate.
+          lv_form_time = lv_ctime.
+        ENDIF.
+      ENDIF.
+
+      IF lst_formresponse-modified_on IS NOT INITIAL.
+* Converting timestamp into date and time
+        CALL FUNCTION 'ABI_TIMESTAMP_CONVERT_FROM'
+          EXPORTING
+            iv_timestamp     = lst_formresponse-modified_on
+          IMPORTING
+            o_date           = lv_mdate
+            o_time           = lv_mtime
+          EXCEPTIONS
+            conversion_error = 1
+            OTHERS           = 2.
+        IF sy-subrc = 0.
+          lst_response-modified_date = lv_mdate.
+          lst_response-modified_time = lv_mtime.
+          lv_form_date  = lv_mdate.
+          lv_form_time = lv_mtime.
+        ENDIF.
+
+      ENDIF.
+
+*  Insert / update logic for Isdraft functionality
+      SELECT SINGLE instanceid FROM /odsmfe/tb_forsp INTO lv_instanceid
+      WHERE instanceid = lst_formresponse-instanceid.
+* Update Table /odsmfe/tb_forsp
+      IF sy-subrc = 0 AND lv_instanceid IS NOT INITIAL.
+        MODIFY /odsmfe/tb_forsp FROM lst_response.       "#EC CI_SUBRC.
+        IF sy-subrc <> 0.
+* Implement suitable error handling here
+          CHECK sy-subrc NE 0.
+        ENDIF.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        SELECT SINGLE aufnr FROM aufk INTO lv_workorder WHERE aufnr = lst_response-wo_num.
+        IF sy-subrc = 0 AND lv_workorder IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+          " updating work order exchange table
+*        IF lst_response-wo_num IS NOT INITIAL.
+*--Start of changes - ES1K902967
+          IF lr_exchtab IS BOUND.
+            lr_exchtab->exch_table_update( lv_workorder ).
+          ENDIF.
+*--End of changes - ES1K902967
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        ELSE.
+          SELECT SINGLE qmnum INTO lv_qmnum FROM qmel WHERE qmnum = lst_response-wo_num.
+          IF sy-subrc = 0 AND lv_qmnum IS NOT INITIAL.
+            "/ Updating notification exchange table
+            IF lr_exchtab IS BOUND.
+              lr_exchtab->exch_table_update_notification( lv_qmnum ).
+            ENDIF.
+          ENDIF. "/ IF sy-subrc = 0 AND lv_qmnum IS NOT INITIAL.
+        ENDIF. "/ IF sy-subrc = 0 AND lst_response-wo_num IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      ENDIF.
+    ENDIF.
+
+    IF lst_formresponse-nonobjtype IS INITIAL.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      IF lv_workorder IS NOT INITIAL.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+* wo number
+        lv_aufnr = lst_response-wo_num.
+
+* Get the Notification number from work order number
+        SELECT SINGLE qmnum INTO lv_qmnum FROM afih
+        WHERE aufnr = lv_aufnr.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      ENDIF.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+      SELECT SINGLE low FROM /odsmfe/tb_filtr INTO lv_postnotification
+             WHERE entitysetname = lc_responsecaptureset AND field = lc_postnotification.
+* Update Work Order Notification
+      IF lv_postnotification = abap_true AND lv_qmnum IS NOT INITIAL.
+        IF lst_response-isdraft IS INITIAL.                        "Do not update notification activity if flag is set as 'X'
+          CALL METHOD me->gmib_parse_responsedata
+            EXPORTING
+              im_responsedata = lst_response-responsedata
+*             im_wonum        = lst_response-wo_num         "Commented by ODS-VSANAGALA - ES1K903619
+              im_wonum        = lv_workorder
+              im_qmnum        = lv_qmnum
+              im_formid       = lst_response-formid
+              im_version      = lst_response-version
+            IMPORTING
+              ex_return       = lit_return.
+* Error Handling
+          IF lit_return IS NOT INITIAL.
+            lit_return1 = lit_return.
+            DELETE lit_return1 WHERE type NE lc_e OR type = lc_a.
+            IF lit_return1 IS NOT INITIAL.
+              lo_error = /iwbep/cl_mgw_msg_container=>get_mgw_msg_container( ).
+
+              lo_error->add_messages_from_bapi( EXPORTING it_bapi_messages = lit_return1
+                iv_determine_leading_msg = /iwbep/if_message_container=>gcs_leading_msg_search_option-first
+                iv_add_to_response_header = abap_true ).
+
+              RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                EXPORTING
+                  message_container = lo_error.
+            ENDIF.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+    IF lv_workorder IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+*--update equipment characterstics
+*--Update the characterstics of Equipment based on the table content
+*--KMADHURI
       SELECT SINGLE postcharacteristics FROM /odsmfe/tb_foass INTO lv_postchar
-       WHERE formid EQ lst_formresponse-formid
-         AND version EQ lst_formresponse-version.
+             WHERE formid EQ lst_formresponse-formid
+               AND version EQ lst_formresponse-version.
       IF sy-subrc = 0 AND lv_postchar IS NOT INITIAL.
         DATA: lt_return   TYPE bapiret2,
               lt_return1  TYPE bapiret2_t,
@@ -512,411 +1053,9 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
         ENDIF.
 *--end of changes
       ENDIF.
-    ENDIF.
-  ENDMETHOD.
-
-
-  METHOD /odsmfe/if_get_entityset_bapi~gmib_delete_entityset.
-
-    DATA: lit_key_tab TYPE /iwbep/t_mgw_name_value_pair,
-          lst_key_tab TYPE /iwbep/s_mgw_name_value_pair.
-
-    DATA: lv_instanceid TYPE /odsmfe/de_instanceid,
-          lv_aufnr      TYPE aufnr,
-          lv_deleted    TYPE char1.
-
-    lit_key_tab = im_key_tab.
-    SORT lit_key_tab BY name.
-
-    "/Work Order Num
-    READ TABLE lit_key_tab INTO lst_key_tab WITH KEY name = 'InstanceID' BINARY SEARCH.
-    IF sy-subrc = 0 AND lst_key_tab-value IS NOT INITIAL.
-      lv_instanceid = lst_key_tab-value.
-    ENDIF.
-
-    "/Update entry from Response capture as deleted
-    lv_deleted = abap_true.
-    UPDATE /odsmfe/tb_forsp SET deleted = lv_deleted
-      WHERE instanceid =  lv_instanceid.
-
-* Update Exchange Table
-    SELECT SINGLE wo_num FROM /odsmfe/tb_forsp INTO lv_aufnr
-      WHERE instanceid = lv_instanceid.
-
-    IF lv_aufnr IS NOT INITIAL.
-      DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
-      IF lr_exchtab IS BOUND.
-        lr_exchtab->exch_table_update( lv_aufnr ).
-      ENDIF.
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD /odsmfe/if_get_entityset_bapi~gmib_modify_entityset.
-
-***********************************************************************
-********************** CREATED HISTORY ********************************
-* Program Author (SID)   :  ODS
-* Creation Date          :  12/05/2020
-* Transport No.          : ES1K901774
-* Program Description    : updates forms data in service
-***********************************************************************
-********************** CHANGE HISTORY *********************************
-* Program Author (SID)   : ODS
-* Change Date            : 29/09/2020
-* Transport No.          : ES1K902140
-* Change Description     : Added logic to update work order exchange table
-***********************************************************************
-* Program Author (SID)   : ODS
-* Change Date            : 14/12/2020
-* Transport No.          : ES1K902363
-* Change Description     : Enabling forms for task list assignment
-***********************************************************************
-*----------------------------------------------------------------------
-*  Data declaration
-*----------------------------------------------------------------------
-    TYPES:
-      BEGIN OF ltys_responsecapture,
-        instanceid      TYPE c LENGTH 50,
-        formid          TYPE /odsmfe/tb_forsp-formid, "++ES1K902499
-        version         TYPE c LENGTH 3,
-        wo_num          TYPE c LENGTH 12,
-        vornr           TYPE c LENGTH 4,
-*  SOC by ODS ++ES1K902363
-        tasklisttype    TYPE  plnty,
-        group           TYPE plnnr,
-        groupcounter    TYPE  plnal,
-*        internalcounter TYPE cim_count, "++ES1K902499
-        internalcounter TYPE char8,      "++ES1K902499
-* EOC by ODS ++ES1K902363
-        equnr           TYPE c LENGTH 18,
-        tplnr           TYPE c LENGTH 30, "ODS- ES1K902140
-        responsedata    TYPE string,
-        created_on      TYPE timestamp,
-        created_by      TYPE c LENGTH 50,
-        modified_on     TYPE timestamp,
-        modified_by     TYPE c LENGTH 50,
-        nonobjtype      TYPE /odsmfe/tb_forsp-nonobjtype,
-        isdraft         TYPE c LENGTH 1,
-        counter         TYPE /odsmfe/de_counter,
-        remarks         TYPE /odsmfe/de_remark,
-      END OF ltys_responsecapture.
-
-    DATA: lst_response     TYPE /odsmfe/tb_forsp,
-          lst_formresponse TYPE ltys_responsecapture,
-          lit_return       TYPE STANDARD TABLE OF bapiret2,
-          lit_return1      TYPE STANDARD TABLE OF bapiret2,
-          lt_return_email  TYPE STANDARD TABLE OF bapiret2.
-
-
-* Class
-    DATA: lo_error           TYPE REF TO /iwbep/if_message_container.
-* Variables
-    DATA: lv_message          TYPE bapi_msg,
-          lv_msg              TYPE char128,
-          lv_postnotification TYPE char1,
-          lv_cdate            TYPE sy-datlo,
-          lv_mdate            TYPE sy-datlo,
-          lv_ctime            TYPE sy-timlo,
-          lv_mtime            TYPE sy-timlo,
-          lv_roleid           TYPE /odsmfe/de_roleid,
-          lv_instanceid       TYPE char50,
-          " soc "++ES1K902140
-          lv_date             TYPE datum,        "Date
-          lv_time             TYPE uzeit,        "Time
-          lv_sys_time_token   TYPE string,
-          lv_count            TYPE i,
-          lv_sys_tzone        TYPE tznzonesys,   "System Time Zone
-          lv_postchar         TYPE char1,
-          lv_timestamp        TYPE timestamp.    "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)
-    " eoc "++ES1K902140
-    DATA: lv_aufnr TYPE aufnr,
-          lv_qmnum TYPE qmnum.
-
-    DATA: lv_form_date TYPE datum,
-          lv_form_time TYPE uzeit.
-
-    DATA: lv_pfcg_role TYPE    /ods/value,
-          lo_auth TYPE REF TO /ods/cl_auth_utility.
-* Constants
-    CONSTANTS: lc_i                  TYPE char1 VALUE 'I',
-               lc_wi                 TYPE char2 VALUE 'WI',
-               lc_aewi               TYPE char4 VALUE 'AEWI',
-               lc_w                  TYPE char1 VALUE 'W',
-               lc_e                  TYPE char1 VALUE 'E',
-               lc_a                  TYPE char1 VALUE 'A',
-               lc_low1               TYPE char1 VALUE '1',
-               lc_low2               TYPE char1 VALUE '2',
-               lc_low3               TYPE char1 VALUE '3',
-               lc_responsecaptureset TYPE /iwbep/sbdm_node_name VALUE 'ResponseCaptureSet',
-               lc_postnotification   TYPE /odsmfe/de_mfe_fieldname VALUE 'POSTNOTIFICATION',
-               lc_pfcg_role          TYPE string VALUE 'PFCG_ROLE',
-               lc_x                  TYPE char1 VALUE 'X',
-               lc_true               TYPE string VALUE 'TRUE'.
-*-------------------------------------------------------------
-* Main Section
-*-------------------------------------------------------------
-    im_data_provider->read_entry_data( IMPORTING es_data = lst_formresponse ).
-    IF lst_formresponse IS NOT INITIAL.
-      lst_response-instanceid = lst_formresponse-instanceid.
-      lst_response-formid     = lst_formresponse-formid.
-      lst_response-version    = lst_formresponse-version.
-      TRANSLATE lst_formresponse-responsedata TO UPPER CASE.
-      lst_response-responsedata = lst_formresponse-responsedata.
-      lst_response-wo_num       = lst_formresponse-wo_num.
-      lst_response-vornr        = lst_formresponse-vornr.
-* SOC by ODS ++ES1K902363
-      lst_response-plnty = lst_formresponse-tasklisttype.
-      lst_response-plnnr = lst_formresponse-group.
-      lst_response-plnal = lst_formresponse-groupcounter.
-      lst_response-zaehl = lst_formresponse-internalcounter.
-* EOC by ODS ++ES1K902363
-      lst_response-equnr        = lst_formresponse-equnr.
-      lst_response-tplnr = lst_formresponse-tplnr."++ES1K902140
-      lst_response-created_on   = lst_formresponse-created_on.
-      TRANSLATE lst_formresponse-created_by TO UPPER CASE.
-      lst_response-created_by  = sy-uname."++ES1K902140
-      lst_response-modified_on = lst_formresponse-modified_on.
-      TRANSLATE lst_formresponse-modified_by TO UPPER CASE.
-      lst_response-modified_by = sy-uname.
-      lst_response-nonobjtype  = lst_formresponse-nonobjtype.
-      lst_response-counter     = lst_formresponse-counter.
-      lst_response-isdraft     = lst_formresponse-isdraft.
-      lst_response-remarks     = lst_formresponse-remarks.
-* PFCG and ODS Role ID
-*--Start of changes - ES1K902967
-       SELECT SINGLE param_value
-          FROM /ods/app_config
-          INTO lv_pfcg_role
-          WHERE param_name = lc_pfcg_role
-          AND activeflag = lc_x.
-
-    IF sy-uname IS NOT INITIAL.
-      IF sy-uname EQ 'PPRIYANKA' AND lv_pfcg_role EQ lc_true.
-
-        DATA(lv_user) = sy-uname .
-      CREATE OBJECT lo_auth.
-     TRY.
-    CALL METHOD lo_auth->role_assignment    "Get PFCG Role ID
-                EXPORTING
-                       iv_uname = lv_user
-                 IMPORTING
-                         ev_field = DATA(lv_role)
-                        .
-        IF lv_role IS NOT INITIAL.
-          lst_response-roleid = lv_role.
-        ENDIF.
-      CATCH /iwbep/cx_mgw_busi_exception.
-      ENDTRY.
-      ELSE.
-*--Get reference for fetching value of user role table
-      DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
-      IF lr_exchtab IS BOUND.
-        DATA(lv_usrroletab) = lr_exchtab->get_userrole_tab( ).
-*--End of changes - ES1K902967
-*--Get Role ID
-        SELECT SINGLE roleid FROM (lv_usrroletab-low) INTO lv_roleid " ES1K902967
-        WHERE userid = sy-uname
-        AND startdate LE sy-datum
-        AND enddate GE sy-datum.
-        IF sy-subrc = 0.
-          lst_response-roleid = lv_roleid.
-        ENDIF.
-      ENDIF.
-      ENDIF.
-      ENDIF.
-
-      IF lst_formresponse-created_on IS NOT INITIAL.
-* Converting timestamp into date and time
-        CALL FUNCTION 'ABI_TIMESTAMP_CONVERT_FROM'
-          EXPORTING
-            iv_timestamp     = lst_formresponse-created_on
-          IMPORTING
-            o_date           = lv_cdate
-            o_time           = lv_ctime
-          EXCEPTIONS
-            conversion_error = 1
-            OTHERS           = 2.
-        IF sy-subrc = 0.
-          lst_response-created_date = lv_cdate.
-          lst_response-created_time = lv_ctime.
-          lv_form_date  = lv_cdate.
-          lv_form_time = lv_ctime.
-        ENDIF.
-      ENDIF.
-
-      IF lst_formresponse-modified_on IS NOT INITIAL.
-* Converting timestamp into date and time
-        CALL FUNCTION 'ABI_TIMESTAMP_CONVERT_FROM'
-          EXPORTING
-            iv_timestamp     = lst_formresponse-modified_on
-          IMPORTING
-            o_date           = lv_mdate
-            o_time           = lv_mtime
-          EXCEPTIONS
-            conversion_error = 1
-            OTHERS           = 2.
-        IF sy-subrc = 0.
-          lst_response-modified_date = lv_mdate.
-          lst_response-modified_time = lv_mtime.
-          lv_form_date  = lv_mdate.
-          lv_form_time = lv_mtime.
-        ENDIF.
-
-      ENDIF.
-
-*  Insert / update logic for Isdraft functionality
-      SELECT SINGLE instanceid FROM /odsmfe/tb_forsp INTO lv_instanceid
-      WHERE instanceid = lst_formresponse-instanceid.
-* Update Table /odsmfe/tb_forsp
-      IF sy-subrc = 0 AND lv_instanceid IS NOT INITIAL.
-        MODIFY /odsmfe/tb_forsp FROM lst_response.       "#EC CI_SUBRC.
-        IF sy-subrc <> 0.
-* Implement suitable error handling here
-          CHECK sy-subrc NE 0.
-        ENDIF.
-        " updating work order exchange table
-        IF lst_response-wo_num IS NOT INITIAL.
-*--Start of changes - ES1K902967
-          IF lr_exchtab IS BOUND.
-            lr_exchtab->exch_table_update( lst_response-wo_num ).
-          ENDIF.
-*--End of changes - ES1K902967
-        ENDIF.
-      ENDIF.
-    ENDIF.
-
-    IF lst_formresponse-nonobjtype IS INITIAL.
-
-* wo number
-      lv_aufnr = lst_response-wo_num.
-
-* Get the Notification number from work order number
-      SELECT SINGLE qmnum INTO lv_qmnum FROM afih
-      WHERE aufnr = lv_aufnr.
-
-      SELECT SINGLE low FROM /odsmfe/tb_filtr INTO lv_postnotification
-             WHERE entitysetname = lc_responsecaptureset AND field = lc_postnotification.
-* Update Work Order Notification
-      IF lv_postnotification = abap_true AND lv_qmnum IS NOT INITIAL.
-        IF lst_response-isdraft IS INITIAL.                        "Do not update notification activity if flag is set as 'X'
-          CALL METHOD me->gmib_parse_responsedata
-            EXPORTING
-              im_responsedata = lst_response-responsedata
-              im_wonum        = lst_response-wo_num
-              im_qmnum        = lv_qmnum
-              im_formid       = lst_response-formid
-              im_version      = lst_response-version
-            IMPORTING
-              ex_return       = lit_return.
-* Error Handling
-          IF lit_return IS NOT INITIAL.
-            lit_return1 = lit_return.
-            DELETE lit_return1 WHERE type NE lc_e OR type = lc_a.
-            IF lit_return1 IS NOT INITIAL.
-              lo_error = /iwbep/cl_mgw_msg_container=>get_mgw_msg_container( ).
-
-              lo_error->add_messages_from_bapi( EXPORTING it_bapi_messages = lit_return1
-                iv_determine_leading_msg = /iwbep/if_message_container=>gcs_leading_msg_search_option-first
-                iv_add_to_response_header = abap_true ).
-
-              RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                EXPORTING
-                  message_container = lo_error.
-            ENDIF.
-          ENDIF.
-        ENDIF.
-      ENDIF.
-    ENDIF.
-
-*--update equipment characterstics
-*--Update the characterstics of Equipment based on the table content
-*--KMADHURI
-    SELECT SINGLE postcharacteristics FROM /odsmfe/tb_foass INTO lv_postchar
-           WHERE formid EQ lst_formresponse-formid
-             AND version EQ lst_formresponse-version.
-    IF sy-subrc = 0 AND lv_postchar IS NOT INITIAL.
-      DATA: lt_return   TYPE bapiret2,
-            lt_return1  TYPE bapiret2_t,
-            lt_xml_data TYPE TABLE OF smum_xmltb,
-            lt_char     TYPE /odsmfe/eq_char_tt,
-            ls_char     TYPE /odsmfe/eq_char,
-            lo_msg1     TYPE REF TO cx_root,
-            lo_msg      TYPE REF TO cx_root,
-            lv_msg1     TYPE string,
-            lt_return2  TYPE STANDARD TABLE OF bapiret2.                    "Return Parameter
-*
-      SELECT *
-        FROM /odsmfe/tb_focha INTO TABLE @DATA(lt_char1)
-                          WHERE formid EQ @lst_formresponse-formid
-                          AND version EQ @lst_formresponse-version.
-      IF sy-subrc = 0.
-        IF NOT lt_char1 IS INITIAL.
-*--Convert the repsonse data to internal table data
-          CLEAR: lt_return1.
-          TRY.
-              CALL METHOD me->gmib_get_xml_content
-                EXPORTING
-                  im_responsedata = lst_response-responsedata
-                IMPORTING
-                  ex_xml_data     = lt_xml_data
-                  ex_return       = lt_return1.
-              IF lt_return1 IS NOT INITIAL.
-*--Catch exceptions
-                DELETE lt_return1 WHERE type NE lc_e OR type = lc_a.
-                IF lt_return1 IS NOT INITIAL.
-                  lo_error = /iwbep/cl_mgw_msg_container=>get_mgw_msg_container( ).
-
-                  lo_error->add_messages_from_bapi( EXPORTING it_bapi_messages = lt_return2
-                    iv_determine_leading_msg = /iwbep/if_message_container=>gcs_leading_msg_search_option-first
-                    iv_add_to_response_header = abap_true ).
-
-                  RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                    EXPORTING
-                      message_container = lo_error.
-                ENDIF.
-              ENDIF.
-
-
-            CATCH /iwbep/cx_mgw_busi_exception INTO lo_msg. " Business Exception
-              CLEAR lv_msg.
-              lo_msg->get_text( RECEIVING result = lv_msg ).
-              lo_msg->get_longtext( RECEIVING result = lv_msg ).
-              MESSAGE lv_msg TYPE 'I'.
-
-            CATCH /iwbep/cx_mgw_tech_exception INTO lo_msg1. " Technical Exception
-              CLEAR lv_msg1.
-              lo_msg1->get_text( RECEIVING result = lv_msg1 ).
-              lo_msg1->get_longtext( RECEIVING result = lv_msg1 ).
-              MESSAGE lv_msg1 TYPE 'I'.
-          ENDTRY.
-*--Prepare internal table to send to new class for equipment char update
-          LOOP AT lt_xml_data INTO DATA(ls_xml).
-            MOVE ls_xml-cname TO ls_char-name.
-            MOVE ls_xml-cvalue TO ls_char-value.
-            TRANSLATE ls_xml-cname TO UPPER CASE.
-            LOOP AT lt_char1 INTO DATA(ls_char1) WHERE field = ls_xml-cname.
-              MOVE ls_xml-cvalue  TO ls_char-value.
-              MOVE-CORRESPONDING ls_char1 TO ls_char.
-              APPEND ls_char TO lt_char.
-              CLEAR : ls_char1.
-            ENDLOOP.
-
-          ENDLOOP.
-*--Method to update characterstics
-          CALL METHOD me->equipment_char_update
-            EXPORTING
-              im_workorder = lst_response-wo_num
-              im_char      = lt_char
-            IMPORTING
-              ex_return    = lt_return.
-          CLEAR: lt_return, lt_char.
-*--Update Equipment
-        ENDIF.
-      ENDIF.
-*--end of changes
-    ENDIF.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+    ENDIF. "/ IF lv_workorder IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 
   ENDMETHOD.
 
@@ -940,6 +1079,12 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 * Transport No.          : ES1K902470
 * Change Description     : Changed logic to display supervisor forms alogn with technitian forms.
 ***********************************************************************
+***********************************************************************
+* Program Author (SID)   : ODS-VSANAGALA
+* Change Date            : 25.02.2023
+* Transport No.          : ES1K903619
+* Change Description     : Added logic to fetch the Forms related to Notifications
+***********************************************************************
 *-------------------------------------------------------------
 *  Data declaration
 *-------------------------------------------------------------
@@ -950,12 +1095,17 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
     DATA:lrs_form                       TYPE /odsmfe/st_core_range_str,
          lrs_filter_values              TYPE /odsmfe/st_form_fil_vals,
          lrs_wonum                      TYPE /odsmfe/st_core_range_str,
-         lst_workorderset_get_entityset TYPE LINE OF /odsmfe/cl_pr_formui_mpc=>tt_workorder,
+         lrs_nonum                      TYPE /odsmfe/st_core_range_str,
+         lst_workorderset_get_entityset TYPE LINE OF /odsmfe/cl_pr_formui_mpc_ext=>tt_workorder,
+         lst_notifset_get_entityset     TYPE LINE OF /odsmfe/cl_pr_formui_mpc_ext=>tt_notifications,
          lst_key_tab                    TYPE /iwbep/s_mgw_name_value_pair,
          lst_filter_range               TYPE /iwbep/s_cod_select_option,
          lst_filter                     TYPE /iwbep/s_mgw_select_option,
          lv_source_entity_set_name      TYPE string,
          lv_aufnr                       TYPE aufnr,
+         lv_aufnr1                      TYPE aufnr,
+         lv_qmnum                       TYPE qmnum,
+         lv_qmnum1                      TYPE qmnum,
          lv_instid                      TYPE /odsmfe/de_instanceid,
          lv_mobileuser                  TYPE string,
          lv_pernr                       TYPE persno,
@@ -963,7 +1113,6 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
          lv_delta_token                 TYPE timestamp,
          lv_formid                      TYPE /odsmfe/de_formid,
          lv_version                     TYPE /odsmfe/de_version.
-
 
 * SOC by ODS - ES1K902363
 
@@ -983,15 +1132,17 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 
     DATA: lit_entity_temp TYPE TABLE OF /odsmfe/tb_forsp,
           lst_entity_temp TYPE /odsmfe/tb_forsp,
-          lit_valid_wo    TYPE STANDARD TABLE OF /odsmfe/pm_valid_aufnr_str.
+          lit_valid_wo    TYPE STANDARD TABLE OF /odsmfe/pm_valid_aufnr_str,
+          lit_valid_no    TYPE STANDARD TABLE OF /odsmfe/pm_valid_qmnum_str.
 
     DATA: lo_delta_context TYPE REF TO /iwbep/if_mgw_req_entityset,
           lo_ref_exch_data TYPE REF TO data.
 
     "/Constants
     CONSTANTS:
-      lc_agr          TYPE memoryid VALUE 'AGR',
       lc_workorderset TYPE string   VALUE 'WorkOrderSet',
+      lc_wonum        TYPE string   VALUE 'WONUM',
+      lc_notification TYPE string   VALUE 'NotificationsSet',
       lc_i            TYPE char1    VALUE 'I',
       lc_eq           TYPE char2    VALUE 'EQ',
       lc_instid       TYPE string   VALUE 'InstanceID',
@@ -1012,43 +1163,114 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 
       lv_source_entity_set_name     = im_tech_request_context->get_source_entity_set_name( ).
 
-      IF  lv_source_entity_set_name = lc_workorderset.
-*   Convert keys to appropriate entity set structure
-        im_tech_request_context->get_converted_source_keys(
-        IMPORTING
-          es_key_values  = lst_workorderset_get_entityset ).
-        lv_aufnr      = lst_workorderset_get_entityset-aufnr.
-        IF lv_aufnr IS NOT INITIAL.
-          lrs_wonum-sign = lc_i.
-          lrs_wonum-option = lc_eq.
-          lrs_wonum-low = lv_aufnr.
-          APPEND lrs_wonum TO lrs_filter_values-wo_num[].
-        ENDIF.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      CASE lv_source_entity_set_name.
+        WHEN lc_workorderset.
+          "/Convert keys to appropriate entity set structure
+          im_tech_request_context->get_converted_source_keys(
+          IMPORTING
+            es_key_values  = lst_workorderset_get_entityset ).
+          lv_aufnr = lst_workorderset_get_entityset-aufnr.
+          IF lv_aufnr IS NOT INITIAL.
+            lrs_wonum-sign   = lc_i.
+            lrs_wonum-option = lc_eq.
+            lrs_wonum-low    = lv_aufnr.
+            APPEND lrs_wonum TO lrs_filter_values-wo_num[].
+            CLEAR: lrs_nonum.
+          ENDIF.
+
+        WHEN lc_notification.
+          "/Convert keys to appropriate entity set structure
+          im_tech_request_context->get_converted_source_keys(
+          IMPORTING
+            es_key_values  = lst_notifset_get_entityset ).
+          lv_qmnum = lst_notifset_get_entityset-notification.
+          IF lv_aufnr IS NOT INITIAL.
+            lrs_nonum-sign   = lc_i.
+            lrs_nonum-option = lc_eq.
+            lrs_nonum-low    = lv_qmnum.
+            APPEND lrs_nonum TO lrs_filter_values-wo_num[].
+            CLEAR: lrs_nonum.
+          ENDIF.
+
+      ENDCASE.
+    ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+*      IF  lv_source_entity_set_name = lc_workorderset.
+*
+*        "/Convert keys to appropriate entity set structure
+*        im_tech_request_context->get_converted_source_keys(
+*        IMPORTING
+*          es_key_values  = lst_workorderset_get_entityset ).
+*        lv_aufnr      = lst_workorderset_get_entityset-aufnr.
+*        IF lv_aufnr IS NOT INITIAL.
+*          lrs_wonum-sign = lc_i.
+*          lrs_wonum-option = lc_eq.
+*          lrs_wonum-low = lv_aufnr.
+*          APPEND lrs_wonum TO lrs_filter_values-wo_num[].
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+
+    "/ Read key values
+    IF im_key_tab IS NOT INITIAL.
+      READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_instid.
+      IF sy-subrc = 0 AND lst_key_tab-value IS NOT INITIAL.
+        lv_instid = lst_key_tab-value.
+        lrs_form-sign = lc_i.
+        lrs_form-option = lc_eq.
+        lrs_form-low = lv_instid.
+        APPEND lrs_form TO lrs_filter_values-forminstanceid[].
+        CLEAR: lrs_form, lst_key_tab.
       ENDIF.
     ENDIF.
-    READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_instid.
-    IF sy-subrc = 0 AND lst_key_tab-value IS NOT INITIAL.
-      lv_instid = lst_key_tab-value.
-      lrs_form-sign = lc_i.
-      lrs_form-option = lc_eq.
-      lrs_form-low = lv_instid.
-      APPEND lrs_form TO lrs_filter_values-forminstanceid[].
-    ENDIF.
 
+    "/ Read filter values
     IF im_filter_select_options IS NOT INITIAL.
       LOOP AT im_filter_select_options INTO lst_filter.
         TRANSLATE lst_filter-property TO UPPER CASE.
         CASE lst_filter-property.
-          WHEN text-002."WorkOrderNumber
+
+          WHEN lc_wonum.
             READ TABLE lst_filter-select_options INTO lst_filter_range INDEX 1.
             IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL .
-              lv_aufnr = lst_filter_range-low.
-              CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-                EXPORTING
-                  input  = lv_aufnr
-                IMPORTING
-                  output = lv_aufnr.
-            ENDIF.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+              SELECT SINGLE aufnr INTO lv_aufnr1 FROM aufk WHERE aufnr = lst_filter_range-low.
+              IF sy-subrc = 0.
+                lv_aufnr = lst_filter_range-low.
+                "/ Conversion for the Work Order
+                CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+                  EXPORTING
+                    input  = lv_aufnr
+                  IMPORTING
+                    output = lv_aufnr.
+
+                lrs_form-sign   = lc_i.
+                lrs_form-option = lc_eq.
+                lrs_form-low    = lv_aufnr.
+                APPEND lrs_form TO lrs_filter_values-wo_num[].
+              ELSE. "/ IF sy-subrc = 0.
+                SELECT SINGLE qmnum INTO lv_qmnum FROM qmel WHERE qmnum = lst_filter_range-low.
+                IF sy-subrc = 0.
+                  lv_qmnum = lst_filter_range-low.
+                  "/ Conversion for the Notification
+                  CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+                    EXPORTING
+                      input  = lv_qmnum
+                    IMPORTING
+                      output = lv_qmnum.
+
+                  lrs_form-sign   = lc_i.
+                  lrs_form-option = lc_eq.
+                  lrs_form-low    = lv_qmnum.
+                  APPEND lrs_form TO lrs_filter_values-wo_num[].
+                ENDIF. "/ IF sy-subrc = 0.
+              ENDIF. "/ IF sy-subrc = 0.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+            ENDIF. "/ IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL .
+
 * SOC skammari 08-06-2020
           WHEN lc_createdby.
             READ TABLE lst_filter-select_options INTO lst_filter_range INDEX 1.
@@ -1057,6 +1279,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
               TRANSLATE lv_mobileuser TO UPPER CASE.
             ENDIF.
 * EOC skammari 08-06-2020
+
           WHEN lc_instanceid.
             READ TABLE lst_filter-select_options INTO lst_filter_range INDEX 1.
             IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL .
@@ -1086,20 +1309,26 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
               lrs_form-low = lv_version.
               APPEND lrs_form TO lrs_filter_values-version[].
             ENDIF.
+
         ENDCASE.
         CLEAR : lrs_form , lst_filter_range.
       ENDLOOP.
     ENDIF.
+
 * SOC by ODS - ES1K902363
     IF lv_mobileuser IS INITIAL.
       lv_mobileuser = sy-uname.
     ENDIF.
 
+    DATA(lr_getworkorder) = NEW /odsmfe/cl_get_workorder_data( ).
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+    DATA(lr_getnotification) = NEW /odsmfe/cl_get_notifications( ).
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
     SELECT SINGLE parva FROM usr05 INTO lv_parva
                   WHERE bname = lv_mobileuser
                    AND  parid = 'RFPNR'.
-
-    DATA(lr_getworkorder) = NEW /odsmfe/cl_get_workorder_data( ).
 
     IF sy-subrc IS INITIAL AND lv_parva EQ 'X'.
 
@@ -1129,6 +1358,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
       IF lit_entity_temp IS NOT INITIAL .
         LOOP AT lit_entity_temp INTO lst_entity_temp.
           MOVE-CORRESPONDING lst_entity_temp TO gstib_entity.
+          gstib_entity-auart = lst_entity_temp-order_type.
           APPEND gstib_entity TO gitib_entity.
           CLEAR: lst_entity_temp,gstib_entity.
         ENDLOOP.
@@ -1143,46 +1373,67 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
           lv_mobileuser = sy-uname.
         ENDIF.
 
-*SOC by ODS-VSANAGALA - ES1K903413
-        "/ Checking whether Work center is assigned to the user or not.
-        CLEAR: lv_parva.
-        SELECT SINGLE parva FROM usr05 INTO lv_parva
-                     WHERE bname = lv_mobileuser
-                       AND parid = lc_agr.
-
-        IF sy-subrc = 0 AND lv_parva IS NOT INITIAL.
-*EOC by ODS-VSANAGALA - ES1K903413
-
+        "/ Get the Forms assigned to workorders
 *--Start of changes - ES1K902967
-          IF lr_getworkorder IS BOUND.
-            lr_getworkorder->gmib_get_workorder_data(
-            EXPORTING
-              im_mobileuser = lv_mobileuser
-              im_tech_request_context = im_tech_request_context
-              im_filter_select_options = im_filter_select_options
-              im_entity_name =  im_entity_name
-            IMPORTING
-              lit_valid_wo = lit_valid_wo ).
-          ENDIF.
+        IF lr_getworkorder IS BOUND.
+          lr_getworkorder->gmib_get_workorder_data(
+          EXPORTING
+            im_mobileuser = lv_mobileuser
+            im_tech_request_context = im_tech_request_context
+            im_filter_select_options = im_filter_select_options
+            im_entity_name =  im_entity_name
+          IMPORTING
+            lit_valid_wo = lit_valid_wo ).
+        ENDIF.
 *--End of changes - ES1K902967
+
+* Fetch Response Capture from /odsmfe/tb_forsp for entered user
+        IF lit_valid_wo[] IS NOT INITIAL.
 
           SORT lit_valid_wo.
           DELETE ADJACENT DUPLICATES FROM lit_valid_wo COMPARING ALL FIELDS.
-* Fetch Response Capture from /odsmfe/tb_forsp for entered user
-          IF lit_valid_wo IS NOT INITIAL.
-* Fetch the Forms associated with work orders
-            SELECT * FROM /odsmfe/tb_forsp                            " FETCHING ALL THE FIELDS FROM RESPONSE CAPTURE TABLE
-            INTO CORRESPONDING FIELDS OF TABLE lit_entity_temp
-            FOR ALL ENTRIES IN lit_valid_wo
-            WHERE wo_num = lit_valid_wo-aufnr.          "#EC CI_NOFIELD
 
-            IF sy-subrc = 0.
-              SORT lit_entity_temp BY instanceid.
-            ENDIF.
+* Fetch the Forms associated with work orders
+          SELECT * FROM /odsmfe/tb_forsp                            " FETCHING ALL THE FIELDS FROM RESPONSE CAPTURE TABLE
+          INTO CORRESPONDING FIELDS OF TABLE lit_entity_temp
+          FOR ALL ENTRIES IN lit_valid_wo
+          WHERE wo_num = lit_valid_wo-aufnr.            "#EC CI_NOFIELD
+
+          IF sy-subrc = 0.
+            SORT lit_entity_temp BY instanceid.
           ENDIF.
-*SOC by ODS-VSANAGALA - ES1K903413
-        ENDIF. "IF sy-subrc = 0 AND lv_parva IS NOT INITIAL.
-*EOC by ODS-VSANAGALA - ES1K903413
+        ENDIF. "/ IF lit_valid_wo[] IS NOT INITIAL.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+        "/ Get the Form assigned to Notification
+        IF lr_getnotification IS BOUND.
+          lr_getnotification->gmib_get_notification_data(
+          EXPORTING
+            im_mobileuser            = lv_mobileuser
+            im_tech_request_context  = im_tech_request_context
+            im_filter_select_options = im_filter_select_options
+            im_entity_name           = im_entity_name
+          IMPORTING
+            ex_valid_notifications   = lit_valid_no ).
+        ENDIF. "/ IF lr_getnotification IS BOUND.
+
+        IF lit_valid_no[] IS NOT INITIAL.
+
+          SORT lit_valid_no.
+          DELETE ADJACENT DUPLICATES FROM lit_valid_no COMPARING ALL FIELDS.
+
+          "/ Fetch the Forms associated with work orders
+          SELECT * FROM /odsmfe/tb_forsp
+            INTO CORRESPONDING FIELDS OF TABLE lit_entity_temp
+            FOR ALL ENTRIES IN lit_valid_no
+            WHERE wo_num = lit_valid_no-qmnum.
+
+          IF sy-subrc = 0.
+            SORT lit_entity_temp BY instanceid.
+          ENDIF.
+        ENDIF. "/ IF lit_valid_no[] IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 
 * Fetch the non associated forms
         SELECT * FROM /odsmfe/tb_forsp                            " FETCHING ALL THE FIELDS FROM RESPONSE CAPTURE TABLE
@@ -1195,33 +1446,36 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 
       ENDIF.
 
-      IF lit_entity_temp IS INITIAL AND im_key_tab IS NOT INITIAL OR lrs_filter_values IS NOT INITIAL .
+      IF lit_entity_temp[] IS INITIAL AND im_key_tab IS NOT INITIAL OR lrs_filter_values IS NOT INITIAL .
 * EOC  SKAMMARI ++ ES1K901991
         SELECT * FROM /odsmfe/tb_forsp
-        INTO TABLE lit_entity_temp
-        WHERE instanceid IN lrs_filter_values-forminstanceid[]
-        AND wo_num IN lrs_filter_values-wo_num[]
-          AND formid IN lrs_filter_values-formid[]
-          AND version IN lrs_filter_values-version[].
+          INTO TABLE lit_entity_temp
+          WHERE instanceid IN lrs_filter_values-forminstanceid[]
+            AND wo_num     IN lrs_filter_values-wo_num[]
+            AND formid     IN lrs_filter_values-formid[]
+            AND version    IN lrs_filter_values-version[].
 
         IF sy-subrc = 0.
-          SORT lit_entity_temp BY formid version."++ES1K902140
+          SORT lit_entity_temp BY formid version. "++ES1K902140
         ENDIF.
-      ENDIF.
+      ENDIF. "/IF lit_entity_temp[] IS INITIAL AND im_key_tab IS NOT INITIAL OR lrs_filter_values IS NOT INITIAL .
 
-      IF lit_entity_temp IS NOT INITIAL .
+      IF lit_entity_temp[] IS NOT INITIAL .
         LOOP AT lit_entity_temp INTO lst_entity_temp.
           MOVE-CORRESPONDING lst_entity_temp TO gstib_entity.
+          gstib_entity-auart = lst_entity_temp-order_type.       "Added by ODS-VSANAGALA - ES1K903619
           APPEND gstib_entity TO gitib_entity.
           CLEAR: lst_entity_temp,gstib_entity.
         ENDLOOP.
         LOOP AT lit_entity_temp INTO lst_entity_temp WHERE deleted IS NOT INITIAL.
           MOVE-CORRESPONDING lst_entity_temp TO gstib_del_entity.
+          gstib_del_entity-auart = lst_entity_temp-order_type.
           APPEND gstib_del_entity TO gitib_del_entity.
           CLEAR: lst_entity_temp,gstib_del_entity.
         ENDLOOP.
-      ENDIF.
-    ENDIF." ODS - ES1K902363
+      ENDIF. "/ IF lit_entity_temp IS NOT INITIAL .
+    ENDIF."/ IF sy-subrc IS INITIAL AND lv_parva EQ 'X'.        ODS - ES1K902363
+
 * Delete deleted entry from inital entity
     DELETE gitib_entity WHERE deleted IS NOT INITIAL.
 
@@ -1402,10 +1656,11 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 * Program Description    : Method creates Notification Item activity
 ***********************************************************************
 ********************** CHANGE HISTORY *********************************
-* Program Author (SID)   :
-* Change Date            :
-* Transport No.          :
-* Change Description     :
+* Program Author (SID)   : ODS-VSANAGALA
+* Change Date            : 24.02.2023
+* Transport No.          : ES1K903619
+* Change Description     : Added logic to skip the fetching of Notification number from the given
+*                          work order number, if the notification number is given in the input.
 ***********************************************************************
 ***********************************************************************
 * Data Declaration
@@ -1485,21 +1740,40 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 * Main Section
 **********************************************************
     TRY.
+
+*----------------------------- SOC by ODS-VSANAGALA - For DRL-ES1K903619 -----------------------------*
+        IF im_wonum IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - For DRL-ES1K903619 -----------------------------*
 * Conversion Exit
-        lv_aufnr = im_wonum.
-        IF lv_aufnr IS NOT INITIAL.
+          lv_aufnr = im_wonum.
+          IF lv_aufnr IS NOT INITIAL.
+            CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+              EXPORTING
+                input  = lv_aufnr
+              IMPORTING
+                output = lv_aufnr.
+* Get the Notification number from work order number
+            SELECT SINGLE qmnum INTO lv_qmnum FROM afih
+            WHERE aufnr = lv_aufnr.
+            IF sy-subrc = 0.
+              lv_number = lv_qmnum.
+            ENDIF.
+          ENDIF. "/ IF lv_aufnr IS NOT INITIAL.
+*----------------------------- SOC by ODS-VSANAGALA - For DRL-ES1K903619 -----------------------------*
+        ENDIF. "/ IF im_wonum IS NOT INITIAL.
+
+        IF im_qmnum IS NOT INITIAL.
+          lv_qmnum  = im_qmnum.
+
           CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
             EXPORTING
-              input  = lv_aufnr
+              input  = lv_qmnum
             IMPORTING
-              output = lv_aufnr.
-* Get the Notification number from work order number
-          SELECT SINGLE qmnum INTO lv_qmnum FROM afih
-          WHERE aufnr = lv_aufnr.
-          IF sy-subrc = 0.
-            lv_number = lv_qmnum.
-          ENDIF.
+              output = lv_qmnum.
+
+          lv_number = im_qmnum.
         ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - For DRL-ES1K903619 -----------------------------*
 
         IF lv_number IS NOT INITIAL.
 * Look for Notificaion Items

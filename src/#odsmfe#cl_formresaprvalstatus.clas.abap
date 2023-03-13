@@ -415,29 +415,32 @@ CLASS /ODSMFE/CL_FORMRESAPRVALSTATUS IMPLEMENTATION.
 *                          Status
 ***********************************************************************
 ********************** CHANGE HISTORY *********************************
-* Program Author (SID)   :
-* Change Date            :
+* Program Author (SID)   : ODS
+* Change Date            : 08/02/2023
 * Transport No.          :
-* Change Description     :
+* Change Description     : Added Filter Options
 ***********************************************************************
 *-------------------------------------------------------------
 *  Data declaration
 *-------------------------------------------------------------
 * Internal Table
-    DATA: lit_forminstance TYPE  STANDARD TABLE OF /odsmfe/tb_finst,
-          lrt_formid       TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrt_version      TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrt_forminstid   TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrt_approverid   TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrt_formsubby    TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrt_counter      TYPE TABLE OF /odsmfe/st_core_range_str,
-          lst_key_tab      TYPE /iwbep/s_mgw_name_value_pair,
-          lrs_formid       TYPE /odsmfe/st_core_range_str,
-          lrs_version      TYPE /odsmfe/st_core_range_str,
-          lrs_forminstid   TYPE /odsmfe/st_core_range_str,
-          lrs_approverid   TYPE /odsmfe/st_core_range_str,
-          lrs_formsubby    TYPE /odsmfe/st_core_range_str,
-          lrs_counter      TYPE /odsmfe/st_core_range_str.
+    DATA: lit_forminstance          TYPE  STANDARD TABLE OF /odsmfe/tb_finst,
+          lrt_formid                TYPE TABLE OF /odsmfe/st_core_range_str,
+          lrt_version               TYPE TABLE OF /odsmfe/st_core_range_str,
+          lrt_forminstid            TYPE TABLE OF /odsmfe/st_core_range_str,
+          lrt_approverid            TYPE TABLE OF /odsmfe/st_core_range_str,
+          lrt_formsubby             TYPE TABLE OF /odsmfe/st_core_range_str,
+          lrt_counter               TYPE TABLE OF /odsmfe/st_core_range_str,
+          lst_key_tab               TYPE /iwbep/s_mgw_name_value_pair,
+          lrs_formid                TYPE /odsmfe/st_core_range_str,
+          lrs_version               TYPE /odsmfe/st_core_range_str,
+          lrs_forminstid            TYPE /odsmfe/st_core_range_str,
+          lrs_approverid            TYPE /odsmfe/st_core_range_str,
+          lrs_formsubby             TYPE /odsmfe/st_core_range_str,
+          lrs_counter               TYPE /odsmfe/st_core_range_str,
+          lst_filter_select_options TYPE /iwbep/s_mgw_select_option,
+          lst_filter_range          TYPE /iwbep/s_cod_select_option.
+
 
 * Constants
     CONSTANTS: lc_e          TYPE string VALUE 'E',
@@ -448,7 +451,7 @@ CLASS /ODSMFE/CL_FORMRESAPRVALSTATUS IMPLEMENTATION.
                lc_forminstid TYPE string VALUE 'FormInstanceID',
                lc_approverid TYPE string VALUE 'ApproverID',
                lc_formsubby  TYPE string VALUE 'FormSubmittedBy',
-               lc_counter    TYPE string VALUE 'COUNTER'.
+               lc_counter    TYPE string VALUE 'Counter'.
 
 * Field Symbols
     FIELD-SYMBOLS <lfsst_form> TYPE /odsmfe/tb_finst.
@@ -499,6 +502,7 @@ CLASS /ODSMFE/CL_FORMRESAPRVALSTATUS IMPLEMENTATION.
             lrs_formsubby-sign   = lc_i.
             lrs_formsubby-option = lc_eq.
             lrs_formsubby-low    = lst_key_tab-value.
+            lv_mobileuser        = lst_key_tab-value.
             APPEND lrs_formsubby TO lrt_formsubby.
             CLEAR lrs_formsubby.
 
@@ -511,6 +515,69 @@ CLASS /ODSMFE/CL_FORMRESAPRVALSTATUS IMPLEMENTATION.
         ENDCASE.
       ENDLOOP.
     ENDIF.
+
+"SOC by ODS
+    IF im_filter_select_options IS NOT INITIAL.
+      LOOP AT im_filter_select_options INTO lst_filter_select_options.
+        CASE lst_filter_select_options-property.
+          WHEN lc_formid.
+            READ TABLE lst_filter_select_options-select_options INTO lst_filter_range INDEX 1.
+            IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL.
+              lrs_formid-sign = lc_i.
+              lrs_formid-option = lc_eq.
+              lrs_formid-low = lst_filter_range-low.
+              APPEND lrs_formid to lrt_formid.
+            ENDIF.
+
+          WHEN lc_version.
+            READ TABLE lst_filter_select_options-select_options INTO lst_filter_range INDEX 1.
+            IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL.
+              lrs_version-sign = lc_i.
+              lrs_version-option = lc_eq.
+              lrs_version-low = lst_filter_range-low.
+              APPEND lrs_version to lrt_version.
+            ENDIF.
+
+          WHEN lc_forminstid.
+            READ TABLE lst_filter_select_options-select_options INTO lst_filter_range INDEX 1.
+            IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL.
+              lrs_forminstid-sign = lc_i.
+              lrs_forminstid-option = lc_eq.
+              lrs_forminstid-low = lst_filter_range-low.
+              APPEND lrs_forminstid to lrt_forminstid.
+            ENDIF.
+
+          WHEN lc_approverid.
+            READ TABLE lst_filter_select_options-select_options INTO lst_filter_range INDEX 1.
+            IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL.
+              lrs_approverid-sign = lc_i.
+              lrs_approverid-option = lc_eq.
+              lrs_approverid-low = lst_filter_range-low.
+              APPEND lrs_approverid to lrt_approverid.
+            ENDIF.
+
+          WHEN lc_formsubby.
+            READ TABLE lst_filter_select_options-select_options INTO lst_filter_range INDEX 1.
+            IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL.
+              lrs_formsubby-sign = lc_i.
+              lrs_formsubby-option = lc_eq.
+              lrs_formsubby-low = lst_filter_range-low.
+              lv_mobileuser = lst_filter_range-low.
+              APPEND lrs_formsubby to lrt_formsubby.
+            ENDIF.
+
+          WHEN lc_counter.
+            READ TABLE lst_filter_select_options-select_options INTO lst_filter_range INDEX 1.
+            IF sy-subrc EQ 0 AND lst_filter_range-low IS NOT INITIAL.
+              lrs_counter-sign = lc_i.
+              lrs_counter-option = lc_eq.
+              lrs_counter-low = lst_filter_range-low.
+              APPEND lrs_counter to lrt_counter.
+            ENDIF.
+        ENDCASE.
+      ENDLOOP.
+    ENDIF.
+"EOC by ODS
 
     IF lv_mobileuser IS INITIAL.
       lv_mobileuser = sy-uname.

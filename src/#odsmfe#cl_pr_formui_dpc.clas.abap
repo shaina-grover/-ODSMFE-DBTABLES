@@ -23,46 +23,6 @@ protected section.
 
   data mo_injection type ref to /IWBEP/IF_SB_GEN_DPC_INJECTION .
 
-  methods FORMMANUALASSIGN_CREATE_ENTITY
-    importing
-      !IV_ENTITY_NAME type STRING
-      !IV_ENTITY_SET_NAME type STRING
-      !IV_SOURCE_NAME type STRING
-      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
-      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_C optional
-      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
-      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
-    exporting
-      !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMANUALASSIGNMENT
-    raising
-      /IWBEP/CX_MGW_BUSI_EXCEPTION
-      /IWBEP/CX_MGW_TECH_EXCEPTION .
-  methods FORMMANUALASSIGN_DELETE_ENTITY
-    importing
-      !IV_ENTITY_NAME type STRING
-      !IV_ENTITY_SET_NAME type STRING
-      !IV_SOURCE_NAME type STRING
-      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
-      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_D optional
-      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
-    raising
-      /IWBEP/CX_MGW_BUSI_EXCEPTION
-      /IWBEP/CX_MGW_TECH_EXCEPTION .
-  methods FORMMANUALASSIGN_GET_ENTITY
-    importing
-      !IV_ENTITY_NAME type STRING
-      !IV_ENTITY_SET_NAME type STRING
-      !IV_SOURCE_NAME type STRING
-      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
-      !IO_REQUEST_OBJECT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
-      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
-      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
-    exporting
-      !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMANUALASSIGNMENT
-      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
-    raising
-      /IWBEP/CX_MGW_BUSI_EXCEPTION
-      /IWBEP/CX_MGW_TECH_EXCEPTION .
   methods FORMMANUALASSIGN_GET_ENTITYSET
     importing
       !IV_ENTITY_NAME type STRING
@@ -388,6 +348,79 @@ protected section.
     raising
       /IWBEP/CX_MGW_BUSI_EXCEPTION
       /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods NOTIFICATIONSSET_CREATE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_C optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
+    exporting
+      !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_NOTIFICATIONS
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods NOTIFICATIONSSET_DELETE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_D optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods NOTIFICATIONSSET_GET_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_REQUEST_OBJECT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    exporting
+      !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_NOTIFICATIONS
+      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods NOTIFICATIONSSET_GET_ENTITYSET
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION
+      !IS_PAGING type /IWBEP/S_MGW_PAGING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IT_ORDER type /IWBEP/T_MGW_SORTING_ORDER
+      !IV_FILTER_STRING type STRING
+      !IV_SEARCH_STRING type STRING
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITYSET optional
+    exporting
+      !ET_ENTITYSET type /ODSMFE/CL_PR_FORMUI_MPC=>TT_NOTIFICATIONS
+      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods NOTIFICATIONSSET_UPDATE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_U optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
+    exporting
+      !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_NOTIFICATIONS
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
   methods REVIEWERFORMRESP_CREATE_ENTITY
     importing
       !IV_ENTITY_NAME type STRING
@@ -531,6 +564,21 @@ protected section.
       !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
     exporting
       !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_WORKORDER
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods FORMMANUALASSIGN_GET_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_REQUEST_OBJECT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    exporting
+      !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMANUALASSIGNMENT
+      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
     raising
       /IWBEP/CX_MGW_BUSI_EXCEPTION
       /IWBEP/CX_MGW_TECH_EXCEPTION .
@@ -1045,6 +1093,31 @@ protected section.
     raising
       /IWBEP/CX_MGW_BUSI_EXCEPTION
       /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods FORMMANUALASSIGN_CREATE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_C optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
+    exporting
+      !ER_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMANUALASSIGNMENT
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods FORMMANUALASSIGN_DELETE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_D optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
 
   methods CHECK_SUBSCRIPTION_AUTHORITY
     redefinition .
@@ -1059,38 +1132,39 @@ CLASS /ODSMFE/CL_PR_FORMUI_DPC IMPLEMENTATION.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~CREATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_CRT_ENTITY_BASE
-*&* This class has been generated on 15.02.2022 18:00:55 in client 001
+*&* This class has been generated on 25.02.2023 11:52:55 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
 *&*   generated methods inside the DPC provider subclass - /ODSMFE/CL_PR_FORMUI_DPC_EXT
 *&-----------------------------------------------------------------------------------------------*
 
- DATA formassingmentse_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formassingment.
- DATA formattachmentse_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formattachment.
- DATA formmanualassign_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmanualassignment.
- DATA formmasterset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmaster.
  DATA formmastermetada_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmastermetadata.
- DATA formidapproverse_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formapprover.
- DATA formmetadataset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmetadata.
- DATA approvermasterda_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_approvermasterdata.
- DATA deptmasterdatase_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_deptmasterdata.
- DATA formset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_responsecapture.
- DATA forminstancestat_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formresponseapprovalstatus.
- DATA reviewerformresp_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_reviewerformresponse.
+ DATA formmanualassign_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmanualassignment.
  DATA workorderset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_workorder.
  DATA formimageset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formimage.
+ DATA forminstancestat_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formresponseapprovalstatus.
+ DATA reviewerformresp_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_reviewerformresponse.
+ DATA notificationsset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_notifications.
+ DATA formset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_responsecapture.
+ DATA formattachmentse_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formattachment.
+ DATA deptmasterdatase_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_deptmasterdata.
+ DATA formmetadataset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmetadata.
+ DATA formidapproverse_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formapprover.
+ DATA formmasterset_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmaster.
+ DATA formassingmentse_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formassingment.
+ DATA approvermasterda_create_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_approvermasterdata.
  DATA lv_entityset_name TYPE string.
 
 lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
 
 CASE lv_entityset_name.
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormAssingmentSet
+*             EntitySet -  FormMasterMetadataSet
 *-------------------------------------------------------------------------*
-     WHEN 'FormAssingmentSet'.
+     WHEN 'FormMasterMetadataSet'.
 *     Call the entity set generated method
-    formassingmentse_create_entity(
+    formmastermetada_create_entity(
          EXPORTING iv_entity_name     = iv_entity_name
                    iv_entity_set_name = iv_entity_set_name
                    iv_source_name     = iv_source_name
@@ -1098,35 +1172,12 @@ CASE lv_entityset_name.
                    it_key_tab         = it_key_tab
                    it_navigation_path = it_navigation_path
                    io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formassingmentse_create_entity
+       	 IMPORTING er_entity          = formmastermetada_create_entity
     ).
 *     Send specific entity data to the caller interfaces
     copy_data_to_ref(
       EXPORTING
-        is_data = formassingmentse_create_entity
-      CHANGING
-        cr_data = er_entity
-   ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormAttachmentSet
-*-------------------------------------------------------------------------*
-     WHEN 'FormAttachmentSet'.
-*     Call the entity set generated method
-    formattachmentse_create_entity(
-         EXPORTING iv_entity_name     = iv_entity_name
-                   iv_entity_set_name = iv_entity_set_name
-                   iv_source_name     = iv_source_name
-                   io_data_provider   = io_data_provider
-                   it_key_tab         = it_key_tab
-                   it_navigation_path = it_navigation_path
-                   io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formattachmentse_create_entity
-    ).
-*     Send specific entity data to the caller interfaces
-    copy_data_to_ref(
-      EXPORTING
-        is_data = formattachmentse_create_entity
+        is_data = formmastermetada_create_entity
       CHANGING
         cr_data = er_entity
    ).
@@ -1155,11 +1206,11 @@ CASE lv_entityset_name.
    ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterSet
+*             EntitySet -  WorkOrderSet
 *-------------------------------------------------------------------------*
-     WHEN 'FormMasterSet'.
+     WHEN 'WorkOrderSet'.
 *     Call the entity set generated method
-    formmasterset_create_entity(
+    workorderset_create_entity(
          EXPORTING iv_entity_name     = iv_entity_name
                    iv_entity_set_name = iv_entity_set_name
                    iv_source_name     = iv_source_name
@@ -1167,22 +1218,22 @@ CASE lv_entityset_name.
                    it_key_tab         = it_key_tab
                    it_navigation_path = it_navigation_path
                    io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formmasterset_create_entity
+       	 IMPORTING er_entity          = workorderset_create_entity
     ).
 *     Send specific entity data to the caller interfaces
     copy_data_to_ref(
       EXPORTING
-        is_data = formmasterset_create_entity
+        is_data = workorderset_create_entity
       CHANGING
         cr_data = er_entity
    ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterMetadataSet
+*             EntitySet -  FormImageSet
 *-------------------------------------------------------------------------*
-     WHEN 'FormMasterMetadataSet'.
+     WHEN 'FormImageSet'.
 *     Call the entity set generated method
-    formmastermetada_create_entity(
+    formimageset_create_entity(
          EXPORTING iv_entity_name     = iv_entity_name
                    iv_entity_set_name = iv_entity_set_name
                    iv_source_name     = iv_source_name
@@ -1190,127 +1241,12 @@ CASE lv_entityset_name.
                    it_key_tab         = it_key_tab
                    it_navigation_path = it_navigation_path
                    io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formmastermetada_create_entity
+       	 IMPORTING er_entity          = formimageset_create_entity
     ).
 *     Send specific entity data to the caller interfaces
     copy_data_to_ref(
       EXPORTING
-        is_data = formmastermetada_create_entity
-      CHANGING
-        cr_data = er_entity
-   ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormApproverSet
-*-------------------------------------------------------------------------*
-     WHEN 'FormApproverSet'.
-*     Call the entity set generated method
-    formidapproverse_create_entity(
-         EXPORTING iv_entity_name     = iv_entity_name
-                   iv_entity_set_name = iv_entity_set_name
-                   iv_source_name     = iv_source_name
-                   io_data_provider   = io_data_provider
-                   it_key_tab         = it_key_tab
-                   it_navigation_path = it_navigation_path
-                   io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formidapproverse_create_entity
-    ).
-*     Send specific entity data to the caller interfaces
-    copy_data_to_ref(
-      EXPORTING
-        is_data = formidapproverse_create_entity
-      CHANGING
-        cr_data = er_entity
-   ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormMetaDataSet
-*-------------------------------------------------------------------------*
-     WHEN 'FormMetaDataSet'.
-*     Call the entity set generated method
-    formmetadataset_create_entity(
-         EXPORTING iv_entity_name     = iv_entity_name
-                   iv_entity_set_name = iv_entity_set_name
-                   iv_source_name     = iv_source_name
-                   io_data_provider   = io_data_provider
-                   it_key_tab         = it_key_tab
-                   it_navigation_path = it_navigation_path
-                   io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formmetadataset_create_entity
-    ).
-*     Send specific entity data to the caller interfaces
-    copy_data_to_ref(
-      EXPORTING
-        is_data = formmetadataset_create_entity
-      CHANGING
-        cr_data = er_entity
-   ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  ApproverMasterDataSet
-*-------------------------------------------------------------------------*
-     WHEN 'ApproverMasterDataSet'.
-*     Call the entity set generated method
-    approvermasterda_create_entity(
-         EXPORTING iv_entity_name     = iv_entity_name
-                   iv_entity_set_name = iv_entity_set_name
-                   iv_source_name     = iv_source_name
-                   io_data_provider   = io_data_provider
-                   it_key_tab         = it_key_tab
-                   it_navigation_path = it_navigation_path
-                   io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = approvermasterda_create_entity
-    ).
-*     Send specific entity data to the caller interfaces
-    copy_data_to_ref(
-      EXPORTING
-        is_data = approvermasterda_create_entity
-      CHANGING
-        cr_data = er_entity
-   ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  DeptMasterDataSet
-*-------------------------------------------------------------------------*
-     WHEN 'DeptMasterDataSet'.
-*     Call the entity set generated method
-    deptmasterdatase_create_entity(
-         EXPORTING iv_entity_name     = iv_entity_name
-                   iv_entity_set_name = iv_entity_set_name
-                   iv_source_name     = iv_source_name
-                   io_data_provider   = io_data_provider
-                   it_key_tab         = it_key_tab
-                   it_navigation_path = it_navigation_path
-                   io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = deptmasterdatase_create_entity
-    ).
-*     Send specific entity data to the caller interfaces
-    copy_data_to_ref(
-      EXPORTING
-        is_data = deptmasterdatase_create_entity
-      CHANGING
-        cr_data = er_entity
-   ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  ResponseCaptureSet
-*-------------------------------------------------------------------------*
-     WHEN 'ResponseCaptureSet'.
-*     Call the entity set generated method
-    formset_create_entity(
-         EXPORTING iv_entity_name     = iv_entity_name
-                   iv_entity_set_name = iv_entity_set_name
-                   iv_source_name     = iv_source_name
-                   io_data_provider   = io_data_provider
-                   it_key_tab         = it_key_tab
-                   it_navigation_path = it_navigation_path
-                   io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formset_create_entity
-    ).
-*     Send specific entity data to the caller interfaces
-    copy_data_to_ref(
-      EXPORTING
-        is_data = formset_create_entity
+        is_data = formimageset_create_entity
       CHANGING
         cr_data = er_entity
    ).
@@ -1362,11 +1298,11 @@ CASE lv_entityset_name.
    ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  WorkOrderSet
+*             EntitySet -  NotificationsSet
 *-------------------------------------------------------------------------*
-     WHEN 'WorkOrderSet'.
+     WHEN 'NotificationsSet'.
 *     Call the entity set generated method
-    workorderset_create_entity(
+    notificationsset_create_entity(
          EXPORTING iv_entity_name     = iv_entity_name
                    iv_entity_set_name = iv_entity_set_name
                    iv_source_name     = iv_source_name
@@ -1374,22 +1310,22 @@ CASE lv_entityset_name.
                    it_key_tab         = it_key_tab
                    it_navigation_path = it_navigation_path
                    io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = workorderset_create_entity
+       	 IMPORTING er_entity          = notificationsset_create_entity
     ).
 *     Send specific entity data to the caller interfaces
     copy_data_to_ref(
       EXPORTING
-        is_data = workorderset_create_entity
+        is_data = notificationsset_create_entity
       CHANGING
         cr_data = er_entity
    ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormImageSet
+*             EntitySet -  ResponseCaptureSet
 *-------------------------------------------------------------------------*
-     WHEN 'FormImageSet'.
+     WHEN 'ResponseCaptureSet'.
 *     Call the entity set generated method
-    formimageset_create_entity(
+    formset_create_entity(
          EXPORTING iv_entity_name     = iv_entity_name
                    iv_entity_set_name = iv_entity_set_name
                    iv_source_name     = iv_source_name
@@ -1397,12 +1333,173 @@ CASE lv_entityset_name.
                    it_key_tab         = it_key_tab
                    it_navigation_path = it_navigation_path
                    io_tech_request_context = io_tech_request_context
-       	 IMPORTING er_entity          = formimageset_create_entity
+       	 IMPORTING er_entity          = formset_create_entity
     ).
 *     Send specific entity data to the caller interfaces
     copy_data_to_ref(
       EXPORTING
-        is_data = formimageset_create_entity
+        is_data = formset_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormAttachmentSet
+*-------------------------------------------------------------------------*
+     WHEN 'FormAttachmentSet'.
+*     Call the entity set generated method
+    formattachmentse_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = formattachmentse_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = formattachmentse_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  DeptMasterDataSet
+*-------------------------------------------------------------------------*
+     WHEN 'DeptMasterDataSet'.
+*     Call the entity set generated method
+    deptmasterdatase_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = deptmasterdatase_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = deptmasterdatase_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMetaDataSet
+*-------------------------------------------------------------------------*
+     WHEN 'FormMetaDataSet'.
+*     Call the entity set generated method
+    formmetadataset_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = formmetadataset_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = formmetadataset_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormApproverSet
+*-------------------------------------------------------------------------*
+     WHEN 'FormApproverSet'.
+*     Call the entity set generated method
+    formidapproverse_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = formidapproverse_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = formidapproverse_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMasterSet
+*-------------------------------------------------------------------------*
+     WHEN 'FormMasterSet'.
+*     Call the entity set generated method
+    formmasterset_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = formmasterset_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = formmasterset_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormAssingmentSet
+*-------------------------------------------------------------------------*
+     WHEN 'FormAssingmentSet'.
+*     Call the entity set generated method
+    formassingmentse_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = formassingmentse_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = formassingmentse_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  ApproverMasterDataSet
+*-------------------------------------------------------------------------*
+     WHEN 'ApproverMasterDataSet'.
+*     Call the entity set generated method
+    approvermasterda_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = approvermasterda_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = approvermasterda_create_entity
       CHANGING
         cr_data = er_entity
    ).
@@ -1426,7 +1523,7 @@ ENDCASE.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~DELETE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_DEL_ENTITY_BASE
-*&* This class has been generated on 15.02.2022 18:00:55 in client 001
+*&* This class has been generated on 25.02.2023 11:52:55 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -1439,53 +1536,11 @@ lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
 
 CASE lv_entityset_name.
 *-------------------------------------------------------------------------*
-*             EntitySet -  ApproverMasterDataSet
+*             EntitySet -  FormManualAssignmentSet
 *-------------------------------------------------------------------------*
-      when 'ApproverMasterDataSet'.
+      when 'FormManualAssignmentSet'.
 *     Call the entity set generated method
-     approvermasterda_delete_entity(
-          EXPORTING iv_entity_name     = iv_entity_name
-                    iv_entity_set_name = iv_entity_set_name
-                    iv_source_name     = iv_source_name
-                    it_key_tab         = it_key_tab
-                    it_navigation_path = it_navigation_path
-                    io_tech_request_context = io_tech_request_context
-     ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  DeptMasterDataSet
-*-------------------------------------------------------------------------*
-      when 'DeptMasterDataSet'.
-*     Call the entity set generated method
-     deptmasterdatase_delete_entity(
-          EXPORTING iv_entity_name     = iv_entity_name
-                    iv_entity_set_name = iv_entity_set_name
-                    iv_source_name     = iv_source_name
-                    it_key_tab         = it_key_tab
-                    it_navigation_path = it_navigation_path
-                    io_tech_request_context = io_tech_request_context
-     ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormApproverSet
-*-------------------------------------------------------------------------*
-      when 'FormApproverSet'.
-*     Call the entity set generated method
-     formidapproverse_delete_entity(
-          EXPORTING iv_entity_name     = iv_entity_name
-                    iv_entity_set_name = iv_entity_set_name
-                    iv_source_name     = iv_source_name
-                    it_key_tab         = it_key_tab
-                    it_navigation_path = it_navigation_path
-                    io_tech_request_context = io_tech_request_context
-     ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormResponseApprovalStatusSet
-*-------------------------------------------------------------------------*
-      when 'FormResponseApprovalStatusSet'.
-*     Call the entity set generated method
-     forminstancestat_delete_entity(
+     formmanualassign_delete_entity(
           EXPORTING iv_entity_name     = iv_entity_name
                     iv_entity_set_name = iv_entity_set_name
                     iv_source_name     = iv_source_name
@@ -1509,53 +1564,11 @@ CASE lv_entityset_name.
      ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormManualAssignmentSet
-*-------------------------------------------------------------------------*
-      when 'FormManualAssignmentSet'.
-*     Call the entity set generated method
-     formmanualassign_delete_entity(
-          EXPORTING iv_entity_name     = iv_entity_name
-                    iv_entity_set_name = iv_entity_set_name
-                    iv_source_name     = iv_source_name
-                    it_key_tab         = it_key_tab
-                    it_navigation_path = it_navigation_path
-                    io_tech_request_context = io_tech_request_context
-     ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  ReviewerFormResponseSet
-*-------------------------------------------------------------------------*
-      when 'ReviewerFormResponseSet'.
-*     Call the entity set generated method
-     reviewerformresp_delete_entity(
-          EXPORTING iv_entity_name     = iv_entity_name
-                    iv_entity_set_name = iv_entity_set_name
-                    iv_source_name     = iv_source_name
-                    it_key_tab         = it_key_tab
-                    it_navigation_path = it_navigation_path
-                    io_tech_request_context = io_tech_request_context
-     ).
-
-*-------------------------------------------------------------------------*
 *             EntitySet -  FormAttachmentSet
 *-------------------------------------------------------------------------*
       when 'FormAttachmentSet'.
 *     Call the entity set generated method
      formattachmentse_delete_entity(
-          EXPORTING iv_entity_name     = iv_entity_name
-                    iv_entity_set_name = iv_entity_set_name
-                    iv_source_name     = iv_source_name
-                    it_key_tab         = it_key_tab
-                    it_navigation_path = it_navigation_path
-                    io_tech_request_context = io_tech_request_context
-     ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormAssingmentSet
-*-------------------------------------------------------------------------*
-      when 'FormAssingmentSet'.
-*     Call the entity set generated method
-     formassingmentse_delete_entity(
           EXPORTING iv_entity_name     = iv_entity_name
                     iv_entity_set_name = iv_entity_set_name
                     iv_source_name     = iv_source_name
@@ -1579,11 +1592,95 @@ CASE lv_entityset_name.
      ).
 
 *-------------------------------------------------------------------------*
+*             EntitySet -  FormApproverSet
+*-------------------------------------------------------------------------*
+      when 'FormApproverSet'.
+*     Call the entity set generated method
+     formidapproverse_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormAssingmentSet
+*-------------------------------------------------------------------------*
+      when 'FormAssingmentSet'.
+*     Call the entity set generated method
+     formassingmentse_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMasterSet
+*-------------------------------------------------------------------------*
+      when 'FormMasterSet'.
+*     Call the entity set generated method
+     formmasterset_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  ApproverMasterDataSet
+*-------------------------------------------------------------------------*
+      when 'ApproverMasterDataSet'.
+*     Call the entity set generated method
+     approvermasterda_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  ReviewerFormResponseSet
+*-------------------------------------------------------------------------*
+      when 'ReviewerFormResponseSet'.
+*     Call the entity set generated method
+     reviewerformresp_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
+*-------------------------------------------------------------------------*
 *             EntitySet -  FormMetaDataSet
 *-------------------------------------------------------------------------*
       when 'FormMetaDataSet'.
 *     Call the entity set generated method
      formmetadataset_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  DeptMasterDataSet
+*-------------------------------------------------------------------------*
+      when 'DeptMasterDataSet'.
+*     Call the entity set generated method
+     deptmasterdatase_delete_entity(
           EXPORTING iv_entity_name     = iv_entity_name
                     iv_entity_set_name = iv_entity_set_name
                     iv_source_name     = iv_source_name
@@ -1621,11 +1718,25 @@ CASE lv_entityset_name.
      ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterSet
+*             EntitySet -  NotificationsSet
 *-------------------------------------------------------------------------*
-      when 'FormMasterSet'.
+      when 'NotificationsSet'.
 *     Call the entity set generated method
-     formmasterset_delete_entity(
+     notificationsset_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormResponseApprovalStatusSet
+*-------------------------------------------------------------------------*
+      when 'FormResponseApprovalStatusSet'.
+*     Call the entity set generated method
+     forminstancestat_delete_entity(
           EXPORTING iv_entity_name     = iv_entity_name
                     iv_entity_set_name = iv_entity_set_name
                     iv_source_name     = iv_source_name
@@ -1650,27 +1761,28 @@ CASE lv_entityset_name.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITY.
 *&-----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_GETENTITY_BASE
-*&* This class has been generated  on 15.02.2022 18:00:55 in client 001
+*&* This class has been generated  on 25.02.2023 11:52:55 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
 *&*   generated methods inside the DPC provider subclass - /ODSMFE/CL_PR_FORMUI_DPC_EXT
 *&-----------------------------------------------------------------------------------------------*
 
- DATA formset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_responsecapture.
- DATA forminstancestat_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formresponseapprovalstatus.
- DATA reviewerformresp_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_reviewerformresponse.
- DATA formimageset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formimage.
- DATA deptmasterdatase_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_deptmasterdata.
- DATA workorderset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_workorder.
- DATA formmetadataset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmetadata.
- DATA approvermasterda_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_approvermasterdata.
- DATA formidapproverse_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formapprover.
- DATA formmasterset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmaster.
- DATA formmastermetada_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmastermetadata.
- DATA formmanualassign_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmanualassignment.
- DATA formassingmentse_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formassingment.
  DATA formattachmentse_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formattachment.
+ DATA formimageset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formimage.
+ DATA formidapproverse_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formapprover.
+ DATA approvermasterda_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_approvermasterdata.
+ DATA formassingmentse_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formassingment.
+ DATA notificationsset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_notifications.
+ DATA formmasterset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmaster.
+ DATA deptmasterdatase_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_deptmasterdata.
+ DATA formmanualassign_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmanualassignment.
+ DATA formmetadataset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmetadata.
+ DATA forminstancestat_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formresponseapprovalstatus.
+ DATA formset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_responsecapture.
+ DATA workorderset_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_workorder.
+ DATA formmastermetada_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmastermetadata.
+ DATA reviewerformresp_get_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_reviewerformresponse.
  DATA lv_entityset_name TYPE string.
  DATA lr_entity TYPE REF TO data.
 
@@ -1678,82 +1790,26 @@ lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
 
 CASE lv_entityset_name.
 *-------------------------------------------------------------------------*
-*             EntitySet -  ResponseCaptureSet
+*             EntitySet -  FormAttachmentSet
 *-------------------------------------------------------------------------*
-      WHEN 'ResponseCaptureSet'.
+      WHEN 'FormAttachmentSet'.
 *     Call the entity set generated method
-          formset_get_entity(
+          formattachmentse_get_entity(
                EXPORTING iv_entity_name     = iv_entity_name
                          iv_entity_set_name = iv_entity_set_name
                          iv_source_name     = iv_source_name
                          it_key_tab         = it_key_tab
                          it_navigation_path = it_navigation_path
                          io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formset_get_entity
+             	 IMPORTING er_entity          = formattachmentse_get_entity
                          es_response_context = es_response_context
           ).
 
-        IF formset_get_entity IS NOT INITIAL.
+        IF formattachmentse_get_entity IS NOT INITIAL.
 *     Send specific entity data to the caller interface
           copy_data_to_ref(
             EXPORTING
-              is_data = formset_get_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormResponseApprovalStatusSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormResponseApprovalStatusSet'.
-*     Call the entity set generated method
-          forminstancestat_get_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = forminstancestat_get_entity
-                         es_response_context = es_response_context
-          ).
-
-        IF forminstancestat_get_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = forminstancestat_get_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  ReviewerFormResponseSet
-*-------------------------------------------------------------------------*
-      WHEN 'ReviewerFormResponseSet'.
-*     Call the entity set generated method
-          reviewerformresp_get_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = reviewerformresp_get_entity
-                         es_response_context = es_response_context
-          ).
-
-        IF reviewerformresp_get_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = reviewerformresp_get_entity
+              is_data = formattachmentse_get_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -1790,82 +1846,26 @@ CASE lv_entityset_name.
           er_entity = lr_entity.
         ENDIF.
 *-------------------------------------------------------------------------*
-*             EntitySet -  DeptMasterDataSet
+*             EntitySet -  FormApproverSet
 *-------------------------------------------------------------------------*
-      WHEN 'DeptMasterDataSet'.
+      WHEN 'FormApproverSet'.
 *     Call the entity set generated method
-          deptmasterdatase_get_entity(
+          formidapproverse_get_entity(
                EXPORTING iv_entity_name     = iv_entity_name
                          iv_entity_set_name = iv_entity_set_name
                          iv_source_name     = iv_source_name
                          it_key_tab         = it_key_tab
                          it_navigation_path = it_navigation_path
                          io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = deptmasterdatase_get_entity
+             	 IMPORTING er_entity          = formidapproverse_get_entity
                          es_response_context = es_response_context
           ).
 
-        IF deptmasterdatase_get_entity IS NOT INITIAL.
+        IF formidapproverse_get_entity IS NOT INITIAL.
 *     Send specific entity data to the caller interface
           copy_data_to_ref(
             EXPORTING
-              is_data = deptmasterdatase_get_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  WorkOrderSet
-*-------------------------------------------------------------------------*
-      WHEN 'WorkOrderSet'.
-*     Call the entity set generated method
-          workorderset_get_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = workorderset_get_entity
-                         es_response_context = es_response_context
-          ).
-
-        IF workorderset_get_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = workorderset_get_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormMetaDataSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormMetaDataSet'.
-*     Call the entity set generated method
-          formmetadataset_get_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formmetadataset_get_entity
-                         es_response_context = es_response_context
-          ).
-
-        IF formmetadataset_get_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formmetadataset_get_entity
+              is_data = formidapproverse_get_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -1902,26 +1902,54 @@ CASE lv_entityset_name.
           er_entity = lr_entity.
         ENDIF.
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormApproverSet
+*             EntitySet -  FormAssingmentSet
 *-------------------------------------------------------------------------*
-      WHEN 'FormApproverSet'.
+      WHEN 'FormAssingmentSet'.
 *     Call the entity set generated method
-          formidapproverse_get_entity(
+          formassingmentse_get_entity(
                EXPORTING iv_entity_name     = iv_entity_name
                          iv_entity_set_name = iv_entity_set_name
                          iv_source_name     = iv_source_name
                          it_key_tab         = it_key_tab
                          it_navigation_path = it_navigation_path
                          io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formidapproverse_get_entity
+             	 IMPORTING er_entity          = formassingmentse_get_entity
                          es_response_context = es_response_context
           ).
 
-        IF formidapproverse_get_entity IS NOT INITIAL.
+        IF formassingmentse_get_entity IS NOT INITIAL.
 *     Send specific entity data to the caller interface
           copy_data_to_ref(
             EXPORTING
-              is_data = formidapproverse_get_entity
+              is_data = formassingmentse_get_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  NotificationsSet
+*-------------------------------------------------------------------------*
+      WHEN 'NotificationsSet'.
+*     Call the entity set generated method
+          notificationsset_get_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = notificationsset_get_entity
+                         es_response_context = es_response_context
+          ).
+
+        IF notificationsset_get_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = notificationsset_get_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -1958,26 +1986,26 @@ CASE lv_entityset_name.
           er_entity = lr_entity.
         ENDIF.
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterMetadataSet
+*             EntitySet -  DeptMasterDataSet
 *-------------------------------------------------------------------------*
-      WHEN 'FormMasterMetadataSet'.
+      WHEN 'DeptMasterDataSet'.
 *     Call the entity set generated method
-          formmastermetada_get_entity(
+          deptmasterdatase_get_entity(
                EXPORTING iv_entity_name     = iv_entity_name
                          iv_entity_set_name = iv_entity_set_name
                          iv_source_name     = iv_source_name
                          it_key_tab         = it_key_tab
                          it_navigation_path = it_navigation_path
                          io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formmastermetada_get_entity
+             	 IMPORTING er_entity          = deptmasterdatase_get_entity
                          es_response_context = es_response_context
           ).
 
-        IF formmastermetada_get_entity IS NOT INITIAL.
+        IF deptmasterdatase_get_entity IS NOT INITIAL.
 *     Send specific entity data to the caller interface
           copy_data_to_ref(
             EXPORTING
-              is_data = formmastermetada_get_entity
+              is_data = deptmasterdatase_get_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -2014,26 +2042,26 @@ CASE lv_entityset_name.
           er_entity = lr_entity.
         ENDIF.
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormAssingmentSet
+*             EntitySet -  FormMetaDataSet
 *-------------------------------------------------------------------------*
-      WHEN 'FormAssingmentSet'.
+      WHEN 'FormMetaDataSet'.
 *     Call the entity set generated method
-          formassingmentse_get_entity(
+          formmetadataset_get_entity(
                EXPORTING iv_entity_name     = iv_entity_name
                          iv_entity_set_name = iv_entity_set_name
                          iv_source_name     = iv_source_name
                          it_key_tab         = it_key_tab
                          it_navigation_path = it_navigation_path
                          io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formassingmentse_get_entity
+             	 IMPORTING er_entity          = formmetadataset_get_entity
                          es_response_context = es_response_context
           ).
 
-        IF formassingmentse_get_entity IS NOT INITIAL.
+        IF formmetadataset_get_entity IS NOT INITIAL.
 *     Send specific entity data to the caller interface
           copy_data_to_ref(
             EXPORTING
-              is_data = formassingmentse_get_entity
+              is_data = formmetadataset_get_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -2042,26 +2070,138 @@ CASE lv_entityset_name.
           er_entity = lr_entity.
         ENDIF.
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormAttachmentSet
+*             EntitySet -  FormResponseApprovalStatusSet
 *-------------------------------------------------------------------------*
-      WHEN 'FormAttachmentSet'.
+      WHEN 'FormResponseApprovalStatusSet'.
 *     Call the entity set generated method
-          formattachmentse_get_entity(
+          forminstancestat_get_entity(
                EXPORTING iv_entity_name     = iv_entity_name
                          iv_entity_set_name = iv_entity_set_name
                          iv_source_name     = iv_source_name
                          it_key_tab         = it_key_tab
                          it_navigation_path = it_navigation_path
                          io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formattachmentse_get_entity
+             	 IMPORTING er_entity          = forminstancestat_get_entity
                          es_response_context = es_response_context
           ).
 
-        IF formattachmentse_get_entity IS NOT INITIAL.
+        IF forminstancestat_get_entity IS NOT INITIAL.
 *     Send specific entity data to the caller interface
           copy_data_to_ref(
             EXPORTING
-              is_data = formattachmentse_get_entity
+              is_data = forminstancestat_get_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  ResponseCaptureSet
+*-------------------------------------------------------------------------*
+      WHEN 'ResponseCaptureSet'.
+*     Call the entity set generated method
+          formset_get_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formset_get_entity
+                         es_response_context = es_response_context
+          ).
+
+        IF formset_get_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formset_get_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  WorkOrderSet
+*-------------------------------------------------------------------------*
+      WHEN 'WorkOrderSet'.
+*     Call the entity set generated method
+          workorderset_get_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = workorderset_get_entity
+                         es_response_context = es_response_context
+          ).
+
+        IF workorderset_get_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = workorderset_get_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMasterMetadataSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormMasterMetadataSet'.
+*     Call the entity set generated method
+          formmastermetada_get_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formmastermetada_get_entity
+                         es_response_context = es_response_context
+          ).
+
+        IF formmastermetada_get_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formmastermetada_get_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  ReviewerFormResponseSet
+*-------------------------------------------------------------------------*
+      WHEN 'ReviewerFormResponseSet'.
+*     Call the entity set generated method
+          reviewerformresp_get_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = reviewerformresp_get_entity
+                         es_response_context = es_response_context
+          ).
+
+        IF reviewerformresp_get_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = reviewerformresp_get_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -2088,37 +2228,38 @@ CASE lv_entityset_name.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITYSET.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TMP_ENTITYSET_BASE
-*&* This class has been generated on 15.02.2022 18:00:55 in client 001
+*&* This class has been generated on 25.02.2023 11:52:55 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
 *&*   generated methods inside the DPC provider subclass - /ODSMFE/CL_PR_FORMUI_DPC_EXT
 *&-----------------------------------------------------------------------------------------------*
- DATA formmetadataset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmetadata.
- DATA deptmasterdatase_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_deptmasterdata.
+ DATA formimageset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formimage.
  DATA approvermasterda_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_approvermasterdata.
+ DATA deptmasterdatase_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_deptmasterdata.
  DATA forminstancestat_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formresponseapprovalstatus.
  DATA formidapproverse_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formapprover.
- DATA formmasterset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmaster.
- DATA formset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_responsecapture.
- DATA formmastermetada_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmastermetadata.
  DATA reviewerformresp_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_reviewerformresponse.
- DATA formmanualassign_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmanualassignment.
- DATA formassingmentse_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formassingment.
- DATA formimageset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formimage.
- DATA formattachmentse_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formattachment.
  DATA workorderset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_workorder.
+ DATA formset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_responsecapture.
+ DATA formmetadataset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmetadata.
+ DATA formmasterset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmaster.
+ DATA formassingmentse_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formassingment.
+ DATA notificationsset_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_notifications.
+ DATA formattachmentse_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formattachment.
+ DATA formmanualassign_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmanualassignment.
+ DATA formmastermetada_get_entityset TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmastermetadata.
  DATA lv_entityset_name TYPE string.
 
 lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
 
 CASE lv_entityset_name.
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormMetaDataSet
+*             EntitySet -  FormImageSet
 *-------------------------------------------------------------------------*
-   WHEN 'FormMetaDataSet'.
+   WHEN 'FormImageSet'.
 *     Call the entity set generated method
-      formmetadataset_get_entityset(
+      formimageset_get_entityset(
         EXPORTING
          iv_entity_name = iv_entity_name
          iv_entity_set_name = iv_entity_set_name
@@ -2132,43 +2273,13 @@ CASE lv_entityset_name.
          iv_search_string = iv_search_string
          io_tech_request_context = io_tech_request_context
        IMPORTING
-         et_entityset = formmetadataset_get_entityset
+         et_entityset = formimageset_get_entityset
          es_response_context = es_response_context
        ).
 *     Send specific entity data to the caller interface
       copy_data_to_ref(
         EXPORTING
-          is_data = formmetadataset_get_entityset
-        CHANGING
-          cr_data = er_entityset
-      ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  DeptMasterDataSet
-*-------------------------------------------------------------------------*
-   WHEN 'DeptMasterDataSet'.
-*     Call the entity set generated method
-      deptmasterdatase_get_entityset(
-        EXPORTING
-         iv_entity_name = iv_entity_name
-         iv_entity_set_name = iv_entity_set_name
-         iv_source_name = iv_source_name
-         it_filter_select_options = it_filter_select_options
-         it_order = it_order
-         is_paging = is_paging
-         it_navigation_path = it_navigation_path
-         it_key_tab = it_key_tab
-         iv_filter_string = iv_filter_string
-         iv_search_string = iv_search_string
-         io_tech_request_context = io_tech_request_context
-       IMPORTING
-         et_entityset = deptmasterdatase_get_entityset
-         es_response_context = es_response_context
-       ).
-*     Send specific entity data to the caller interface
-      copy_data_to_ref(
-        EXPORTING
-          is_data = deptmasterdatase_get_entityset
+          is_data = formimageset_get_entityset
         CHANGING
           cr_data = er_entityset
       ).
@@ -2199,6 +2310,36 @@ CASE lv_entityset_name.
       copy_data_to_ref(
         EXPORTING
           is_data = approvermasterda_get_entityset
+        CHANGING
+          cr_data = er_entityset
+      ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  DeptMasterDataSet
+*-------------------------------------------------------------------------*
+   WHEN 'DeptMasterDataSet'.
+*     Call the entity set generated method
+      deptmasterdatase_get_entityset(
+        EXPORTING
+         iv_entity_name = iv_entity_name
+         iv_entity_set_name = iv_entity_set_name
+         iv_source_name = iv_source_name
+         it_filter_select_options = it_filter_select_options
+         it_order = it_order
+         is_paging = is_paging
+         it_navigation_path = it_navigation_path
+         it_key_tab = it_key_tab
+         iv_filter_string = iv_filter_string
+         iv_search_string = iv_search_string
+         io_tech_request_context = io_tech_request_context
+       IMPORTING
+         et_entityset = deptmasterdatase_get_entityset
+         es_response_context = es_response_context
+       ).
+*     Send specific entity data to the caller interface
+      copy_data_to_ref(
+        EXPORTING
+          is_data = deptmasterdatase_get_entityset
         CHANGING
           cr_data = er_entityset
       ).
@@ -2264,11 +2405,11 @@ CASE lv_entityset_name.
       ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterSet
+*             EntitySet -  ReviewerFormResponseSet
 *-------------------------------------------------------------------------*
-   WHEN 'FormMasterSet'.
+   WHEN 'ReviewerFormResponseSet'.
 *     Call the entity set generated method
-      formmasterset_get_entityset(
+      reviewerformresp_get_entityset(
         EXPORTING
          iv_entity_name = iv_entity_name
          iv_entity_set_name = iv_entity_set_name
@@ -2282,13 +2423,43 @@ CASE lv_entityset_name.
          iv_search_string = iv_search_string
          io_tech_request_context = io_tech_request_context
        IMPORTING
-         et_entityset = formmasterset_get_entityset
+         et_entityset = reviewerformresp_get_entityset
          es_response_context = es_response_context
        ).
 *     Send specific entity data to the caller interface
       copy_data_to_ref(
         EXPORTING
-          is_data = formmasterset_get_entityset
+          is_data = reviewerformresp_get_entityset
+        CHANGING
+          cr_data = er_entityset
+      ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  WorkOrderSet
+*-------------------------------------------------------------------------*
+   WHEN 'WorkOrderSet'.
+*     Call the entity set generated method
+      workorderset_get_entityset(
+        EXPORTING
+         iv_entity_name = iv_entity_name
+         iv_entity_set_name = iv_entity_set_name
+         iv_source_name = iv_source_name
+         it_filter_select_options = it_filter_select_options
+         it_order = it_order
+         is_paging = is_paging
+         it_navigation_path = it_navigation_path
+         it_key_tab = it_key_tab
+         iv_filter_string = iv_filter_string
+         iv_search_string = iv_search_string
+         io_tech_request_context = io_tech_request_context
+       IMPORTING
+         et_entityset = workorderset_get_entityset
+         es_response_context = es_response_context
+       ).
+*     Send specific entity data to the caller interface
+      copy_data_to_ref(
+        EXPORTING
+          is_data = workorderset_get_entityset
         CHANGING
           cr_data = er_entityset
       ).
@@ -2324,11 +2495,11 @@ CASE lv_entityset_name.
       ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterMetadataSet
+*             EntitySet -  FormMetaDataSet
 *-------------------------------------------------------------------------*
-   WHEN 'FormMasterMetadataSet'.
+   WHEN 'FormMetaDataSet'.
 *     Call the entity set generated method
-      formmastermetada_get_entityset(
+      formmetadataset_get_entityset(
         EXPORTING
          iv_entity_name = iv_entity_name
          iv_entity_set_name = iv_entity_set_name
@@ -2342,23 +2513,23 @@ CASE lv_entityset_name.
          iv_search_string = iv_search_string
          io_tech_request_context = io_tech_request_context
        IMPORTING
-         et_entityset = formmastermetada_get_entityset
+         et_entityset = formmetadataset_get_entityset
          es_response_context = es_response_context
        ).
 *     Send specific entity data to the caller interface
       copy_data_to_ref(
         EXPORTING
-          is_data = formmastermetada_get_entityset
+          is_data = formmetadataset_get_entityset
         CHANGING
           cr_data = er_entityset
       ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  ReviewerFormResponseSet
+*             EntitySet -  FormMasterSet
 *-------------------------------------------------------------------------*
-   WHEN 'ReviewerFormResponseSet'.
+   WHEN 'FormMasterSet'.
 *     Call the entity set generated method
-      reviewerformresp_get_entityset(
+      formmasterset_get_entityset(
         EXPORTING
          iv_entity_name = iv_entity_name
          iv_entity_set_name = iv_entity_set_name
@@ -2372,43 +2543,13 @@ CASE lv_entityset_name.
          iv_search_string = iv_search_string
          io_tech_request_context = io_tech_request_context
        IMPORTING
-         et_entityset = reviewerformresp_get_entityset
+         et_entityset = formmasterset_get_entityset
          es_response_context = es_response_context
        ).
 *     Send specific entity data to the caller interface
       copy_data_to_ref(
         EXPORTING
-          is_data = reviewerformresp_get_entityset
-        CHANGING
-          cr_data = er_entityset
-      ).
-
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormManualAssignmentSet
-*-------------------------------------------------------------------------*
-   WHEN 'FormManualAssignmentSet'.
-*     Call the entity set generated method
-      formmanualassign_get_entityset(
-        EXPORTING
-         iv_entity_name = iv_entity_name
-         iv_entity_set_name = iv_entity_set_name
-         iv_source_name = iv_source_name
-         it_filter_select_options = it_filter_select_options
-         it_order = it_order
-         is_paging = is_paging
-         it_navigation_path = it_navigation_path
-         it_key_tab = it_key_tab
-         iv_filter_string = iv_filter_string
-         iv_search_string = iv_search_string
-         io_tech_request_context = io_tech_request_context
-       IMPORTING
-         et_entityset = formmanualassign_get_entityset
-         es_response_context = es_response_context
-       ).
-*     Send specific entity data to the caller interface
-      copy_data_to_ref(
-        EXPORTING
-          is_data = formmanualassign_get_entityset
+          is_data = formmasterset_get_entityset
         CHANGING
           cr_data = er_entityset
       ).
@@ -2444,11 +2585,11 @@ CASE lv_entityset_name.
       ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  FormImageSet
+*             EntitySet -  NotificationsSet
 *-------------------------------------------------------------------------*
-   WHEN 'FormImageSet'.
+   WHEN 'NotificationsSet'.
 *     Call the entity set generated method
-      formimageset_get_entityset(
+      notificationsset_get_entityset(
         EXPORTING
          iv_entity_name = iv_entity_name
          iv_entity_set_name = iv_entity_set_name
@@ -2462,13 +2603,13 @@ CASE lv_entityset_name.
          iv_search_string = iv_search_string
          io_tech_request_context = io_tech_request_context
        IMPORTING
-         et_entityset = formimageset_get_entityset
+         et_entityset = notificationsset_get_entityset
          es_response_context = es_response_context
        ).
 *     Send specific entity data to the caller interface
       copy_data_to_ref(
         EXPORTING
-          is_data = formimageset_get_entityset
+          is_data = notificationsset_get_entityset
         CHANGING
           cr_data = er_entityset
       ).
@@ -2504,11 +2645,11 @@ CASE lv_entityset_name.
       ).
 
 *-------------------------------------------------------------------------*
-*             EntitySet -  WorkOrderSet
+*             EntitySet -  FormManualAssignmentSet
 *-------------------------------------------------------------------------*
-   WHEN 'WorkOrderSet'.
+   WHEN 'FormManualAssignmentSet'.
 *     Call the entity set generated method
-      workorderset_get_entityset(
+      formmanualassign_get_entityset(
         EXPORTING
          iv_entity_name = iv_entity_name
          iv_entity_set_name = iv_entity_set_name
@@ -2522,13 +2663,43 @@ CASE lv_entityset_name.
          iv_search_string = iv_search_string
          io_tech_request_context = io_tech_request_context
        IMPORTING
-         et_entityset = workorderset_get_entityset
+         et_entityset = formmanualassign_get_entityset
          es_response_context = es_response_context
        ).
 *     Send specific entity data to the caller interface
       copy_data_to_ref(
         EXPORTING
-          is_data = workorderset_get_entityset
+          is_data = formmanualassign_get_entityset
+        CHANGING
+          cr_data = er_entityset
+      ).
+
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMasterMetadataSet
+*-------------------------------------------------------------------------*
+   WHEN 'FormMasterMetadataSet'.
+*     Call the entity set generated method
+      formmastermetada_get_entityset(
+        EXPORTING
+         iv_entity_name = iv_entity_name
+         iv_entity_set_name = iv_entity_set_name
+         iv_source_name = iv_source_name
+         it_filter_select_options = it_filter_select_options
+         it_order = it_order
+         is_paging = is_paging
+         it_navigation_path = it_navigation_path
+         it_key_tab = it_key_tab
+         iv_filter_string = iv_filter_string
+         iv_search_string = iv_search_string
+         io_tech_request_context = io_tech_request_context
+       IMPORTING
+         et_entityset = formmastermetada_get_entityset
+         es_response_context = es_response_context
+       ).
+*     Send specific entity data to the caller interface
+      copy_data_to_ref(
+        EXPORTING
+          is_data = formmastermetada_get_entityset
         CHANGING
           cr_data = er_entityset
       ).
@@ -2556,27 +2727,28 @@ CASE lv_entityset_name.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~UPDATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_UPD_ENTITY_BASE
-*&* This class has been generated on 15.02.2022 18:00:55 in client 001
+*&* This class has been generated on 25.02.2023 11:52:55 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
 *&*   generated methods inside the DPC provider subclass - /ODSMFE/CL_PR_FORMUI_DPC_EXT
 *&-----------------------------------------------------------------------------------------------*
 
- DATA approvermasterda_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_approvermasterdata.
- DATA formmetadataset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmetadata.
- DATA deptmasterdatase_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_deptmasterdata.
- DATA formidapproverse_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formapprover.
- DATA formset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_responsecapture.
- DATA forminstancestat_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formresponseapprovalstatus.
- DATA formmastermetada_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmastermetadata.
- DATA formmasterset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmaster.
- DATA formmanualassign_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmanualassignment.
- DATA reviewerformresp_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_reviewerformresponse.
- DATA workorderset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_workorder.
- DATA formattachmentse_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formattachment.
+ DATA notificationsset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_notifications.
  DATA formimageset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formimage.
+ DATA reviewerformresp_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_reviewerformresponse.
+ DATA forminstancestat_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formresponseapprovalstatus.
+ DATA deptmasterdatase_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_deptmasterdata.
+ DATA approvermasterda_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_approvermasterdata.
+ DATA formidapproverse_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formapprover.
+ DATA formmastermetada_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmastermetadata.
+ DATA formmanualassign_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmanualassignment.
+ DATA formattachmentse_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formattachment.
  DATA formassingmentse_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formassingment.
+ DATA formmasterset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmaster.
+ DATA formmetadataset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_formmetadata.
+ DATA formset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_responsecapture.
+ DATA workorderset_update_entity TYPE /odsmfe/cl_pr_formui_mpc=>ts_workorder.
  DATA lv_entityset_name TYPE string.
  DATA lr_entity TYPE REF TO data.
 
@@ -2584,11 +2756,11 @@ lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
 
 CASE lv_entityset_name.
 *-------------------------------------------------------------------------*
-*             EntitySet -  ApproverMasterDataSet
+*             EntitySet -  NotificationsSet
 *-------------------------------------------------------------------------*
-      WHEN 'ApproverMasterDataSet'.
+      WHEN 'NotificationsSet'.
 *     Call the entity set generated method
-          approvermasterda_update_entity(
+          notificationsset_update_entity(
                EXPORTING iv_entity_name     = iv_entity_name
                          iv_entity_set_name = iv_entity_set_name
                          iv_source_name     = iv_source_name
@@ -2596,310 +2768,13 @@ CASE lv_entityset_name.
                          it_key_tab         = it_key_tab
                          it_navigation_path = it_navigation_path
                          io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = approvermasterda_update_entity
+             	 IMPORTING er_entity          = notificationsset_update_entity
           ).
-       IF approvermasterda_update_entity IS NOT INITIAL.
+       IF notificationsset_update_entity IS NOT INITIAL.
 *     Send specific entity data to the caller interface
           copy_data_to_ref(
             EXPORTING
-              is_data = approvermasterda_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormMetaDataSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormMetaDataSet'.
-*     Call the entity set generated method
-          formmetadataset_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formmetadataset_update_entity
-          ).
-       IF formmetadataset_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formmetadataset_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  DeptMasterDataSet
-*-------------------------------------------------------------------------*
-      WHEN 'DeptMasterDataSet'.
-*     Call the entity set generated method
-          deptmasterdatase_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = deptmasterdatase_update_entity
-          ).
-       IF deptmasterdatase_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = deptmasterdatase_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormApproverSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormApproverSet'.
-*     Call the entity set generated method
-          formidapproverse_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formidapproverse_update_entity
-          ).
-       IF formidapproverse_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formidapproverse_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  ResponseCaptureSet
-*-------------------------------------------------------------------------*
-      WHEN 'ResponseCaptureSet'.
-*     Call the entity set generated method
-          formset_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formset_update_entity
-          ).
-       IF formset_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formset_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormResponseApprovalStatusSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormResponseApprovalStatusSet'.
-*     Call the entity set generated method
-          forminstancestat_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = forminstancestat_update_entity
-          ).
-       IF forminstancestat_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = forminstancestat_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterMetadataSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormMasterMetadataSet'.
-*     Call the entity set generated method
-          formmastermetada_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formmastermetada_update_entity
-          ).
-       IF formmastermetada_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formmastermetada_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormMasterSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormMasterSet'.
-*     Call the entity set generated method
-          formmasterset_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formmasterset_update_entity
-          ).
-       IF formmasterset_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formmasterset_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormManualAssignmentSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormManualAssignmentSet'.
-*     Call the entity set generated method
-          formmanualassign_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formmanualassign_update_entity
-          ).
-       IF formmanualassign_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formmanualassign_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  ReviewerFormResponseSet
-*-------------------------------------------------------------------------*
-      WHEN 'ReviewerFormResponseSet'.
-*     Call the entity set generated method
-          reviewerformresp_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = reviewerformresp_update_entity
-          ).
-       IF reviewerformresp_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = reviewerformresp_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  WorkOrderSet
-*-------------------------------------------------------------------------*
-      WHEN 'WorkOrderSet'.
-*     Call the entity set generated method
-          workorderset_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = workorderset_update_entity
-          ).
-       IF workorderset_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = workorderset_update_entity
-            CHANGING
-              cr_data = er_entity
-          ).
-        ELSE.
-*         In case of initial values - unbind the entity reference
-          er_entity = lr_entity.
-        ENDIF.
-*-------------------------------------------------------------------------*
-*             EntitySet -  FormAttachmentSet
-*-------------------------------------------------------------------------*
-      WHEN 'FormAttachmentSet'.
-*     Call the entity set generated method
-          formattachmentse_update_entity(
-               EXPORTING iv_entity_name     = iv_entity_name
-                         iv_entity_set_name = iv_entity_set_name
-                         iv_source_name     = iv_source_name
-                         io_data_provider   = io_data_provider
-                         it_key_tab         = it_key_tab
-                         it_navigation_path = it_navigation_path
-                         io_tech_request_context = io_tech_request_context
-             	 IMPORTING er_entity          = formattachmentse_update_entity
-          ).
-       IF formattachmentse_update_entity IS NOT INITIAL.
-*     Send specific entity data to the caller interface
-          copy_data_to_ref(
-            EXPORTING
-              is_data = formattachmentse_update_entity
+              is_data = notificationsset_update_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -2935,6 +2810,222 @@ CASE lv_entityset_name.
           er_entity = lr_entity.
         ENDIF.
 *-------------------------------------------------------------------------*
+*             EntitySet -  ReviewerFormResponseSet
+*-------------------------------------------------------------------------*
+      WHEN 'ReviewerFormResponseSet'.
+*     Call the entity set generated method
+          reviewerformresp_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = reviewerformresp_update_entity
+          ).
+       IF reviewerformresp_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = reviewerformresp_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormResponseApprovalStatusSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormResponseApprovalStatusSet'.
+*     Call the entity set generated method
+          forminstancestat_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = forminstancestat_update_entity
+          ).
+       IF forminstancestat_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = forminstancestat_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  DeptMasterDataSet
+*-------------------------------------------------------------------------*
+      WHEN 'DeptMasterDataSet'.
+*     Call the entity set generated method
+          deptmasterdatase_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = deptmasterdatase_update_entity
+          ).
+       IF deptmasterdatase_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = deptmasterdatase_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  ApproverMasterDataSet
+*-------------------------------------------------------------------------*
+      WHEN 'ApproverMasterDataSet'.
+*     Call the entity set generated method
+          approvermasterda_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = approvermasterda_update_entity
+          ).
+       IF approvermasterda_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = approvermasterda_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormApproverSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormApproverSet'.
+*     Call the entity set generated method
+          formidapproverse_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formidapproverse_update_entity
+          ).
+       IF formidapproverse_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formidapproverse_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMasterMetadataSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormMasterMetadataSet'.
+*     Call the entity set generated method
+          formmastermetada_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formmastermetada_update_entity
+          ).
+       IF formmastermetada_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formmastermetada_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormManualAssignmentSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormManualAssignmentSet'.
+*     Call the entity set generated method
+          formmanualassign_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formmanualassign_update_entity
+          ).
+       IF formmanualassign_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formmanualassign_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormAttachmentSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormAttachmentSet'.
+*     Call the entity set generated method
+          formattachmentse_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formattachmentse_update_entity
+          ).
+       IF formattachmentse_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formattachmentse_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
 *             EntitySet -  FormAssingmentSet
 *-------------------------------------------------------------------------*
       WHEN 'FormAssingmentSet'.
@@ -2954,6 +3045,114 @@ CASE lv_entityset_name.
           copy_data_to_ref(
             EXPORTING
               is_data = formassingmentse_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMasterSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormMasterSet'.
+*     Call the entity set generated method
+          formmasterset_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formmasterset_update_entity
+          ).
+       IF formmasterset_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formmasterset_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  FormMetaDataSet
+*-------------------------------------------------------------------------*
+      WHEN 'FormMetaDataSet'.
+*     Call the entity set generated method
+          formmetadataset_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formmetadataset_update_entity
+          ).
+       IF formmetadataset_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formmetadataset_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  ResponseCaptureSet
+*-------------------------------------------------------------------------*
+      WHEN 'ResponseCaptureSet'.
+*     Call the entity set generated method
+          formset_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = formset_update_entity
+          ).
+       IF formset_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = formset_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  WorkOrderSet
+*-------------------------------------------------------------------------*
+      WHEN 'WorkOrderSet'.
+*     Call the entity set generated method
+          workorderset_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = workorderset_update_entity
+          ).
+       IF workorderset_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = workorderset_update_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -3574,6 +3773,46 @@ lo_logger = /iwbep/if_mgw_conv_srv_runtime~get_logger( ).
     EXPORTING
       textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
       method = 'FORMSET_UPDATE_ENTITY'.
+  endmethod.
+
+
+  method NOTIFICATIONSSET_CREATE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'NOTIFICATIONSSET_CREATE_ENTITY'.
+  endmethod.
+
+
+  method NOTIFICATIONSSET_DELETE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'NOTIFICATIONSSET_DELETE_ENTITY'.
+  endmethod.
+
+
+  method NOTIFICATIONSSET_GET_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'NOTIFICATIONSSET_GET_ENTITY'.
+  endmethod.
+
+
+  method NOTIFICATIONSSET_GET_ENTITYSET.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'NOTIFICATIONSSET_GET_ENTITYSET'.
+  endmethod.
+
+
+  method NOTIFICATIONSSET_UPDATE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'NOTIFICATIONSSET_UPDATE_ENTITY'.
   endmethod.
 
 

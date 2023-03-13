@@ -16,33 +16,51 @@
      <IMPORT>
       <RSIMP>
        <PARAMETER>IM_AUFNR</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
        <REFERENCE>X</REFERENCE>
        <TYP>AUFNR</TYP>
       </RSIMP>
       <RSIMP>
        <PARAMETER>IM_AUART</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
        <REFERENCE>X</REFERENCE>
        <TYP>AUFART</TYP>
       </RSIMP>
       <RSIMP>
        <PARAMETER>IM_PLNTY</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
        <REFERENCE>X</REFERENCE>
        <TYP>PLNTY</TYP>
       </RSIMP>
       <RSIMP>
        <PARAMETER>IM_PLNNR</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
        <REFERENCE>X</REFERENCE>
        <TYP>PLNNR</TYP>
       </RSIMP>
       <RSIMP>
        <PARAMETER>IM_PLNAL</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
        <REFERENCE>X</REFERENCE>
        <TYP>PLNAL</TYP>
       </RSIMP>
       <RSIMP>
        <PARAMETER>IM_ZAEHL</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
        <REFERENCE>X</REFERENCE>
        <TYP>CIM_COUNT</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>IM_QMNUM</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
+       <REFERENCE>X</REFERENCE>
+       <TYP>QMNUM</TYP>
+      </RSIMP>
+      <RSIMP>
+       <PARAMETER>IM_QMART</PARAMETER>
+       <OPTIONAL>X</OPTIONAL>
+       <REFERENCE>X</REFERENCE>
+       <TYP>QMART</TYP>
       </RSIMP>
      </IMPORT>
      <DOCUMENTATION>
@@ -75,6 +93,16 @@
        <PARAMETER>IM_ZAEHL</PARAMETER>
        <KIND>P</KIND>
        <STEXT>Internal counter</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>IM_QMNUM</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Notification No</STEXT>
+      </RSFDO>
+      <RSFDO>
+       <PARAMETER>IM_QMART</PARAMETER>
+       <KIND>P</KIND>
+       <STEXT>Notification Type</STEXT>
       </RSFDO>
      </DOCUMENTATION>
     </item>

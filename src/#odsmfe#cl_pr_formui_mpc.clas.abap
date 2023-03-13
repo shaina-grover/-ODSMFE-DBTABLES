@@ -42,8 +42,8 @@ TT_WORKORDER type standard table of TS_WORKORDER. .
      AUART type AUFART,
      COUNTER type C length 12,
      REMARKS type C length 75,
-     deleted TYPE C LENGTH 1,
-  end of TS_RESPONSECAPTURE.
+     DELETED type /ODSMFE/DE_DELETED,
+  end of TS_RESPONSECAPTURE. .
   types:
 TT_RESPONSECAPTURE type standard table of TS_RESPONSECAPTURE. .
   types:
@@ -160,6 +160,10 @@ TT_REVIEWERFORMRESPONSE type standard table of TS_REVIEWERFORMRESPONSE. .
      TS_FORMIMAGE type /ODSMFE/ST_FRMIMG. .
   types:
 TT_FORMIMAGE type standard table of TS_FORMIMAGE. .
+  types:
+     TS_NOTIFICATIONS type /ODSMFE/ST_NOTIFICATION. .
+  types:
+TT_NOTIFICATIONS type standard table of TS_NOTIFICATIONS. .
 
   constants GC_APPROVERMASTERDATA type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'ApproverMasterData' ##NO_TEXT.
   constants GC_DEPTMASTERDATA type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'DeptMasterData' ##NO_TEXT.
@@ -172,6 +176,7 @@ TT_FORMIMAGE type standard table of TS_FORMIMAGE. .
   constants GC_FORMMASTERMETADATA type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'FormMasterMetadata' ##NO_TEXT.
   constants GC_FORMMETADATA type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'FormMetaData' ##NO_TEXT.
   constants GC_FORMRESPONSEAPPROVALSTATUS type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'FormResponseApprovalStatus' ##NO_TEXT.
+  constants GC_NOTIFICATIONS type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'Notifications' ##NO_TEXT.
   constants GC_RESPONSECAPTURE type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'ResponseCapture' ##NO_TEXT.
   constants GC_REVIEWERFORMRESPONSE type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'ReviewerFormResponse' ##NO_TEXT.
   constants GC_WORKORDER type /IWBEP/IF_MGW_MED_ODATA_TYPES=>TY_E_MED_ENTITY_NAME value 'WorkOrder' ##NO_TEXT.
@@ -234,6 +239,9 @@ private section.
   methods DEFINE_FORMIMAGE
     raising
       /IWBEP/CX_MGW_MED_EXCEPTION .
+  methods DEFINE_NOTIFICATIONS
+    raising
+      /IWBEP/CX_MGW_MED_EXCEPTION .
   methods DEFINE_ASSOCIATIONS
     raising
       /IWBEP/CX_MGW_MED_EXCEPTION .
@@ -269,6 +277,7 @@ define_deptmasterdata( ).
 define_formresponseapprovalsta( ).
 define_reviewerformresponse( ).
 define_formimage( ).
+define_notifications( ).
 define_associations( ).
   endmethod.
 
@@ -500,6 +509,22 @@ lo_assoc_set = model->create_association_set( iv_association_set_name  = 'Ass_Fo
                                               iv_right_entity_set_name = 'FormMetaDataSet'             "#EC NOTEXT
                                               iv_association_name      = 'Ass_Form_FormMetaData' ).                                 "#EC NOTEXT
 
+ lo_association = model->create_association(
+                            iv_association_name = 'Ass_Notifications_Form' "#EC NOTEXT
+                            iv_left_type        = 'Notifications' "#EC NOTEXT
+                            iv_right_type       = 'ResponseCapture' "#EC NOTEXT
+                            iv_right_card       = 'M' "#EC NOTEXT
+                            iv_left_card        = '1'  "#EC NOTEXT
+                            iv_def_assoc_set    = abap_false ). "#EC NOTEXT
+* Referential constraint for association - Ass_Notifications_Form
+lo_ref_constraint = lo_association->create_ref_constraint( ).
+lo_ref_constraint->add_property( iv_principal_property = 'Notification'   iv_dependent_property = 'WoNum' ). "#EC NOTEXT
+lo_ref_constraint->add_property( iv_principal_property = 'OrderType'   iv_dependent_property = 'OrderType' ). "#EC NOTEXT
+lo_assoc_set = model->create_association_set( iv_association_set_name  = 'Ass_Notifications_FormSet'                         "#EC NOTEXT
+                                              iv_left_entity_set_name  = 'NotificationsSet'              "#EC NOTEXT
+                                              iv_right_entity_set_name = 'ResponseCaptureSet'             "#EC NOTEXT
+                                              iv_association_name      = 'Ass_Notifications_Form' ).                                 "#EC NOTEXT
+
 
 ***********************************************************************************************************************************
 *   NAVIGATION PROPERTIES
@@ -507,17 +532,22 @@ lo_assoc_set = model->create_association_set( iv_association_set_name  = 'Ass_Fo
 
 * Navigation Properties for entity - WorkOrder
 lo_entity_type = model->get_entity_type( iv_entity_name = 'WorkOrder' ). "#EC NOTEXT
-lo_nav_property = lo_entity_type->create_navigation_property( iv_property_name  = 'FormSet' "#EC NOTEXT
-                                                              iv_abap_fieldname = 'FORMSET' "#EC NOTEXT
-                                                              iv_association_name = 'Ass_WorkOrder_Form' ). "#EC NOTEXT
 lo_nav_property = lo_entity_type->create_navigation_property( iv_property_name  = 'FormMetaDataSet' "#EC NOTEXT
                                                               iv_abap_fieldname = 'FORMMETADATASET' "#EC NOTEXT
                                                               iv_association_name = 'Ass_WorkOrder_FormMetaData' ). "#EC NOTEXT
+lo_nav_property = lo_entity_type->create_navigation_property( iv_property_name  = 'FormSet' "#EC NOTEXT
+                                                              iv_abap_fieldname = 'FORMSET' "#EC NOTEXT
+                                                              iv_association_name = 'Ass_WorkOrder_Form' ). "#EC NOTEXT
 * Navigation Properties for entity - ResponseCapture
 lo_entity_type = model->get_entity_type( iv_entity_name = 'ResponseCapture' ). "#EC NOTEXT
 lo_nav_property = lo_entity_type->create_navigation_property( iv_property_name  = 'FormMetaData' "#EC NOTEXT
                                                               iv_abap_fieldname = 'FORMMETADATA' "#EC NOTEXT
                                                               iv_association_name = 'Ass_Form_FormMetaData' ). "#EC NOTEXT
+* Navigation Properties for entity - Notifications
+lo_entity_type = model->get_entity_type( iv_entity_name = 'Notifications' ). "#EC NOTEXT
+lo_nav_property = lo_entity_type->create_navigation_property( iv_property_name  = 'FormSet' "#EC NOTEXT
+                                                              iv_abap_fieldname = 'FORMSET' "#EC NOTEXT
+                                                              iv_association_name = 'Ass_Notifications_Form' ). "#EC NOTEXT
   endmethod.
 
 
@@ -1128,6 +1158,14 @@ lo_property->set_updatable( abap_true ).
 lo_property->set_sortable( abap_true ).
 lo_property->set_nullable( abap_true ).
 lo_property->set_filterable( abap_true ).
+lo_property = lo_entity_type->create_property( iv_property_name = 'OrderType' iv_abap_fieldname = 'ORDER_TYPE' ). "#EC NOTEXT
+lo_property->set_type_edm_string( ).
+lo_property->set_maxlength( iv_max_length = 4 ). "#EC NOTEXT
+lo_property->set_creatable( abap_true ).
+lo_property->set_updatable( abap_true ).
+lo_property->set_sortable( abap_true ).
+lo_property->set_nullable( abap_true ).
+lo_property->set_filterable( abap_true ).
 lo_property = lo_entity_type->create_property( iv_property_name = 'OperationNum' iv_abap_fieldname = 'VORNR' ). "#EC NOTEXT
 lo_property->set_type_edm_string( ).
 lo_property->set_maxlength( iv_max_length = 4 ). "#EC NOTEXT
@@ -1479,6 +1517,7 @@ lo_property->set_sortable( abap_true ).
 lo_property->set_nullable( abap_true ).
 lo_property->set_filterable( abap_true ).
 lo_property = lo_entity_type->create_property( iv_property_name = 'PostNotification' iv_abap_fieldname = 'POSTNOTIFICATION' ). "#EC NOTEXT
+lo_property->set_label_from_text_element( iv_text_element_symbol = '140' iv_text_element_container = gc_incl_name ).  "#EC NOTEXT
 lo_property->set_type_edm_boolean( ).
 lo_property->set_creatable( abap_false ).
 lo_property->set_updatable( abap_false ).
@@ -2141,7 +2180,7 @@ lo_property->set_creatable( abap_false ).
 lo_property->set_updatable( abap_false ).
 lo_property->set_sortable( abap_true ).
 lo_property->set_nullable( abap_false ).
-lo_property->set_filterable( abap_false ).
+lo_property->set_filterable( abap_true ).
 lo_property = lo_entity_type->create_property( iv_property_name = 'FormInstanceID' iv_abap_fieldname = 'FORMINSTANCEID' ). "#EC NOTEXT
 lo_property->set_is_key( ).
 lo_property->set_type_edm_string( ).
@@ -2235,6 +2274,82 @@ lo_entity_type->bind_structure( iv_structure_name   = '/ODSMFE/TB_FINST'
 *   ENTITY SETS
 ***********************************************************************************************************************************
 lo_entity_set = lo_entity_type->create_entity_set( 'FormResponseApprovalStatusSet' ). "#EC NOTEXT
+
+lo_entity_set->set_creatable( abap_false ).
+lo_entity_set->set_updatable( abap_false ).
+lo_entity_set->set_deletable( abap_false ).
+
+lo_entity_set->set_pageable( abap_false ).
+lo_entity_set->set_addressable( abap_true ).
+lo_entity_set->set_has_ftxt_search( abap_false ).
+lo_entity_set->set_subscribable( abap_false ).
+lo_entity_set->set_filter_required( abap_false ).
+  endmethod.
+
+
+  method DEFINE_NOTIFICATIONS.
+*&---------------------------------------------------------------------*
+*&           Generated code for the MODEL PROVIDER BASE CLASS         &*
+*&                                                                     &*
+*&  !!!NEVER MODIFY THIS CLASS. IN CASE YOU WANT TO CHANGE THE MODEL  &*
+*&        DO THIS IN THE MODEL PROVIDER SUBCLASS!!!                   &*
+*&                                                                     &*
+*&---------------------------------------------------------------------*
+
+
+  data:
+        lo_annotation     type ref to /iwbep/if_mgw_odata_annotation,                "#EC NEEDED
+        lo_entity_type    type ref to /iwbep/if_mgw_odata_entity_typ,                "#EC NEEDED
+        lo_complex_type   type ref to /iwbep/if_mgw_odata_cmplx_type,                "#EC NEEDED
+        lo_property       type ref to /iwbep/if_mgw_odata_property,                  "#EC NEEDED
+        lo_entity_set     type ref to /iwbep/if_mgw_odata_entity_set.                "#EC NEEDED
+
+***********************************************************************************************************************************
+*   ENTITY - Notifications
+***********************************************************************************************************************************
+
+lo_entity_type = model->create_entity_type( iv_entity_type_name = 'Notifications' iv_def_entity_set = abap_false ). "#EC NOTEXT
+
+***********************************************************************************************************************************
+*Properties
+***********************************************************************************************************************************
+
+lo_property = lo_entity_type->create_property( iv_property_name = 'Notification' iv_abap_fieldname = 'NOTIFICATION' ). "#EC NOTEXT
+lo_property->set_is_key( ).
+lo_property->set_type_edm_string( ).
+lo_property->set_maxlength( iv_max_length = 12 ). "#EC NOTEXT
+lo_property->set_conversion_exit( 'ALPHA' ). "#EC NOTEXT
+lo_property->set_creatable( abap_false ).
+lo_property->set_updatable( abap_false ).
+lo_property->set_sortable( abap_true ).
+lo_property->set_nullable( abap_false ).
+lo_property->set_filterable( abap_true ).
+lo_property = lo_entity_type->create_property( iv_property_name = 'OrderType' iv_abap_fieldname = 'ORDER_TYPE' ). "#EC NOTEXT
+lo_property->set_is_key( ).
+lo_property->set_type_edm_string( ).
+lo_property->set_maxlength( iv_max_length = 4 ). "#EC NOTEXT
+lo_property->set_creatable( abap_false ).
+lo_property->set_updatable( abap_false ).
+lo_property->set_sortable( abap_true ).
+lo_property->set_nullable( abap_false ).
+lo_property->set_filterable( abap_true ).
+lo_property = lo_entity_type->create_property( iv_property_name = 'Description' iv_abap_fieldname = 'DESCRIPTION' ). "#EC NOTEXT
+lo_property->set_type_edm_string( ).
+lo_property->set_maxlength( iv_max_length = 40 ). "#EC NOTEXT
+lo_property->set_creatable( abap_false ).
+lo_property->set_updatable( abap_false ).
+lo_property->set_sortable( abap_true ).
+lo_property->set_nullable( abap_true ).
+lo_property->set_filterable( abap_true ).
+
+lo_entity_type->bind_structure( iv_structure_name   = '/ODSMFE/ST_NOTIFICATION'
+                                iv_bind_conversions = 'X' ). "#EC NOTEXT
+
+
+***********************************************************************************************************************************
+*   ENTITY SETS
+***********************************************************************************************************************************
+lo_entity_set = lo_entity_type->create_entity_set( 'NotificationsSet' ). "#EC NOTEXT
 
 lo_entity_set->set_creatable( abap_false ).
 lo_entity_set->set_updatable( abap_false ).
@@ -2463,6 +2578,15 @@ lo_property = lo_entity_type->create_property( iv_property_name = 'Remarks' iv_a
 lo_property->set_label_from_text_element( iv_text_element_symbol = '136' iv_text_element_container = gc_incl_name ).  "#EC NOTEXT
 lo_property->set_type_edm_string( ).
 lo_property->set_maxlength( iv_max_length = 75 ). "#EC NOTEXT
+lo_property->set_creatable( abap_false ).
+lo_property->set_updatable( abap_false ).
+lo_property->set_sortable( abap_true ).
+lo_property->set_nullable( abap_true ).
+lo_property->set_filterable( abap_true ).
+lo_property = lo_entity_type->create_property( iv_property_name = 'Deleted' iv_abap_fieldname = 'DELETED' ). "#EC NOTEXT
+lo_property->set_label_from_text_element( iv_text_element_symbol = '141' iv_text_element_container = gc_incl_name ).  "#EC NOTEXT
+lo_property->set_type_edm_string( ).
+lo_property->set_maxlength( iv_max_length = 1 ). "#EC NOTEXT
 lo_property->set_creatable( abap_false ).
 lo_property->set_updatable( abap_false ).
 lo_property->set_sortable( abap_true ).
@@ -2812,7 +2936,7 @@ lo_entity_set->set_filter_required( abap_false ).
 *&---------------------------------------------------------------------*
 
 
-  CONSTANTS: lc_gen_date_time TYPE timestamp VALUE '20220215170052'.                  "#EC NOTEXT
+  CONSTANTS: lc_gen_date_time TYPE timestamp VALUE '20230225105251'.                  "#EC NOTEXT
   rv_last_modified = super->get_last_modified( ).
   IF rv_last_modified LT lc_gen_date_time.
     rv_last_modified = lc_gen_date_time.
@@ -2996,6 +3120,13 @@ ls_text_element-artifact_type          = 'PROP'.                                
 ls_text_element-parent_artifact_name   = 'ResponseCapture'.                            "#EC NOTEXT
 ls_text_element-parent_artifact_type   = 'ETYP'.                                       "#EC NOTEXT
 ls_text_element-text_symbol            = '136'.              "#EC NOTEXT
+APPEND ls_text_element TO rt_text_elements.
+clear ls_text_element.
+ls_text_element-artifact_name          = 'Deleted'.                 "#EC NOTEXT
+ls_text_element-artifact_type          = 'PROP'.                                       "#EC NOTEXT
+ls_text_element-parent_artifact_name   = 'ResponseCapture'.                            "#EC NOTEXT
+ls_text_element-parent_artifact_type   = 'ETYP'.                                       "#EC NOTEXT
+ls_text_element-text_symbol            = '141'.              "#EC NOTEXT
 APPEND ls_text_element TO rt_text_elements.
 
 
@@ -3249,6 +3380,13 @@ ls_text_element-artifact_type          = 'PROP'.                                
 ls_text_element-parent_artifact_name   = 'FormManualAssignment'.                            "#EC NOTEXT
 ls_text_element-parent_artifact_type   = 'ETYP'.                                       "#EC NOTEXT
 ls_text_element-text_symbol            = '101'.              "#EC NOTEXT
+APPEND ls_text_element TO rt_text_elements.
+clear ls_text_element.
+ls_text_element-artifact_name          = 'PostNotification'.                 "#EC NOTEXT
+ls_text_element-artifact_type          = 'PROP'.                                       "#EC NOTEXT
+ls_text_element-parent_artifact_name   = 'FormManualAssignment'.                            "#EC NOTEXT
+ls_text_element-parent_artifact_type   = 'ETYP'.                                       "#EC NOTEXT
+ls_text_element-text_symbol            = '140'.              "#EC NOTEXT
 APPEND ls_text_element TO rt_text_elements.
 clear ls_text_element.
 ls_text_element-artifact_name          = 'AssignedTime'.                 "#EC NOTEXT

@@ -208,6 +208,14 @@ CLASS /ODSMFE/CL_FORMMETADATA IMPLEMENTATION.
 
     FIELD-SYMBOLS : <lfsst_form_master> TYPE  ltys_form_mast.
 
+    CONSTANTS: lc_ResponseCaptureSet TYPE string VALUE 'ResponseCaptureSet',
+               lc_FormMetaDataSet    TYPE string VALUE 'FormMetaDataSet',
+               lc_FormId             TYPE string VALUE 'FormId',
+               lc_Version            TYPE string VALUE 'Version',
+               lc_WorkOrderSet       TYPE string VALUE 'WorkOrderSet',
+               lc_WorkOrderNumber    TYPE string VALUE 'WorkOrderNumber',
+               lc_OrderType          TYPE string VALUE 'OrderType'.
+
 *-------------------------------------------------------------
 * Main Section
 *-------------------------------------------------------------
@@ -222,7 +230,7 @@ CLASS /ODSMFE/CL_FORMMETADATA IMPLEMENTATION.
         lv_source_entity_set_name     = im_tech_request_context->get_source_entity_set_name( ).
       ENDIF.
       " In case of navigation from ResponseCaptureSet , get data based on InstanceId
-      IF  lv_source_entity_set_name = text-001.
+      IF  lv_source_entity_set_name = lc_ResponseCaptureSet.
 
         IF im_tech_request_context_entity IS NOT INITIAL.
 * Convert keys to appropriate entity set structure
@@ -244,13 +252,13 @@ CLASS /ODSMFE/CL_FORMMETADATA IMPLEMENTATION.
           ENDIF.
         ENDIF.
         " In case of running independent FormMetadtaSet, Fetch data based on FormId and Version ++SKAMMARI ES1K902140
-      ELSEIF  lv_source_entity_set_name IS INITIAL AND im_entity_set_name = text-002."'FormMetaDataSet'.
-        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = text-004."'FormId'
+      ELSEIF  lv_source_entity_set_name IS INITIAL AND im_entity_set_name = lc_FormMetaDataSet.
+        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_FormId.
         IF sy-subrc IS INITIAL.
           lv_formid = lst_key_tab-value.
         ENDIF.
 
-        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = text-005."'Version'
+        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_Version.
         IF sy-subrc IS INITIAL.
           lv_version = lst_key_tab-value.
         ENDIF.
@@ -283,15 +291,15 @@ CLASS /ODSMFE/CL_FORMMETADATA IMPLEMENTATION.
 
 *     " EOC ++SKAMMARI ES1K902140
         " In case of Navigation from Workoderset service
-      ELSEIF lv_source_entity_set_name = text-003 "'WorkOrderSet'
-         AND im_entity_set_name = text-002."'FormMetaDataSet'.
+      ELSEIF lv_source_entity_set_name = lc_WorkOrderSet
+         AND im_entity_set_name = lc_FormMetaDataSet.
 
-        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = text-006."'WorkOrderNumber'
+        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_WorkOrderNumber.
         IF sy-subrc IS INITIAL.
           lv_wonum = lst_key_tab-value.
         ENDIF.
 
-        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = text-007."'OrderType'
+        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_OrderType.
         IF sy-subrc IS INITIAL.
           lv_ordertype = lst_key_tab-value.
         ENDIF.
@@ -341,7 +349,7 @@ CLASS /ODSMFE/CL_FORMMETADATA IMPLEMENTATION.
         MOVE <lfsst_form_master>-version  TO gstib_entity-version.
         MOVE <lfsst_form_master>-formhtml TO gstib_entity-formhtml.
         MOVE <lfsst_form_master>-formmodel TO gstib_entity-formmodel.
-        IF lv_source_entity_set_name IS INITIAL AND im_entity_set_name = text-002."'FormMetaDataSet'.
+        IF lv_source_entity_set_name IS INITIAL AND im_entity_set_name = lc_FormMetaDataSet.
           CLEAR gstib_entity-responsedata.
         ELSE.
           SORT lit_resp_cap by formid.
@@ -350,7 +358,7 @@ CLASS /ODSMFE/CL_FORMMETADATA IMPLEMENTATION.
             gstib_entity-responsedata = lst_respdata-responsedata.
           ENDIF.
         ENDIF.
-        IF lv_source_entity_set_name = text-001. " 'ResponseCaptureSet' ++SKAMMARI
+        IF lv_source_entity_set_name = lc_ResponseCaptureSet. "++SKAMMARI
           gstib_entity-instanceid = lv_instid.
         ENDIF.                                              "++SKAMMARI
       ENDLOOP.                                                         " LOOP AT LIT_FORM_MASTER
@@ -416,7 +424,7 @@ CLASS /ODSMFE/CL_FORMMETADATA IMPLEMENTATION.
         LOOP AT lit_formmast INTO lst_formmast .
           gstib_entity-formid     = lst_formmast-formid.
           gstib_entity-version    = lst_formmast-version.
-          IF lv_source_entity_set_name NE text-003."'WorkOrderSet'.
+          IF lv_source_entity_set_name NE lc_WorkOrderSet.
             gstib_entity-formhtml   = lst_formmast-formhtml.
             gstib_entity-formmodel  = lst_formmast-formmodel.
           ENDIF.

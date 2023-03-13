@@ -69,6 +69,12 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
 * Transport No.          : ES1K902967
 * Change Description     : ODSMFE Refactoring
 ***********************************************************************
+********************** CHANGE HISTORY **********************
+* Program Author (SID)   : ODS-VSANAGALA
+* Change Date            : 27.02.2023
+* Transport No.          : ES1K903619
+* Change Description     : Added logic to update the Notification exchange table and Create the Attachment for the Notification.
+***********************************************************************
 *----------------------------------------------------------------------
 *  Data declaration
 *----------------------------------------------------------------------
@@ -104,6 +110,7 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
            lv_tempid           TYPE /odsmfe/de_middleware_objkey,
            lv_target_obj_key   TYPE /odsmfe/de_middleware_objkey,
            lv_workordernum     TYPE aufnr,
+           lv_qmnum            TYPE qmnum,
            lv_line             TYPE string,
            lv_file_content_bin TYPE xstring,
            lv_description      TYPE string,
@@ -116,6 +123,7 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
            lv_gos_active       TYPE bapibds01-x,
            lv_bds_active       TYPE bapibds01-x,
            lv_wo_classname     TYPE bds_clsnam,
+           lv_no_classname     TYPE bds_clsnam,
            lv_srv_classname    TYPE bds_clsnam,
            lv_classname        TYPE bapibds01-classname,
            lv_name             TYPE string,
@@ -161,13 +169,33 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
       CLEAR lv_var.
       lv_tempid = lst_formatt-instanceid .
       IF lst_formatt-wo_num IS NOT INITIAL.
-        lv_workordernum        =  lst_formatt-wo_num.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        SELECT SINGLE aufnr FROM aufk INTO lv_workordernum WHERE aufnr = lst_formatt-wo_num.
+        IF sy-subrc = 0 AND lv_workordernum IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+          lv_workordernum        =  lst_formatt-wo_num.
 * Converson exits
-        CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-          EXPORTING
-            input  = lv_workordernum
-          IMPORTING
-            output = lv_workordernum.
+          CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+            EXPORTING
+              input  = lv_workordernum
+            IMPORTING
+              output = lv_workordernum.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        ELSE.
+          SELECT SINGLE qmnum FROM qmel INTO lv_qmnum WHERE qmnum = lst_formatt-wo_num.
+          IF sy-subrc = 0 AND lv_qmnum IS NOT INITIAL.
+            "/ Conversion exit for Notification
+            CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+              EXPORTING
+                input  = lv_qmnum
+              IMPORTING
+                output = lv_qmnum.
+
+          ENDIF.
+        ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
       ENDIF.
 
 * Fill the values
@@ -175,17 +203,34 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
       SPLIT lst_formatt-file_name AT '.' INTO lv_description lv_filetype.
       lv_desc     = lst_formatt-description.
       lv_mimetype = lst_formatt-mimetype.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      IF lv_workordernum IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 * get the order type
-      SELECT SINGLE auart FROM aufk INTO lv_auart WHERE aufnr = lv_workordernum.
-      IF sy-subrc <> 0 .
-        CLEAR lv_auart.
-      ENDIF.
+        SELECT SINGLE auart FROM aufk INTO lv_auart WHERE aufnr = lv_workordernum.
+        IF sy-subrc <> 0 .
+          CLEAR lv_auart.
+        ENDIF.
 
 * Check the Values
-      lv_object_key =  lv_workordernum.
-      IF lv_operationnum IS NOT INITIAL.
-        CONCATENATE lv_object_key lv_operationnum INTO lv_object_key.
+        lv_object_key =  lv_workordernum.
+        IF lv_operationnum IS NOT INITIAL.
+          CONCATENATE lv_object_key lv_operationnum INTO lv_object_key.
+        ENDIF.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      ELSEIF lv_qmnum IS NOT INITIAL.
+        lv_object_key = lv_qmnum.
       ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+** Check the Values
+*      lv_object_key = lv_workordernum.
+*      IF lv_operationnum IS NOT INITIAL.
+*        CONCATENATE lv_object_key lv_operationnum INTO lv_object_key.
+*      ENDIF.
+
       lv_binary_flg = lc_x.
 
       lst_signature-doc_count  = 1.
@@ -215,6 +260,7 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
       lst_uploadonent-comp_id    = lst_formatt-file_name.
       lst_uploadonent-comp_size  = lst_formatt-file_size.
       APPEND lst_uploadonent TO lit_component.
+
 * Convert SCMS_BASE64_DECODE_STR
       CALL FUNCTION 'SCMS_BASE64_DECODE_STR'
         EXPORTING
@@ -232,6 +278,7 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
             textid  = /iwbep/cx_mgw_busi_exception=>business_error
             message = text-t07.
       ENDIF.
+
 * Convert SCMS_BASE64_DECODE_STR
       CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
         EXPORTING
@@ -272,6 +319,16 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
         CLEAR: lst_filter_vals.
       ENDIF.
 
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      "/ Read Notification attachment classname
+      READ TABLE lit_filter_vals INTO lst_filter_vals
+      WITH KEY field = 'NO_CLASSNAME' active = lc_x BINARY SEARCH.
+      IF sy-subrc = 0.
+        MOVE lst_filter_vals-low TO lv_no_classname.
+        CLEAR: lst_filter_vals.
+      ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
 * Read Service WO_CLASSNAME value
       READ TABLE lit_filter_vals INTO lst_filter_vals
       WITH KEY field = 'SRV_CLASSNAME' active = lc_x BINARY SEARCH.
@@ -280,15 +337,23 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
         CLEAR: lst_filter_vals.
       ENDIF.
 
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      IF lv_auart IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 * Read data Service for Order Type.
-      SELECT SINGLE service FROM t350 INTO lv_service
-      WHERE auart = lv_auart.
+        SELECT SINGLE service FROM t350 INTO lv_service
+        WHERE auart = lv_auart.
 
-      IF sy-subrc = 0 AND lv_service = lc_x.
-        lv_classname = lv_srv_classname.
+        IF sy-subrc = 0 AND lv_service = lc_x.
+          lv_classname = lv_srv_classname.
+        ELSE.
+          lv_classname = lv_wo_classname.
+        ENDIF.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
       ELSE.
-        lv_classname = lv_wo_classname.
+        lv_classname = lv_no_classname.
       ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 
       IF  lv_bds_active = lc_x .
 * Call standard BAPI to create BDS Document
@@ -382,7 +447,15 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
           WRITE:/ 'SO_DOCUMENT_INSERT_API1 SY-SUBRC = ', sy-subrc.
         ENDIF.
 
-        lst_bizojb-objkey  = lv_workordernum.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        IF lv_workordernum IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+          lst_bizojb-objkey  = lv_workordernum.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        ELSEIF lv_qmnum IS NOT INITIAL.
+          lst_bizojb-objkey  = lv_qmnum.
+        ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
         lst_bizojb-objtype = lv_classname.
 
 *Attachment folder id is in lst_docinfo
@@ -396,7 +469,7 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
             relationtype = lc_relation_type.
 
         lst_formattahcment-doc_id = lst_docinfo-doc_id.
-        lst_formatt-doc_id = lst_docinfo-doc_id.
+        lst_formatt-doc_id        = lst_docinfo-doc_id.
       ENDIF.
 
 *** Modify data as per data received from FE
@@ -409,16 +482,27 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
         ENDIF.
 
 * Reference
-    DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
+        DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
 
-" updating work order exchange table
-    IF lst_formatt-wo_num IS NOT INITIAL.
+        " updating work order exchange table
+*        IF lst_formatt-wo_num IS NOT INITIAL.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        IF lv_workordernum IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 *--Start of changes  - ES1K902967
-      IF lr_exchtab IS BOUND.
-        lr_exchtab->exch_table_update( lst_formatt-wo_num ).
-      ENDIF.
+          IF lr_exchtab IS BOUND.
+            lr_exchtab->exch_table_update( lst_formatt-wo_num ).
+          ENDIF.
 *--End of changes  - ES1K902967
-    ENDIF.
+        ENDIF.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        IF lv_qmnum IS NOT INITIAL.
+          IF lr_exchtab IS BOUND.
+            lr_exchtab->exch_table_update_notification( lst_formatt-wo_num ).
+          ENDIF.
+        ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
       ELSE.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
@@ -529,6 +613,12 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
 * Transport No.          : ES1K902967
 * Change Description     : ODSMFE Refactoring
 ***********************************************************************
+********************** CHANGE HISTORY **********************
+* Program Author (SID)   : ODS-VSANAGALA
+* Change Date            : 27.02.2023
+* Transport No.          : ES1K903619
+* Change Description     : Added logic to update the Notification exchange table
+***********************************************************************
 *-------------------------------------------------------------
 *  Data declaration
 *-------------------------------------------------------------
@@ -540,6 +630,8 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
            lv_sys_time_token TYPE string,
            lv_count          TYPE i,
            lv_sys_tzone      TYPE tznzonesys,   "System Time Zone
+           lv_aufnr          TYPE aufnr,
+           lv_qmnum          TYPE qmnum,
            lv_timestamp      TYPE timestamp.    "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)
 ************************************************************************
 * Main Section
@@ -558,17 +650,31 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
 
 
 * Reference
-    DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
+        DATA(lr_exchtab) = NEW /odsmfe/cl_exchmechwo( ).
 
-" updating work order exchange table
-    IF lst_formatt-wo_num IS NOT INITIAL.
+        " updating work order exchange table
+        IF lst_formatt-wo_num IS NOT INITIAL.
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+          SELECT SINGLE aufnr FROM aufk INTO lv_aufnr WHERE aufnr = lst_formatt-wo_num.
+          IF sy-subrc = 0 AND lv_aufnr IS NOT INITIAL.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 *--Start of changes  - ES1K902967
-      IF lr_exchtab IS BOUND.
-        lr_exchtab->exch_table_update( lst_formatt-wo_num ).
-      ENDIF.
+            IF lr_exchtab IS BOUND.
+              lr_exchtab->exch_table_update( lst_formatt-wo_num ).
+            ENDIF.
 *--End of changes  - ES1K902967
-    ENDIF.
-
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+          ELSE.
+            SELECT SINGLE qmnum FROM qmel INTO lv_qmnum WHERE qmnum = lst_formatt-wo_num.
+            IF sy-subrc = 0 AND lv_qmnum IS NOT INITIAL.
+              "/ Updating Notification exchange table
+              IF lr_exchtab IS BOUND.
+                lr_exchtab->exch_table_update_notification( lv_qmnum ).
+              ENDIF.
+            ENDIF.
+          ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+        ENDIF.
       ELSE.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
@@ -603,6 +709,12 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
 * Change Date            : 11.03.2022
 * Transport No.          : ES1K902967
 * Change Description     : ODSMFE Refactoring SP07
+***********************************************************************
+********************** CHANGE HISTORY *********************************
+* Program Author (SID)   : ODS-VSANAGALA
+* Change Date            : 27.02.2023
+* Transport No.          : ES1K903619
+* Change Description     : Added logic to fetch the attachment based on the Notifications.
 ***********************************************************************
 
 *-------------------------------------------------------------
@@ -650,6 +762,8 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
                    <lfsst_ls_return> TYPE /iwbep/s_mgw_select_option,
                    <lfsst_form>      TYPE /odsmfe/tb_fmatt.
 * EOC by ODS- ES1K902140
+
+    DATA: lit_valid_no TYPE STANDARD TABLE OF /odsmfe/pm_valid_qmnum_str.
 
 *-------------------------------------------------------------
 * Main Section
@@ -743,29 +857,61 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
       SORT lit_valid_wo.
       DELETE ADJACENT DUPLICATES FROM lit_valid_wo COMPARING ALL FIELDS.
 * Fetch Response Capture from /odsmfe/tb_forsp for entered user
-      IF lit_valid_wo IS NOT INITIAL.
+      IF lit_valid_wo[] IS NOT INITIAL.
 * Fetch the Forms associated with work orders
         SELECT * FROM /odsmfe/tb_forsp                            " FETCHING ALL THE FIELDS FROM RESPONSE CAPTURE TABLE
         INTO CORRESPONDING FIELDS OF TABLE lit_workorders_resp
         FOR ALL ENTRIES IN lit_valid_wo
         WHERE wo_num = lit_valid_wo-aufnr.              "#EC CI_NOFIELD
 
-        IF lit_workorders_resp IS NOT INITIAL.
+      ENDIF.
+
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+      DATA(lr_getnotification) = NEW /odsmfe/cl_get_notifications( ).
+
+      IF lr_getnotification IS BOUND.
+        lr_getnotification->gmib_get_notification_data(
+        EXPORTING
+          im_mobileuser            = lv_mobileuser
+          im_tech_request_context  = im_tech_request_context
+          im_filter_select_options = im_filter_select_options
+          im_entity_name           = im_entity_name
+        IMPORTING
+          ex_valid_notifications   = lit_valid_no ).
+      ENDIF. "/ IF lr_getnotification IS BOUND.
+
+      SORT lit_valid_no.
+      DELETE ADJACENT DUPLICATES FROM lit_valid_no COMPARING ALL FIELDS.
+
+      IF lit_valid_no[] IS NOT INITIAL.
+
+        SELECT * FROM /odsmfe/tb_forsp
+          INTO CORRESPONDING FIELDS OF TABLE lit_workorders_resp
+          FOR ALL ENTRIES IN lit_valid_no
+          WHERE wo_num = lit_valid_no-qmnum.            "#EC CI_NOFIELD
+
+      ENDIF.
+*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+
+        IF lit_workorders_resp[] IS NOT INITIAL.
+
           SORT lit_workorders_resp BY instanceid.
+
           SELECT * INTO TABLE lit_formatt
-          FROM /odsmfe/tb_fmatt
-          FOR ALL ENTRIES IN lit_workorders_resp
-          WHERE instanceid EQ lit_workorders_resp-instanceid
-          AND formid EQ lit_workorders_resp-formid
-          AND version EQ lit_workorders_resp-version.
+            FROM /odsmfe/tb_fmatt
+            FOR ALL ENTRIES IN lit_workorders_resp
+            WHERE instanceid EQ lit_workorders_resp-instanceid
+              AND formid     EQ lit_workorders_resp-formid
+              AND version    EQ lit_workorders_resp-version.
+
           IF sy-subrc = 0 .
             SORT lit_formatt BY formid version.
           ENDIF.
         ENDIF.
-      ENDIF.
+
 * Fetch the non associated forms
       SELECT * FROM /odsmfe/tb_fmatt
-      APPENDING TABLE lit_formatt
+        APPENDING TABLE lit_formatt
         WHERE instanceid NE space
               AND wo_num EQ space
               AND equnr EQ space
@@ -779,11 +925,11 @@ CLASS /ODSMFE/CL_FORMATTACHMENT IMPLEMENTATION.
 * EOC by ODS- ES1K902140
     IF lrt_instanceid IS NOT INITIAL.
       SELECT * FROM /odsmfe/tb_fmatt
-      INTO TABLE lit_formatt
-      WHERE instanceid IN lrt_instanceid
-      AND formid IN lrt_formid
-      AND version IN lrt_version
-      AND doc_count IN lrt_attcounter.
+        INTO TABLE lit_formatt
+        WHERE instanceid IN lrt_instanceid
+         AND formid      IN lrt_formid
+         AND version     IN lrt_version
+         AND doc_count   IN lrt_attcounter.
       IF sy-subrc = 0.
         SORT lit_formatt BY formid version.
       ENDIF.

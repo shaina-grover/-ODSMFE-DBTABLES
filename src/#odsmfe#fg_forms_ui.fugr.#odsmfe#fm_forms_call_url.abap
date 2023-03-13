@@ -23,6 +23,12 @@ FUNCTION /odsmfe/fm_forms_call_url .
 
   DATA: lit_filters TYPE TABLE OF /odsmfe/tb_filtr,
         lst_filters TYPE /odsmfe/tb_filtr.
+  "Added
+  DATA: lst_fomrsp TYPE /odsmfe/tb_forsp,
+        lv_vornr   TYPE /odsmfe/tb_forsp-vornr,
+        lv_instanceid TYPE /odsmfe/tb_forsp-instanceid,
+        lv_wonum   TYPE /odsmfe/tb_forsp-wo_num.
+
 
 * get start url
   DATA : lv_url         TYPE string,
@@ -150,8 +156,10 @@ FUNCTION /odsmfe/fm_forms_call_url .
 
   ENDIF.
   CLEAR lv_param.
+  lv_instanceid = im_instanceid.
+
   IF im_mode IS NOT INITIAL.
-    IF im_function = text-003 AND im_wo IS NOT INITIAL."create                  "++ ES1K902140
+    IF im_function = text-003 AND im_wo IS NOT INITIAL.   "create                  "++ ES1K902140
 
       CALL FUNCTION 'CONVERSION_EXIT_ALPHA_OUTPUT'
         EXPORTING
@@ -159,15 +167,23 @@ FUNCTION /odsmfe/fm_forms_call_url .
         IMPORTING
           output = lv_wo.
 
-* Pass operation Number when function is create
-      IF im_vornr IS NOT INITIAL.
-        CONCATENATE lv_url '#/' lc_workorder '/' lv_wo '/' lc_vornr '/' im_vornr '/' im_mode '/' INTO lv_url.
-      ELSE.
-        CONCATENATE lv_url '#/' lc_workorder '/' lv_wo '/' lc_vornr '/' im_mode '/' INTO lv_url.
-      ENDIF.
-    ELSE.                                                                        "++ ES1K902140
-      CONCATENATE lv_url '#/' im_mode '/' INTO lv_url.
+      lv_vornr = im_vornr.
+    ELSE.
+      SELECT SINGLE  *
+        FROM /odsmfe/tb_forsp
+        INTO lst_fomrsp
+        WHERE INSTANCEID = lv_instanceid.                "Added
+
+      lv_wo = lst_fomrsp-wo_num.
+      lv_vornr = lst_fomrsp-vornr.                                                             "++ ES1K902140
+      "CONCATENATE lv_url '#/' im_mode '/' INTO lv_url.
     ENDIF.
+* Pass operation Number when function is create
+*    IF lv_vornr IS NOT INITIAL.
+      CONCATENATE lv_url '#/' lc_workorder '/' lv_wo '/' lc_vornr '/' lv_vornr '/' im_mode '/' INTO lv_url.
+*    ELSE.
+*      CONCATENATE lv_url '#/' lc_workorder '/' lv_wo '/' lc_vornr '/' im_mode '/' INTO lv_url.
+*    ENDIF.
   ENDIF.
 
   IF im_wo IS NOT INITIAL AND im_function NE text-003. "++ ES1K902140

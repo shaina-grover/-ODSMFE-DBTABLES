@@ -150,6 +150,22 @@ lo_property->set_updatable( abap_false ).
 lo_property->set_sortable( abap_true ).
 lo_property->set_nullable( abap_true ).
 lo_property->set_filterable( abap_true ).
+lo_property = lo_entity_type->create_property( iv_property_name = 'ConfigSetId' iv_abap_fieldname = 'CONFIG_SET_ID' ). "#EC NOTEXT
+lo_property->set_type_edm_string( ).
+lo_property->set_maxlength( iv_max_length = 40 ). "#EC NOTEXT
+lo_property->set_creatable( abap_false ).
+lo_property->set_updatable( abap_false ).
+lo_property->set_sortable( abap_true ).
+lo_property->set_nullable( abap_true ).
+lo_property->set_filterable( abap_true ).
+lo_property = lo_entity_type->create_property( iv_property_name = 'AppId' iv_abap_fieldname = 'APP_ID' ). "#EC NOTEXT
+lo_property->set_type_edm_string( ).
+lo_property->set_maxlength( iv_max_length = 20 ). "#EC NOTEXT
+lo_property->set_creatable( abap_false ).
+lo_property->set_updatable( abap_false ).
+lo_property->set_sortable( abap_true ).
+lo_property->set_nullable( abap_true ).
+lo_property->set_filterable( abap_true ).
 
 lo_entity_type->bind_structure( iv_structure_name   = '/ODSMFE/ST_APPCONFIG'
                                 iv_bind_conversions = 'X' ). "#EC NOTEXT
@@ -505,7 +521,7 @@ lo_entity_set->set_filter_required( abap_false ).
 *&---------------------------------------------------------------------*
 
 
-  CONSTANTS: lc_gen_date_time TYPE timestamp VALUE '20230109062128'.                  "#EC NOTEXT
+  CONSTANTS: lc_gen_date_time TYPE timestamp VALUE '20230302061507'.                  "#EC NOTEXT
   rv_last_modified = super->get_last_modified( ).
   IF rv_last_modified LT lc_gen_date_time.
     rv_last_modified = lc_gen_date_time.
