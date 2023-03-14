@@ -116,80 +116,88 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
 * Transport No.          : ES1K903619
 * Change Description     : Added the logic to get the Forms list based in the Notification type
 ***********************************************************************
-*-------------------------------------------------------------
-*  Data declaration
-*-------------------------------------------------------------
 
-    TYPES: BEGIN OF ltys_formass1,
-             formid    TYPE /odsmfe/de_formid,                         "ODS Form ID
-             version   TYPE /odsmfe/de_version,                        "ODS Version
-             ordertype TYPE aufart,                                    "ODS Version
-             oprnum    TYPE vornr,                                     "Operation/Activity Type
-*   SOC by ODS ES1K902363
-             plnty     TYPE plnty,
-             plnnr     TYPE plnnr,
-             plnal     TYPE plnal,
-*            zaehl     TYPE cim_count,                               "++ES1K902499
-             zaehl     TYPE char8,                                    "++ES1K902499
-*   EOC by ODS ES1K902363
-             roleid    TYPE /odsmfe/de_roleid,                         "Role ID
-             category  TYPE /odsmfe/de_formcategory,
-             mandatory TYPE /odsmfe/de_mandatory,                      "Mandatory Form
-             allowed   TYPE /odsmfe/de_occur,                          "Occurances
-             form_name TYPE /odsmfe/de_formname,                       "ODS Form Name
-           END OF ltys_formass1.
+*-------------------------------------------------------------*
+*                D A T A    D E C L A R A T I O N             *
+*-------------------------------------------------------------*
 
-    DATA: lit_formass1    TYPE STANDARD TABLE OF ltys_formass1,
-          lit_formresp    TYPE TABLE OF /odsmfe/tb_forsp,              "Table to Capture Response
-          lst_final_resp  TYPE /odsmfe/tb_forsp,                       "Table to Capture Response
-          lit_salv_column TYPE salv_t_int4_column,
-          lst_salv_column TYPE salv_s_int4_column,                     "Values Column
-          lst_tmp_foass   TYPE gtys_foass,
-          lst_final       TYPE /odsmfe/cl_model=>gtys_final.
-    DATA:lit_foass TYPE TABLE OF gtys_foass .
+    "/ Types
+    TYPES:
+      BEGIN OF ltys_formass1,
+        formid    TYPE /odsmfe/de_formid,                            "Form ID
+        version   TYPE /odsmfe/de_version,                           "Version
+        ordertype TYPE aufart,                                       "Order Type
+        oprnum    TYPE vornr,                                        "Operation/Activity Type
+        plnty     TYPE plnty,                                        "Task List Type           - Added by ODS ES1K902363
+        plnnr     TYPE plnnr,                                        "Key for Task List Group  - Added by ODS ES1K902363
+        plnal     TYPE plnal,                                        "Group Counter            - Added by ODS ES1K902363
+        zaehl     TYPE char8,                                        "Internal counter         - Added by ODS ES1K902363 - Changed by ODS ES1K902499
+        roleid    TYPE /odsmfe/de_roleid,                            "Role ID
+        category  TYPE /odsmfe/de_formcategory,                      "Category
+        mandatory TYPE /odsmfe/de_mandatory,                         "Mandatory Form
+        allowed   TYPE /odsmfe/de_occur,                             "Occurances
+        form_name TYPE /odsmfe/de_formname,                          "ODS Form Name
+      END OF ltys_formass1.
 
-*   SOC by ODS ES1K902363
-    DATA: lrt_auart    TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrs_it_auart TYPE /odsmfe/st_core_range_str,
-          lrt_plnty    TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrs_it_plnty TYPE /odsmfe/st_core_range_str,
-          lrt_plnnr    TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrs_it_plnnr TYPE /odsmfe/st_core_range_str,
-          lrt_plnal    TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrs_it_plnal TYPE /odsmfe/st_core_range_str,
-          lrt_zaehl    TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrs_it_zaehl TYPE /odsmfe/st_core_range_str,
-          lrt_aufnr    TYPE TABLE OF /odsmfe/st_core_range_str,
-          lrs_it_aufnr TYPE /odsmfe/st_core_range_str,
-*   EOC by ODS ES1K902363
-*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
-          lrs_qmnum    TYPE /odsmfe/st_core_range_str,
-          lrt_qmnum    TYPE STANDARD TABLE OF /odsmfe/st_core_range_str,
-          lrs_qmart    TYPE /odsmfe/st_core_range_str,
-          lrt_qmart    TYPE STANDARD TABLE OF /odsmfe/st_core_range_str.
-*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+    "/ Tables and Structures
+    DATA:
+      lit_formass1    TYPE STANDARD TABLE OF ltys_formass1,          "Form Assignment table
+      lit_formresp    TYPE TABLE OF /odsmfe/tb_forsp,                "Table: Capture Response
+      lst_final_resp  TYPE /odsmfe/tb_forsp,                         "Structure: Capture Response
+      lit_salv_column TYPE salv_t_int4_column,                       "Table: Values Column
+      lst_salv_column TYPE salv_s_int4_column,                       "Structure: Values Column
+      lit_foass       TYPE TABLE OF gtys_foass,                      "Table: Form Assignment global types
+      lst_tmp_foass   TYPE gtys_foass,                               "Structure: Form Assignment global types
+      lst_final       TYPE /odsmfe/cl_model=>gtys_final.             "Final structure
 
-* Variables
-    DATA: lv_subrc     TYPE sy-subrc,
-          lv_index1    TYPE sy-index,                                  "ABAP System Field: Loop Index
-          lv_submitted TYPE i,
-          lv_aufnr     TYPE aufnr,
-          lv_index2    TYPE sy-index,                                  "Row Index of Internal Tables
-          lv_count     TYPE i.
+    "/ Range Tables and Structures
+    DATA:
+      lrt_auart    TYPE TABLE OF /odsmfe/st_core_range_str,          "Range table                - Added by ODS ES1K902363
+      lrs_it_auart TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS ES1K902363
+      lrt_plnty    TYPE TABLE OF /odsmfe/st_core_range_str,          "Range table                - Added by ODS ES1K902363
+      lrs_it_plnty TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS ES1K902363
+      lrt_plnnr    TYPE TABLE OF /odsmfe/st_core_range_str,          "Range table                - Added by ODS ES1K902363
+      lrs_it_plnnr TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS ES1K902363
+      lrt_plnal    TYPE TABLE OF /odsmfe/st_core_range_str,          "Range table                - Added by ODS ES1K902363
+      lrs_it_plnal TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS ES1K902363
+      lrt_zaehl    TYPE TABLE OF /odsmfe/st_core_range_str,          "Range table                - Added by ODS ES1K902363
+      lrs_it_zaehl TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS ES1K902363
+      lrt_aufnr    TYPE TABLE OF /odsmfe/st_core_range_str,          "Range table                - Added by ODS ES1K902363
+      lrs_it_aufnr TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS ES1K902363
+      lrs_qmnum    TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS-VSANAGALA : ES1K903619
+      lrt_qmnum    TYPE STANDARD TABLE OF /odsmfe/st_core_range_str, "Range table                - Added by ODS-VSANAGALA : ES1K903619
+      lrs_qmart    TYPE /odsmfe/st_core_range_str,                   "Range structure            - Added by ODS-VSANAGALA : ES1K903619
+      lrt_qmart    TYPE STANDARD TABLE OF /odsmfe/st_core_range_str. "Range table                - Added by ODS-VSANAGALA : ES1K903619
 
-*    Constants
-    CONSTANTS: lc_submitted TYPE lvc_fname VALUE 'SUBMITTED',
-               lc_i         TYPE string VALUE 'I', "++ES1K902363
-               lc_eq        TYPE string VALUE 'EQ'. "++ES1K902363
+    "/ Variables
+    DATA:
+      lv_subrc     TYPE sy-subrc,                                    "System variable for subrc
+      lv_index1    TYPE sy-index,                                    "ABAP System Field: Loop Index
+      lv_submitted TYPE i,                                           "Submitted Forms variable
+      lv_aufnr     TYPE aufnr,                                       "Work Order
+      lv_index2    TYPE sy-index,                                    "Row Index of Internal Tables
+      lv_count     TYPE i.                                           "Count
 
-*   Field Symbols
-    FIELD-SYMBOLS: <lfsst_form> TYPE ltys_formass1,
-                   <lfsst_resp> TYPE /odsmfe/tb_forsp.
+    "/ Constants
+    CONSTANTS:
+      lc_submitted TYPE lvc_fname VALUE 'SUBMITTED',                 "Submitted constant
+      lc_i         TYPE string VALUE 'I',                            "Value I                 - Added by ODS ES1K902363
+      lc_eq        TYPE string VALUE 'EQ'.                           "Value EQ                - Added by ODS ES1K902363
 
-*-------------------------------------------------------------
-* Main Section
-*-------------------------------------------------------------
-*   SOC by ODS ES1K902363
+    "/ Field Symbols
+    FIELD-SYMBOLS:
+      <lfsst_form> TYPE ltys_formass1,                               "Form Assignment structure
+      <lfsst_resp> TYPE /odsmfe/tb_forsp.                            "Form Response Structure
+
+*-------------------------------------------------------------*
+*        E N D   O F   D A T A   D E C L A R A T I O N        *
+*-------------------------------------------------------------*
+*-------------------------------------------------------------*
+*                   M A I N   S E C T I O N                   *
+*-------------------------------------------------------------*
+
+*---------------------------------- SOC by ODS - ES1K902363 ----------------------------------*
+    "/ Filling the Order type range table
     IF im_auart IS NOT INITIAL.
       lrs_it_auart-sign   = lc_i.
       lrs_it_auart-option = lc_eq.
@@ -197,7 +205,8 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       APPEND lrs_it_auart TO lrt_auart.
       CLEAR lrs_it_auart.
     ENDIF.
-    " filling task list type range table
+
+    "/ Filling Task list type range table
     IF im_plnty IS NOT INITIAL.
       lrs_it_plnty-sign   = lc_i.
       lrs_it_plnty-option = lc_eq.
@@ -205,7 +214,8 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       APPEND lrs_it_plnty TO lrt_plnty.
       CLEAR lrs_it_plnty.
     ENDIF.
-    " filling tasklist group range table
+
+    "/ Filling tasklist group range table
     IF im_plnnr IS NOT INITIAL.
       lrs_it_plnnr-sign   = lc_i.
       lrs_it_plnnr-option = lc_eq.
@@ -213,7 +223,8 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       APPEND lrs_it_plnnr TO lrt_plnnr.
       CLEAR lrs_it_plnnr.
     ENDIF.
-    "filling task list group counter
+
+    "/ Filling task list group counter
     IF im_plnal IS NOT INITIAL.
       lrs_it_plnal-sign   = lc_i.
       lrs_it_plnal-option = lc_eq.
@@ -221,7 +232,8 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       APPEND lrs_it_plnal TO lrt_plnal.
       CLEAR lrs_it_plnal.
     ENDIF.
-    " filling internal counter range table
+
+    "/ Filling internal counter range table
     IF im_zaehl IS NOT INITIAL.
       lrs_it_zaehl-sign   = lc_i.
       lrs_it_zaehl-option = lc_eq.
@@ -230,7 +242,7 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       CLEAR lrs_it_zaehl.
     ENDIF.
 
-* Get the WO Number from ALV List
+    "/ Get the Work Order Number/Notication number from the ALV List
     IF gitib_foass IS NOT INITIAL.
       lit_foass[] = gitib_foass[].
       DELETE ADJACENT DUPLICATES FROM lit_foass COMPARING wo_num.
@@ -240,6 +252,7 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
+    "/ Filling the Work Order range table with the requested work order number
     IF im_aufnr IS NOT INITIAL.
       lrs_it_aufnr-sign   = lc_i.
       lrs_it_aufnr-option = lc_eq.
@@ -248,6 +261,7 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       CLEAR lrs_it_aufnr.
     ENDIF.
 
+    "/ Filling the Work Order range table from the Form assignment data from the ALV, if the work order number is not requested
     IF im_aufnr IS INITIAL AND lv_aufnr IS NOT INITIAL.
       lrs_it_aufnr-sign   = lc_i.
       lrs_it_aufnr-option = lc_eq.
@@ -255,8 +269,10 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       APPEND lrs_it_aufnr TO lrt_aufnr.
       CLEAR lrs_it_aufnr.
     ENDIF.
+*---------------------------------- EOC by ODS - ES1K902363 ----------------------------------*
 
 *----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+    "/ Filling the Notification into the range table
     IF im_qmnum IS NOT INITIAL.
       lrs_qmnum-sign   = lc_i.
       lrs_qmnum-option = lc_eq.
@@ -265,6 +281,7 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       CLEAR lrs_qmnum.
     ENDIF.
 
+    "/ Filling the range table from the Form assignment data from the ALV with the Notification, if the notification is not requested
     IF im_qmnum IS INITIAL AND lv_aufnr IS NOT INITIAL.
       lrs_qmnum-sign   = lc_i.
       lrs_qmnum-option = lc_eq.
@@ -273,6 +290,7 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
       CLEAR lrs_qmnum.
     ENDIF.
 
+    "/ Filling the Notification type into the range table
     IF im_qmart IS NOT INITIAL.
       lrs_qmart-sign   = lc_i.
       lrs_qmart-option = lc_eq.
@@ -282,60 +300,58 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
     ENDIF.
 *----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
 
-*   SOC by ODS ES1K902363
-
-*    IF im_aufnr IS NOT INITIAL AND im_auart IS NOT INITIAL.
-
-*  Fetching All forms from Form master which are assigned to work order type
-    SELECT a~formid a~version a~ordertype  a~oprnum
-           a~plnty a~plnnr a~plnal a~zaehl
-           a~roleid a~category a~mandatory a~occur AS allowed
+    "/  Fetching All forms from Form master which are assigned to work order type/Notification Type
+    SELECT a~formid
+           a~version
+           a~ordertype
+           a~oprnum
+           a~plnty
+           a~plnnr
+           a~plnal
+           a~zaehl
+           a~roleid
+           a~category
+           a~mandatory
+           a~occur AS allowed
            b~form_name
-           FROM /odsmfe/tb_foass AS a
-           INNER JOIN /odsmfe/tb_fomst AS b
-           ON b~form_name EQ a~formid AND b~version EQ a~version
-           INTO CORRESPONDING FIELDS OF TABLE  lit_formass1
-*   SOC by ODS ES1K902363
-     WHERE a~ordertype IN lrt_auart
-           AND a~plnty IN lrt_plnty
-           AND a~plnnr IN lrt_plnnr
-           AND a~plnal IN lrt_plnal
-*           AND a~zaehl IN lrt_zaehl
-*   EOC by ODS ES1K902363
-           AND a~version EQ b~version
-           AND a~active EQ 'X'.
-* Fetch crieria for Manual form assignment
+      FROM /odsmfe/tb_foass AS a
+      INNER JOIN /odsmfe/tb_fomst AS b
+      ON b~form_name EQ a~formid AND b~version EQ a~version
+      INTO CORRESPONDING FIELDS OF TABLE  lit_formass1
+      WHERE a~ordertype IN lrt_auart[]                        " Added by ODS ES1K902363
+        AND a~plnty     IN lrt_plnty[]                        " Added by ODS ES1K902363
+        AND a~plnnr     IN lrt_plnnr[]                        " Added by ODS ES1K902363
+        AND a~plnal     IN lrt_plnal[]                        " Added by ODS ES1K902363
+        AND a~version   EQ b~version
+        AND a~active    EQ 'X'.
+
+    "/ Fetch crieria for Manual form assignment
     SELECT formid version oprnum formcategory AS category mandatory occur AS allowed
-           FROM /odsmfe/tb_fmass
-           APPENDING CORRESPONDING FIELDS OF TABLE lit_formass1
-           WHERE workordernum IN lrt_aufnr
-           AND active = abap_true
-           AND deleted NE abap_true.
+      FROM /odsmfe/tb_fmass
+      APPENDING CORRESPONDING FIELDS OF TABLE lit_formass1
+      WHERE workordernum IN lrt_aufnr[]
+        AND active       EQ abap_true
+        AND deleted      NE abap_true.
 
     IF lit_formass1 IS NOT INITIAL.
-
-      SELECT * FROM /odsmfe/tb_forsp
-             INTO TABLE lit_formresp
-             FOR ALL ENTRIES IN lit_formass1
-             WHERE wo_num IN lrt_aufnr
-             AND version = lit_formass1-version
-             AND formid = lit_formass1-formid          "#EC CI_NOFIELD.
-             AND instanceid NE space
-             AND deleted NE abap_true.
+      "/ Get the Form response data for the requested Work Orders/Notifcations
+      SELECT *
+        FROM /odsmfe/tb_forsp
+        INTO TABLE lit_formresp
+        FOR ALL ENTRIES IN lit_formass1
+        WHERE wo_num     IN lrt_aufnr
+          AND version    EQ lit_formass1-version
+          AND formid     EQ lit_formass1-formid      "#EC CI_NOFIELD.
+          AND instanceid NE space
+          AND deleted    NE abap_true.
 
       IF sy-subrc <> 0 AND lit_formresp IS INITIAL.
-
-* If no forms are filled
+        "/ If no forms are filled
         LOOP AT lit_formass1 ASSIGNING <lfsst_form>.
           MOVE-CORRESPONDING <lfsst_form> TO lst_tmp_foass.
           lst_tmp_foass-submitted = text-004.
           lst_tmp_foass-operation = <lfsst_form>-oprnum.
           lst_tmp_foass-occur     = <lfsst_form>-allowed.
-*          IF im_aufnr IS INITIAL.
-*            lst_tmp_foass-wo_num     = lv_aufnr."++
-*          ELSE.
-*            lst_tmp_foass-wo_num     = im_aufnr.
-*          ENDIF.
 *----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
           IF im_aufnr IS NOT INITIAL.
             lst_tmp_foass-wo_num = im_aufnr.
@@ -347,39 +363,31 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
 *----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
           APPEND lst_tmp_foass TO gitib_foass.
           CLEAR: lst_tmp_foass.
-        ENDLOOP.
-      ELSE.
-* filling final internal table from response
+        ENDLOOP. "/ LOOP AT lit_formass1 ASSIGNING <lfsst_form>.
+
+      ELSE. "/ IF sy-subrc <> 0 AND lit_formresp IS INITIAL.
+
+        "/ Filling final internal table from response
         SORT: lit_formass1[] BY formid version roleid,
-             lit_formresp[] BY formid version roleid.
+              lit_formresp[] BY formid version roleid.
 
         LOOP AT lit_formass1 ASSIGNING <lfsst_form>.
           CLEAR: lv_submitted,lst_tmp_foass,lst_salv_column.
-          READ TABLE lit_formresp TRANSPORTING NO FIELDS
-                                  WITH KEY formid = <lfsst_form>-formid
-                                           version = <lfsst_form>-version BINARY SEARCH.
-*                                          roleid = <lfsst_form>-roleid BINARY SEARCH.
+          READ TABLE lit_formresp TRANSPORTING NO FIELDS WITH KEY formid = <lfsst_form>-formid version = <lfsst_form>-version BINARY SEARCH.
           IF sy-subrc = 0.
             CLEAR: lv_submitted.
-
             lv_index1 = sy-tabix.
 
             LOOP AT lit_formresp ASSIGNING <lfsst_resp> FROM lv_index1. "#EC CI_NESTED.
               IF <lfsst_resp>-formid <> <lfsst_form>-formid OR <lfsst_form>-version <> <lfsst_resp>-version.
-*                  OR <lfsst_form>-roleid <> <lfsst_resp>-roleid.
                 EXIT.
               ENDIF.
               ADD 1 TO lv_submitted.
-            ENDLOOP.
-            MOVE-CORRESPONDING <lfsst_form> TO lst_tmp_foass.
+            ENDLOOP. "/ LOOP AT lit_formresp ASSIGNING <lfsst_resp> FROM lv_index1.
 
+            MOVE-CORRESPONDING <lfsst_form> TO lst_tmp_foass.
             lst_tmp_foass-submitted = lv_submitted.
             lst_tmp_foass-occur     = <lfsst_form>-allowed.
-*            IF im_aufnr IS INITIAL.
-*              lst_tmp_foass-wo_num     = lv_aufnr."++
-*            ELSE.
-*              lst_tmp_foass-wo_num     = im_aufnr.
-*            ENDIF.
 *----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
             IF im_aufnr IS NOT INITIAL.
               lst_tmp_foass-wo_num = im_aufnr.
@@ -397,7 +405,9 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
               lst_tmp_foass-cell_type = lit_salv_column.
             ENDIF.
             APPEND lst_tmp_foass TO gitib_foass.
-          ELSE.
+
+          ELSE. "/ IF sy-subrc = 0
+
             MOVE-CORRESPONDING <lfsst_form> TO lst_tmp_foass.
             lst_tmp_foass-occur = <lfsst_form>-allowed.
             IF im_aufnr IS NOT INITIAL."----------------------- Added by ODS-VSANAGALA - ES1K903619
@@ -408,6 +418,7 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
             ENDIF.
 *----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
             lst_tmp_foass-operation = <lfsst_form>-oprnum.
+
             IF lst_tmp_foass-submitted NE 000 .
               lst_salv_column-columnname = lc_submitted.
               lst_salv_column-value      = if_salv_c_cell_type=>hotspot.
@@ -417,30 +428,26 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
 
             lst_tmp_foass-submitted = text-004.
             APPEND lst_tmp_foass TO gitib_foass.
-          ENDIF.
-        ENDLOOP.
+          ENDIF. "/  IF sy-subrc = 0.
+        ENDLOOP. "/ LOOP AT lit_formass1 ASSIGNING <lfsst_form>.
 
         IF lit_formresp IS NOT INITIAL.
           gitib_response = lit_formresp.
           SORT: gitib_response BY formid version.
         ENDIF.
-      ENDIF.
-    ENDIF.
-*    ENDIF.
+      ENDIF. "/ IF sy-subrc <> 0 AND lit_formresp IS INITIAL.
+    ENDIF. "/ IF lit_formass1 IS NOT INITIAL.
 
     IF im_forms IS NOT INITIAL.
-
       REFRESH: gitib_final.
-* Fetching froms based on form instance id
-      READ TABLE gitib_response TRANSPORTING NO FIELDS WITH KEY
-           formid = im_forms-formid version = im_forms-version BINARY SEARCH.
+      "/ Fetching froms based on form instance id
+      READ TABLE gitib_response TRANSPORTING NO FIELDS WITH KEY formid = im_forms-formid version = im_forms-version BINARY SEARCH.
       IF sy-subrc = 0.
         CLEAR: lv_count.
         lv_index2 = sy-tabix.
+
         LOOP AT gitib_response INTO lst_final_resp FROM lv_index2.
-          IF lst_final_resp-formid <> im_forms-formid
-             OR im_forms-version <> lst_final_resp-version.
-*             OR im_forms-roleid <> lst_final_resp-roleid.
+          IF lst_final_resp-formid <> im_forms-formid OR im_forms-version <> lst_final_resp-version.
             EXIT.
           ENDIF.
           CLEAR: lst_final.
@@ -449,28 +456,30 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
           lst_final-version    = lst_final_resp-version.
           lst_final-roleid     = lst_final_resp-roleid.
           lst_final-operation  = lst_final_resp-vornr.
+
           IF lst_final_resp-modified_on IS NOT INITIAL.
             lst_final-credt      = lst_final_resp-modified_on.
           ELSE.
             lst_final-credt      = lst_final_resp-created_on.
           ENDIF.
+
           lst_final-creby      = lst_final_resp-created_by.
           lst_final-instanceid = lst_final_resp-instanceid.
           lst_final-draft      = lst_final_resp-isdraft.
           lst_final-count      = lv_count.
           APPEND lst_final TO gitib_final.
 
-        ENDLOOP.
+        ENDLOOP. "/ LOOP AT lit_formass1 ASSIGNING <lfsst_form>.
+      ENDIF. "/ IF sy-subrc = 0.
 
-      ENDIF.
-* dispay forms
+     "/ Dispay forms
       IF gitib_final IS NOT INITIAL.
         CALL FUNCTION '/ODSMFE/FM_FORM_DATA'.
       ELSE.
-* if no forms available in respanse capture table
+     "/ If no forms available in respanse capture table
         MESSAGE i398(00) WITH text-005 im_forms-formid.
-      ENDIF.
-    ENDIF.
+      ENDIF. "/ IF gitib_final IS NOT INITIAL.
+    ENDIF. "/ IF im_forms IS NOT INITIAL.
 
   ENDMETHOD.
 
