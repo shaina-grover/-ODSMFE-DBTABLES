@@ -247,6 +247,11 @@ ENDMETHOD.
         lv_plnal = <lfsst_plnal>.
       ENDIF.
 
+      "/ Assign space to  TaskList type if group and group counter is empty
+      IF lv_plnnr IS INITIAL AND lv_plnal IS INITIAL.
+        lv_plnty = space.
+      ENDIF.
+
       "/ Get the Internal counter
       ASSIGN ('(SAPLCOIH)CAUFVD-ZAEHL') TO <lfsst_zaehl>.
       IF sy-subrc = 0.

@@ -406,6 +406,37 @@ CLASS /ODSMFE/CL_FORMRESAPRVALSTATUS IMPLEMENTATION.
 
 
   METHOD /odsmfe/if_get_entityset_bapi~gmib_read_entityset.
+*&----------------------------------------------------------------------*
+* PROGRAM ID           :/ODSMFE/IF_GET_ENTITYSET_BAPI                   *
+* developer id :hsangam                                      *
+* SUPPLIER             :OnDevice Solutions                              *
+* DATE                 :2023/05/15                                      *
+* DEVELOPMENT ID       :/ODSMFE/MA\ HPQC                                *
+* CHANGE REQUEST (CTS) :DR0K######                                      *
+*=======================================================================*
+* COPIED FROM         : (CLONED PROGRAM)                                *
+* TITLE               : (PROGRAM TITLE)                                 *
+* OTHER RELATED OBJ   : (OBJECT NAMES)                                  *
+*=======================================================================*
+* CHANGE HISTORY LOG                                                    *
+* CHANGE HISTORY LOG                                                    *
+*-----------------------------------------------------------------------*
+* CHANGE HISTORY LOG                                                    *
+* MOD.NO.| DATE     | NAME           | CORRECTION NUMBER  |CHANGE       *
+*                                                          REFERENCE    *
+*-----------------------------------------------------------------------*
+*        |          |                |                    |             *
+*                                                                       *
+* DESCRIPTION:                                                          *
+*-----------------------------------------------------------------------*
+* -----------------------------------------------------------------------*
+*                   D A T A   D E C L A R A T I O N                    *
+* -----------------------------------------------------------------------*
+
+* -----------------------------------------------------------------------*
+*            E N D   O F   D A T A   D E C L A R A T I O N             *
+* -----------------------------------------------------------------------*
+
 ***********************************************************************
 ********************** CREATED HISTORY ********************************
 * Program Author (SID)   : Sravan Kumar
@@ -658,7 +689,7 @@ CLASS /ODSMFE/CL_FORMRESAPRVALSTATUS IMPLEMENTATION.
 
 * Get EntitySet method is requested
       GET REFERENCE OF gitib_entity INTO ex_entityset.
-    ENDIF.
+    ENDIF.                                                                " IF LIT_FORMINSTANCE IS NOT INITIAL Line No. :253
 
   ENDMETHOD.
 ENDCLASS.

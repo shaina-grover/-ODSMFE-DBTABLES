@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/ODSMFE/DE_UI5_ELEMENT</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>/ODSMFE/DO_UI5_ELEMENT</DOMNAME>
+    <HEADLEN>55</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>20</SCRLEN2>
+    <SCRLEN3>40</SCRLEN3>
+    <DDTEXT>ODSMFE: UI5 Application Element</DDTEXT>
+    <REPTEXT>UI5 Application Element</REPTEXT>
+    <SCRTEXT_S>UI5 Elemnt</SCRTEXT_S>
+    <SCRTEXT_M>UI5 Element</SCRTEXT_M>
+    <SCRTEXT_L>UI5 Application Element</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+  </asx:values>
+ </asx:abap>
+</abapGit>

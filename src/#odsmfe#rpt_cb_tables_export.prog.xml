@@ -12,20 +12,86 @@
    <TPOOL>
     <item>
      <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>Selection Screen</ENTRY>
+     <LENGTH>26</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>002</KEY>
-     <ENTRY>Download Table Structure</ENTRY>
+     <ENTRY>Selection of Table Name</ENTRY>
+     <LENGTH>46</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>003</KEY>
+     <ENTRY>Unable to execute</ENTRY>
+     <LENGTH>27</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>005</KEY>
+     <ENTRY>Unable to download data</ENTRY>
+     <LENGTH>46</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>006</KEY>
+     <ENTRY>Data downloaded successfully</ENTRY>
+     <LENGTH>56</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>007</KEY>
+     <ENTRY>Table contains no records</ENTRY>
+     <LENGTH>50</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>008</KEY>
+     <ENTRY>Please select any table</ENTRY>
+     <LENGTH>46</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>009</KEY>
+     <ENTRY>Structure downloaded successfully</ENTRY>
+     <LENGTH>66</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>010</KEY>
+     <ENTRY>Unable to download structure</ENTRY>
+     <LENGTH>56</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>011</KEY>
+     <ENTRY>Structure does not exist</ENTRY>
      <LENGTH>48</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>012</KEY>
+     <ENTRY>Unable to upload data</ENTRY>
+     <LENGTH>42</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>013</KEY>
+     <ENTRY>Data uploaded successfully</ENTRY>
+     <LENGTH>52</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>014</KEY>
+     <ENTRY>Please Choose a File</ENTRY>
+     <LENGTH>40</LENGTH>
     </item>
     <item>
      <ID>R</ID>
      <ENTRY>Download and Upload CB Tables</ENTRY>
      <LENGTH>29</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_CLI</KEY>
-     <ENTRY>Mandt</ENTRY>
-     <LENGTH>13</LENGTH>
     </item>
     <item>
      <ID>S</ID>
@@ -44,12 +110,6 @@
      <KEY>P_FILE</KEY>
      <ENTRY>Choose File</ENTRY>
      <LENGTH>19</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_HDR</KEY>
-     <ENTRY>Header</ENTRY>
-     <LENGTH>14</LENGTH>
     </item>
     <item>
      <ID>S</ID>

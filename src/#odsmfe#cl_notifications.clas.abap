@@ -73,6 +73,13 @@ CLASS /ODSMFE/CL_NOTIFICATIONS IMPLEMENTATION.
               IF sy-subrc = 0 AND lrs_filter_range IS NOT INITIAL.
                 lrs_filter-sign   = lc_i.
                 lrs_filter-option = lc_eq.
+                "/ Conversion exit for the Notification number
+                CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+                  EXPORTING
+                    input  = lrs_filter_range-low
+                  IMPORTING
+                    output = lrs_filter_range-low.
+
                 lrs_filter-low    = lrs_filter_range-low.
                 APPEND lrs_filter_range TO lrt_notification.
               ENDIF.
@@ -97,6 +104,13 @@ CLASS /ODSMFE/CL_NOTIFICATIONS IMPLEMENTATION.
         IF sy-subrc = 0 AND lst_key_tab IS NOT INITIAL.
           lrs_filter-sign   = lc_i.
           lrs_filter-option = lc_eq.
+          "/ Conversion exit for the Notification number
+          CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+            EXPORTING
+              input  = lrs_filter_range-low
+            IMPORTING
+              output = lrs_filter_range-low.
+
           lrs_filter-low    = lrs_filter_range-low.
           APPEND lrs_filter_range TO lrt_notification.
           CLEAR: lrs_filter_range, lrs_filter, lst_key_tab.

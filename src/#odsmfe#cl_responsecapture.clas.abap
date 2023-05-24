@@ -240,7 +240,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 
         lv_wo = lst_formresponse-wo_num.
 
-*----------------------------- EOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
+*----------------------------- SOC by ODS-VSANAGALA - ES1K903619 -----------------------------*
         SELECT SINGLE aufnr FROM aufk INTO lv_workorder
           WHERE aufnr = lv_wo.
 
@@ -1330,7 +1330,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
                   WHERE bname = lv_mobileuser
                    AND  parid = 'RFPNR'.
 
-    IF sy-subrc IS INITIAL AND lv_parva EQ 'X'.
+    IF sy-subrc = 0 AND lv_parva EQ 'X'.
 
       IF lr_getworkorder IS BOUND.
         lr_getworkorder->gmib_get_technician_data(
@@ -1425,7 +1425,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
 
           "/ Fetch the Forms associated with work orders
           SELECT * FROM /odsmfe/tb_forsp
-            INTO CORRESPONDING FIELDS OF TABLE lit_entity_temp
+            APPENDING CORRESPONDING FIELDS OF TABLE lit_entity_temp
             FOR ALL ENTRIES IN lit_valid_no
             WHERE wo_num = lit_valid_no-qmnum.
 
@@ -1486,7 +1486,7 @@ CLASS /ODSMFE/CL_RESPONSECAPTURE IMPLEMENTATION.
     ex_response_context-deltatoken = lv_delta_token.
 * Delete Duplicate entries
     DELETE ADJACENT DUPLICATES FROM gitib_entity COMPARING ALL FIELDS.
-    IF im_tech_request_context_entity IS SUPPLIED AND  gitib_entity IS NOT INITIAL.
+    IF im_tech_request_context_entity IS NOT INITIAL AND gitib_entity IS NOT INITIAL.
       READ TABLE gitib_entity INTO gstib_entity INDEX 1.
       IF sy-subrc EQ 0.
         GET REFERENCE OF gstib_entity INTO ex_entity.

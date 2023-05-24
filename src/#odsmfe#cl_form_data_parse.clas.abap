@@ -1,57 +1,63 @@
-CLASS /odsmfe/cl_form_data_parse DEFINITION
-  PUBLIC
-  CREATE PUBLIC .
+class /ODSMFE/CL_FORM_DATA_PARSE definition
+  public
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    TYPES:
-      BEGIN OF gtys_response_data,
+  types:
+    BEGIN OF gtys_response_data,
         formid         TYPE /odsmfe/de_formid,
         version        TYPE /odsmfe/de_version,
         instanceid     TYPE /odsmfe/de_instanceid,
-        wo_num         TYPE aufnr,                    """""""""""""""""""""""""""""""""""""""""""""""""""
-        vornr          TYPE vornr,                                        "Operation/Activity Number
-        equnr          TYPE equnr,                                        "Equipment Number
-        tplnr          TYPE tplnr,                                        "Functional Location
-        created_date   TYPE dats,                                         "CreatedOn UTC Time Stamp in Short Form (YYYYMMDDhhmmss)
+        wo_num         TYPE aufnr,
+        vornr          TYPE vornr,
+        equnr          TYPE equnr,
+        tplnr          TYPE tplnr,
+        created_date   TYPE dats,
         created_by     TYPE /odsmfe/de_createdby,
         group          TYPE string,
+        repeat_group   TYPE string,
         sub_group      TYPE string,
         question_id    TYPE string,
         question_index TYPE string,
         questionname   TYPE string,
         responsedata   TYPE string,
       END OF gtys_response_data .
-    TYPES:
-      gtyt_response_data TYPE STANDARD TABLE OF gtys_response_data .
-    TYPES:
-      BEGIN OF gtys_form_data,
-        lang           TYPE string,
-        label          TYPE string,
-        pre_group_id   TYPE string,
-        group_id       TYPE string,
-        question_id    TYPE string,
-        question_index TYPE string,
-        pre_group_name TYPE string,
-        group_name     TYPE string,
-        question       TYPE string,
+  types:
+    gtyt_response_data TYPE STANDARD TABLE OF gtys_response_data .
+  types:
+    BEGIN OF gtys_form_data,
+        lang              TYPE string,
+        label             TYPE string,
+        pre_group_id      TYPE string,
+        group_id          TYPE string,
+        repeat_group_id   TYPE string,
+        question_id       TYPE string,
+        question_index    TYPE string,
+        pre_group_name    TYPE string,
+        group_name        TYPE string,
+        repeat_group_name TYPE string,
+        question          TYPE string,
       END OF gtys_form_data .
-    TYPES:
-      gtyt_form_data TYPE STANDARD TABLE OF gtys_form_data .
+  types:
+    gtyt_form_data TYPE STANDARD TABLE OF gtys_form_data .
 
-    METHODS gmib_get_all_questions
-      IMPORTING
-        !im_formid    TYPE /odsmfe/de_formid
-        !im_version   TYPE /odsmfe/de_version OPTIONAL
-      EXPORTING
-        !ex_form_data TYPE gtyt_form_data .
-    METHODS gmib_get_response_data
-      IMPORTING
-        !im_formid        TYPE /odsmfe/de_formid OPTIONAL
-        !im_version       TYPE /odsmfe/de_version OPTIONAL
-        !im_instanceid    TYPE /odsmfe/de_instanceid
-      EXPORTING
-        !ex_response_data TYPE gtyt_response_data .
+  methods GMIB_GET_ALL_QUESTIONS
+    importing
+      !IM_FORMID type /ODSMFE/DE_FORMID
+      !IM_VERSION type /ODSMFE/DE_VERSION optional
+    exporting
+      !EX_FORM_DATA type GTYT_FORM_DATA .
+  methods GMIB_GET_RESPONSE_DATA
+    importing
+      !IM_FORMID type /ODSMFE/DE_FORMID optional
+      !IM_VERSION type /ODSMFE/DE_VERSION optional
+      !IM_INSTANCEID type /ODSMFE/DE_INSTANCEID
+    exporting
+      !EX_RESPONSE_DATA type GTYT_RESPONSE_DATA
+    raising
+      /IWBEP/CX_MGW_TECH_EXCEPTION
+      /IWBEP/CX_MGW_BUSI_EXCEPTION .
 protected section.
 private section.
 ENDCLASS.
@@ -121,16 +127,22 @@ METHOD gmib_get_all_questions.
          END OF ltys_pre_group,
 
          BEGIN OF ltys_final,
-           lang           TYPE string,
-           label          TYPE string,
-           pre_group_id   TYPE string,
-           group_id       TYPE string,
-           question_id    TYPE string,
-           question_index TYPE string,
-           pre_group_name TYPE string,
-           group_name     TYPE string,
-           question       TYPE string,
-         END OF ltys_final.
+           lang              TYPE string,
+           label             TYPE string,
+           pre_group_id      TYPE string,
+           group_id          TYPE string,
+           repeat_group_id   TYPE string,
+           question_id       TYPE string,
+           question_index    TYPE string,
+           pre_group_name    TYPE string,
+           group_name        TYPE string,
+           repeat_group_name TYPE string,
+           question          TYPE string,
+         END OF ltys_final,
+
+         BEGIN OF ltys_repeat_group,
+           repeat_group_id TYPE string,
+         END OF ltys_repeat_group.
 
   "/Tables and Structures
   DATA: lst_fomst        TYPE /odsmfe/tb_fomst,
@@ -162,7 +174,9 @@ METHOD gmib_get_all_questions.
         lit_group        TYPE STANDARD TABLE OF ltys_group,
         lit_pre_group    TYPE STANDARD TABLE OF ltys_pre_group,
         lst_final        TYPE ltys_final,
-        lit_final        TYPE STANDARD TABLE OF ltys_final.
+        lit_final        TYPE STANDARD TABLE OF ltys_final,
+        lst_repeat_group TYPE ltys_repeat_group,
+        lit_repeat_group TYPE STANDARD TABLE OF ltys_repeat_group.
 
   "/Range Tables and Range structures
   DATA: lrs_version TYPE /odsmfe/st_core_range_str,
@@ -178,6 +192,19 @@ METHOD gmib_get_all_questions.
         lv_pre_group_id TYPE string,
         lv_index        TYPE string,
         lv_formid       TYPE /odsmfe/tb_fomst-formid.
+
+  DATA :lst_label  TYPE string,
+        lit_label  LIKE TABLE OF lst_label,
+        lst_repeat TYPE string,
+        lit_repeat LIKE TABLE OF lst_repeat.
+  DATA lv_lines TYPE i.
+  DATA lv_strlen TYPE i.
+
+  DATA :  lt_data    TYPE swxmlcont,
+          lref_xml   TYPE REF TO cl_xml_document,                       "XML-Dokument für WF- WEB-Aktivität
+          lt_retcode TYPE sysubrc,                                      "Return Code
+          lv_subrc   TYPE sy-subrc,                                     "ABAP System Field: Return Code of ABAP Statements
+          lv_size    TYPE sytabix.                                      "Row Index of Internal Tables
 
   "/Constants
   CONSTANTS: lc_i  TYPE char1 VALUE 'I',
@@ -206,6 +233,36 @@ METHOD gmib_get_all_questions.
 
   lv_xml_string = lst_fomst-formhtml.
 
+  CREATE OBJECT lref_xml.
+
+* Convert XString to Binary
+  CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+    EXPORTING
+      buffer     = lv_xml_string
+    TABLES
+      binary_tab = lt_data.
+
+* Parse data
+  TRY.
+      CALL METHOD lref_xml->create_with_table
+        EXPORTING
+          table   = lt_data
+*         SIZE    = 0
+        RECEIVING
+          retcode = lt_retcode.
+    CATCH cx_sy_ref_is_initial.
+  ENDTRY.
+* RENDER_2_XSTRING
+  TRY.
+      CALL METHOD lref_xml->render_2_xstring
+        IMPORTING
+          retcode = lv_subrc
+          stream  = lv_xml_string
+          size    = lv_size.
+    CATCH cx_sy_ref_is_initial.
+  ENDTRY.
+
+
   CALL FUNCTION 'SMUM_XML_PARSE'
     EXPORTING
       xml_input = lv_xml_string
@@ -224,13 +281,20 @@ METHOD gmib_get_all_questions.
   LOOP AT lit_data_text_id INTO lst_data_text_id.
     lv_index = sy-tabix.
     lst_ids-data_text_id = lst_data_text_id-cvalue.
-    SPLIT lst_data_text_id-cvalue AT '/' INTO TABLE DATA(lit_label).
-    DESCRIBE TABLE lit_label LINES DATA(lv_lines).
+    SPLIT lst_data_text_id-cvalue AT '/' INTO TABLE lit_label.
+    DESCRIBE TABLE lit_label LINES lv_lines.
 
-    READ TABLE lit_label INTO DATA(lst_label) INDEX lv_lines.
-    DATA(lv_strlen) = strlen( lst_label ).
+    READ TABLE lit_label INTO lst_label INDEX lv_lines.
+    lv_strlen = strlen( lst_label ).
 
     SPLIT lst_label AT '-' INTO DATA(lv_que) DATA(lv_check_label).
+
+*    IF lv_check_label <> 'label'.
+*      SPLIT lst_label AT '-' INTO TABLE DATA(lit_check_label)."DATA(lv_que) DATA(lv_check_label).
+*      DESCRIBE TABLE lit_check_label LINES DATA(lv_check_label_lines).
+*      READ TABLE lit_check_label INTO DATA(lst_check_label) INDEX lv_check_label_lines.
+*      lv_check_label = lst_check_label.
+*    ENDIF.
 
     IF lv_check_label = 'label'.
 
@@ -278,7 +342,19 @@ METHOD gmib_get_all_questions.
       ENDIF.
       APPEND lst_question TO lit_question.
     ENDIF.
-    CLEAR: lst_question, lst_html1, lst_html.
+
+    IF lst_html-cname = 'class' AND lst_html-cvalue = 'or-repeat'.
+      lv_index = lv_index + 1.
+      READ TABLE lit_html1 INTO lst_html1 INDEX lv_index.
+      IF lst_html1-cname = 'name'.
+        SPLIT lst_html1-cvalue AT '/' INTO TABLE lit_repeat.
+        DESCRIBE TABLE lit_repeat LINES lv_lines.
+        READ TABLE lit_repeat INTO lst_repeat INDEX lv_lines.
+        lst_repeat_group-repeat_group_id = lst_repeat.
+        APPEND lst_repeat_group TO lit_repeat_group.
+      ENDIF.
+    ENDIF.
+    CLEAR: lst_question, lst_html1, lst_html, lv_index, lst_repeat_group.
   ENDLOOP.
 
   LOOP AT lit_ids INTO lst_ids.
@@ -333,25 +409,35 @@ METHOD gmib_get_all_questions.
       lst_final-pre_group_name = lst_pre_group-pre_group_name.
     ENDIF.
 
+    READ TABLE lit_repeat_group INTO lst_repeat_group WITH KEY repeat_group_id = lst_questions-group_id.
+    IF sy-subrc = 0.
+      lst_final-repeat_group_id   = lst_repeat_group-repeat_group_id.
+      lst_final-repeat_group_name = lst_final-group_name.
+    ENDIF.
+
     APPEND lst_final TO lit_final.
-    CLEAR: lst_final, lst_group, lst_questions, lst_pre_group.
+    CLEAR: lst_final, lst_group, lst_questions, lst_pre_group, lst_repeat_group.
   ENDLOOP.
 
-  IF lit_lang[] IS NOT INITIAL.
-    DELETE lit_final WHERE lang NE 'en'.
-  ENDIF. "/ IF lit_lang[] IS NOT INITIAL.
+*  IF lit_lang[] IS NOT INITIAL.
+*    DELETE lit_final WHERE lang NE 'en'.
+*  ENDIF. "/ IF lit_lang[] IS NOT INITIAL.
+
+  DATA : lv_name_strlen TYPE i,
+         lv_fieldname   TYPE string,
+         lv_ques_index  TYPE string.
 
   LOOP AT lit_final ASSIGNING FIELD-SYMBOL(<lfsst_final>).
     lv_index = sy-tabix.
     CONDENSE lv_index.
-    DATA(lv_name_strlen) = strlen( <lfsst_final>-question_id ).
+    lv_name_strlen = strlen( <lfsst_final>-question_id ).
     IF lv_name_strlen > 24.
-      DATA(lv_fieldname) = <lfsst_final>-question_id(24).
+      lv_fieldname = <lfsst_final>-question_id(24).
     ELSE.
       lv_fieldname = <lfsst_final>-question_id.
     ENDIF.
 
-    CONCATENATE lv_fieldname '_' lv_index INTO DATA(lv_ques_index).
+    CONCATENATE lv_fieldname '_' lv_index INTO lv_ques_index.
     CONDENSE lv_ques_index.
     <lfsst_final>-question_index = lv_ques_index.
     CLEAR: lv_ques_index, lv_fieldname, lv_index, lv_name_strlen.
@@ -364,6 +450,39 @@ ENDMETHOD.
 
 
   METHOD gmib_get_response_data.
+
+*&----------------------------------------------------------------------*
+* PROGRAM ID           :                                                *
+* PROGRAM TITLE        :                                                *
+* developer id :mrakesh                                      *
+* SUPPLIER             :OnDevice Solutions                              *
+* DATE                 :12.05.2023                                      *
+* DEVELOPMENT ID       :$TMP\ HPQC                                      *
+* CHANGE REQUEST (CTS) :DR0K######                                      *
+*=======================================================================*
+* COPIED FROM         : (CLONED PROGRAM)                                *
+* TITLE               : (PROGRAM TITLE)                                 *
+* OTHER RELATED OBJ   : (OBJECT NAMES)                                  *
+*=======================================================================*
+* CHANGE HISTORY LOG                                                    *
+* CHANGE HISTORY LOG                                                    *
+*-----------------------------------------------------------------------*
+* CHANGE HISTORY LOG                                                    *
+* MOD.NO.| DATE     | NAME           | CORRECTION NUMBER  |CHANGE       *
+*                                                          REFERENCE    *
+*-----------------------------------------------------------------------*
+*        |          |                |                    |             *
+*                                                                       *
+* DESCRIPTION:                                                          *
+*-----------------------------------------------------------------------*
+* -----------------------------------------------------------------------*
+*                   D A T A   D E C L A R A T I O N                    *
+* -----------------------------------------------------------------------*
+
+* -----------------------------------------------------------------------*
+*            E N D   O F   D A T A   D E C L A R A T I O N             *
+* -----------------------------------------------------------------------*
+
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS-VSANAGALA
@@ -381,52 +500,60 @@ ENDMETHOD.
 *                   D A T A   D E C L A R A T I O N                      *
 * -----------------------------------------------------------------------*
 
-    "/Types
-    TYPES : BEGIN OF ltys_response,
-              formid         TYPE /odsmfe/de_formid,
-              version        TYPE /odsmfe/de_version,
-              instanceid     TYPE /odsmfe/de_instanceid,
-              wo_num         TYPE aufnr,
-              vornr          TYPE vornr,
-              equnr          TYPE equnr,
-              tplnr          TYPE tplnr,
-              created_date   TYPE dats,
-              created_by     TYPE /odsmfe/de_createdby,
-              group          TYPE string,
-              sub_group      TYPE string,
-              question_id    TYPE string,
-              question_index TYPE string,
-              questionname   TYPE string,
-              responsedata   TYPE string,
-            END OF ltys_response.
+                                                                               "/Types
+types : begin of ltys_response,
+         formid         type /odsmfe/de_formid,                                "ODS Form ID
+         version        type /odsmfe/de_version,                               "ODS Version
+         instanceid     type /odsmfe/de_instanceid,                            "ODS MFE InstanceId
+         wo_num         type aufnr,                                            "Order Number
+         vornr          type vornr,                                            "Operation/Activity Number
+         equnr          type equnr,                                            "Equipment Number
+         tplnr          type tplnr,                                            "Functional Location
+         created_date   type dats,                                             "Field of type DATS
+         created_by     type /odsmfe/de_createdby,                             "ODS Created By
+         group          type string,                                           "
+         repeat_group   type string,                                           "
+         sub_group      type string,                                           "
+         question_id    type string,                                           "
+         question_index type string,                                           "
+         questionname   type string,                                           "
+         responsedata   type string,                                           "
+        end of ltys_response.
 
-    "/Variables
-    DATA: lv_xml_string TYPE xstring,
-          lit_fomrsp    TYPE TABLE OF smum_xmltb,
-          lst_fomrsp    TYPE smum_xmltb,
-          lit_return    TYPE STANDARD TABLE OF bapiret2,
-          ls_return     TYPE bapiret2,
-          lv_num        TYPE i,
-          lv_instanceid TYPE /odsmfe/de_instanceid,
-          lv_qid        TYPE string,
-          lv_index      TYPE string.
+                                                                               "/Variables
+    DATA: lv_xml_string TYPE xstring,                                          "
+          lit_fomrsp    TYPE TABLE OF smum_xmltb,                              "XML Table structure used for retreive and output XML doc
+          lst_fomrsp    TYPE smum_xmltb,                                       "XML Table structure used for retreive and output XML doc
+          lit_return    TYPE STANDARD TABLE OF bapiret2,                       "Return Parameter
+          ls_return     TYPE bapiret2,                                         "Return Parameter
+          lv_num        TYPE i,                                                "
+          lv_instanceid TYPE /odsmfe/de_instanceid,                            "ODS MFE InstanceId
+          lv_qid        TYPE string,                                           "
+          lv_text_string TYPE string,                                            "
+          lv_index      TYPE string.                                           "
 
-    "/Range Tables and Range structures
-    DATA: lrs_formid  TYPE /odsmfe/st_core_range_str,
-          lrs_version TYPE /odsmfe/st_core_range_str,
-          lrt_version TYPE /odsmfe/tt_core_range_tab,
-          lrt_formid  TYPE /odsmfe/tt_core_range_tab.
+                                                                               "/Range Tables and Range structures
+    DATA: lrs_formid  TYPE /odsmfe/st_core_range_str,                          "ODS MFE: Filter Purpose Range Structure
+          lrs_version TYPE /odsmfe/st_core_range_str,                          "ODS MFE: Filter Purpose Range Structure
+          lrt_version TYPE /odsmfe/tt_core_range_tab,                          "
+          lrt_formid  TYPE /odsmfe/tt_core_range_tab.                          "
 
-    DATA: lt_forsp    TYPE STANDARD TABLE OF /odsmfe/tb_forsp,
-          lt_response TYPE STANDARD TABLE OF gtys_form_data,
-          ls_response TYPE  gtys_form_data,
-          ls_forsp    TYPE /odsmfe/tb_forsp,
-          lit_final   TYPE TABLE OF ltys_response,
-          lst_final   TYPE ltys_response.
+    DATA: lt_forsp    TYPE STANDARD TABLE OF /odsmfe/tb_forsp,                 "Table to Capture Response
+          lt_response TYPE STANDARD TABLE OF gtys_form_data,                   "
+          ls_response TYPE gtys_form_data,                                     "
+          ls_forsp    TYPE /odsmfe/tb_forsp,                                   "Table to Capture Response
+          lit_final   TYPE TABLE OF ltys_response,                             "
+          lst_final   TYPE ltys_response.                                      "
 
-    "/Constants
-    CONSTANTS: lc_i  TYPE char1 VALUE 'I',
-               lc_eq TYPE char2 VALUE 'EQ'.
+    DATA :lit_data    TYPE swxmlcont,                                           "
+          lo_xml   TYPE REF TO cl_xml_document,                              "XML-Dokument für WF- WEB-Aktivität
+          lit_retcode TYPE sysubrc,                                             "Return Code
+          lv_subrc   TYPE sy-subrc,                                            "ABAP System Field: Return Code of ABAP Statements
+          lv_size    TYPE sytabix.                                             "Row Index of Internal Tables
+
+                                                                               "/Constants
+    CONSTANTS: lc_i  TYPE char1 VALUE 'I',                                     "
+               lc_eq TYPE char2 VALUE 'EQ'.                                    "
 
 * -----------------------------------------------------------------------*
 *            E N D   O F   D A T A   D E C L A R A T I O N               *
@@ -434,7 +561,7 @@ ENDMETHOD.
 
     IF im_instanceid IS NOT INITIAL.
       lv_instanceid = im_instanceid.
-    ENDIF.
+    ENDIF.                                                                     " IF IM_INSTANCEID IS NOT INITIAL Line No. :78
 
     IF im_formid IS NOT INITIAL.
       lrs_formid-sign   = lc_i.
@@ -442,7 +569,7 @@ ENDMETHOD.
       lrs_formid-low    = im_formid.
       APPEND lrs_formid TO lrt_formid.
       CLEAR: lrs_formid.
-    ENDIF.
+    ENDIF.                                                                     " IF IM_FORMID IS NOT INITIAL Line No. :82
 
     IF im_version IS NOT INITIAL.
       lrs_version-sign   = lc_i.
@@ -450,9 +577,9 @@ ENDMETHOD.
       lrs_version-low    = im_version.
       APPEND lrs_version TO lrt_version.
       CLEAR lrs_version.
-    ENDIF.
+    ENDIF.                                                                     " IF IM_VERSION IS NOT INITIAL Line No. :90
 
-    "/ Fetching the data from Form Response table
+                                                                               "/ Fetching the data from Form Response table
     SELECT SINGLE *
       FROM /odsmfe/tb_forsp
       INTO ls_forsp
@@ -460,8 +587,53 @@ ENDMETHOD.
         AND formid  IN lrt_formid[]
         AND version IN lrt_version[].
 
-    "/ FM converts hexadecimal into internal table
+                                                                               "/ FM converts hexadecimal into internal table
     lv_xml_string = ls_forsp-responsedata.
+
+    CREATE OBJECT lo_xml.
+* Check Response data
+    IF ls_forsp-responsedata IS NOT INITIAL.
+      lv_xml_string = ls_forsp-responsedata.
+    ELSE.
+      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+        EXPORTING
+          textid  = /iwbep/cx_mgw_busi_exception=>business_error
+          message = 'Response data not found'.
+    ENDIF.
+
+* Convert XString to Binary
+    CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+      EXPORTING
+        buffer     = lv_xml_string
+      TABLES
+        binary_tab = lit_data.
+    IF lit_data IS INITIAL.
+      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+        EXPORTING
+          textid  = /iwbep/cx_mgw_busi_exception=>business_error
+          message = 'Converting Xstring to Binary data Failed'.
+    ENDIF.
+
+* Parse data
+    CALL METHOD lo_xml->create_with_table
+      EXPORTING
+        table   = lit_data
+*       SIZE    = 0
+      RECEIVING
+        retcode = lit_retcode.
+* render_2_xstring
+    CALL METHOD lo_xml->render_2_xstring
+      IMPORTING
+        retcode = lv_subrc
+        stream  = lv_xml_string
+        size    = lv_size.
+    IF lv_xml_string IS INITIAL.
+      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+        EXPORTING
+          textid  = /iwbep/cx_mgw_busi_exception=>business_error
+          message = 'Render to XString Failed'.
+    ENDIF.
+
     CALL FUNCTION 'SMUM_XML_PARSE'
       EXPORTING
         xml_input = lv_xml_string
@@ -469,21 +641,21 @@ ENDMETHOD.
         xml_table = lit_fomrsp
         return    = lit_return.
 
-    "/ Call method to get all the questions, groups and subgroups
+                                                                               "/ Call method to get all the questions, groups and subgroups
     CALL METHOD gmib_get_all_questions
       EXPORTING
-        im_formid    = ls_forsp-formid  " ODS Form ID
-        im_version   = ls_forsp-version " ODS Version
+        im_formid    = ls_forsp-formid                                         " ODS Form ID
+        im_version   = ls_forsp-version                                        " ODS Version
       IMPORTING
         ex_form_data = lt_response.
 
-    "/ Getting all the response data for all questions
+                                                                               "/ Getting all the response data for all questions
     LOOP AT lit_fomrsp INTO lst_fomrsp WHERE type = 'V'.
       lv_qid = lst_fomrsp-cname.
       READ TABLE lt_response INTO ls_response WITH KEY question_id = lv_qid.
       IF sy-subrc <> 0.
         READ TABLE lt_response INTO ls_response WITH KEY question = lv_qid.
-      ENDIF.
+      ENDIF.                                                                   " IF SY-SUBRC <> 0 Line No. :159
       IF ls_response IS NOT INITIAL.
         lst_final-instanceid     = ls_forsp-instanceid.
         lst_final-formid         = ls_forsp-formid.
@@ -495,6 +667,7 @@ ENDMETHOD.
         lst_final-created_date   = ls_forsp-created_date.
         lst_final-created_by     = ls_forsp-created_by.
         lst_final-group          = ls_response-pre_group_name.
+        lst_final-repeat_group   = ls_response-repeat_group_name.
         lst_final-sub_group      = ls_response-group_name.
         lst_final-question_id    = ls_response-question_id.
         lst_final-question_index = ls_response-question_index.
@@ -502,8 +675,8 @@ ENDMETHOD.
         lst_final-responsedata   = lst_fomrsp-cvalue.
         APPEND lst_final TO ex_response_data.
         CLEAR: lst_final, ls_response, lst_fomrsp, ls_forsp.
-      ENDIF.
-    ENDLOOP.
+      ENDIF.                                                                   " IF LS_RESPONSE IS NOT INITIAL Line No. :162
+    ENDLOOP.                                                                   " LOOP AT LIT_FOMRSP Line No. :156
 
   ENDMETHOD.
 ENDCLASS.

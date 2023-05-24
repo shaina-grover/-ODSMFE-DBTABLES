@@ -38,26 +38,47 @@ CLASS /ODSMFE/CL_APPCONFIG IMPLEMENTATION.
 * Transport No.          :ES1K903398
 * Change Description     :Mapping system userid to the related parameter to get the relevant data based on the UserID in the related services.
 ***********************************************************************
+********************** CHANGE HISTORY **********************
+* Program Author (SID)   :ODS-PIYYAPPAN
+* Change Date            :17.05.2023
+* Transport No.          :ES1K903808
+* Change Description     :To get the configurable days for myForms Response Capture Service
+***********************************************************************
 * -----------------------------------------------------------------------*
-*                   D A T A   D E C L A R A T I O N                    *
+*                   D A T A   D E C L A R A T I O N                      *
 * -----------------------------------------------------------------------*
 
-    DATA: lv_select        TYPE /odsmfe/if_get_entityset~gtyt_select,
-          lv_where_clause  TYPE string,
-          lv_from          TYPE string,
-          lst_filter       TYPE /iwbep/s_mgw_select_option,
-          lst_filter_range TYPE /iwbep/s_cod_select_option,
-          lit_appconfig    TYPE /odsmfe/cl_pr_appstore_mpc=>tt_applicationconfig.
+    "/Tables and Structures
+    DATA: lst_filter       TYPE /iwbep/s_mgw_select_option,                         "MGW Framework: Selection Option Parameters for db selects
+          lst_filter_range TYPE /iwbep/s_cod_select_option,                         "MGW Framework: Select Options for Queries
+          lit_appconfig    TYPE /odsmfe/cl_pr_appstore_mpc=>tt_applicationconfig.   "Gateway properties for appconfig
 
-    FIELD-SYMBOLS: <lfsst_select> TYPE /odsmfe/if_get_entityset~gtyt_select,
-                   <lfsst_entity> TYPE /odsmfe/tb_apcon.
+    "/ Reference Object
+    DATA: lo_super  TYPE REF TO /odsmfe/cl_get_ent_super_bapi.                      "Super Class For implementing the getentityset with BAPI
 
-    DATA: lv_active  TYPE string.
+    "/ Variables
+    DATA: lv_active        TYPE string,                                             "Active flag
+          lv_days          TYPE char10,                                                  "Configured days
+          lv_select        TYPE /odsmfe/if_get_entityset~gtyt_select,               "EDIC: Program editor line
+          lv_where_clause  TYPE string,                                             "Where Clause
+          lv_from          TYPE string.                                             "From Clause
 
-    DATA: lo_super  TYPE REF TO /odsmfe/cl_get_ent_super_bapi.
+    "/ Constants
+    CONSTANTS: lc_user       TYPE string VALUE 'BackEndUser',                       "BackEndUser
+               lc_instance   TYPE string VALUE 'MYFORMS_INSTANCES_DAYS',            "myForms Instance Days
+               lc_entityset  TYPE string VALUE 'myFormsResponseCaptureSet',         "myForms Response Capture Set
+               lc_field      TYPE string VALUE 'DAYS_INSTANCE'.                     "Instance Days
+
+    "/ Field Symbols
+    FIELD-SYMBOLS: <lfsst_select> TYPE /odsmfe/if_get_entityset~gtyt_select,        "EDIC: Program editor line
+                   <lfsst_entity> TYPE /odsmfe/tb_apcon.                            "Structure for Application Configuration
 
 * -----------------------------------------------------------------------*
-*            E N D   O F   D A T A   D E C L A R A T I O N             *
+*            E N D   O F   D A T A   D E C L A R A T I O N               *
+* -----------------------------------------------------------------------*
+
+* -----------------------------------------------------------------------*
+*                  M A I N    S E C T I O N                              *
 * -----------------------------------------------------------------------*
 
     TRY.
@@ -99,17 +120,35 @@ CLASS /ODSMFE/CL_APPCONFIG IMPLEMENTATION.
             IF sy-subrc EQ 0.
               me->/odsmfe/if_get_entityset~gmib_sort_data( ).
 
-*SOC by ODS-VSANAGALA - ES1K903398
+*SOC by ODS-VSANAGALA - ES1K903398.
               "/ Mapping userid to the related parameter.
-              READ TABLE gitii_entityset ASSIGNING <lfsst_entity> WITH KEY param_name = 'BackEndUser'.
+              READ TABLE gitii_entityset ASSIGNING <lfsst_entity> WITH KEY param_name = lc_user.
               IF sy-subrc = 0 .
                 <lfsst_entity>-param_value = sy-uname.
-              ENDIF.
-*EOC by ODS-VSANAGALA - ES1K903398
+              ENDIF. "/IF sy-subrc = 0 .
+*EOC by ODS-VSANAGALA - ES1K903398.
+
+*SOC by ODS-PIYYAPPAN - ES1K903808.
+              READ TABLE gitii_entityset ASSIGNING <lfsst_entity> WITH KEY param_name = lc_instance.
+              IF sy-subrc = 0.
+                "/ Get Configurable days from filter table
+                SELECT SINGLE low
+                  FROM /odsmfe/tb_filtr
+                  INTO lv_days
+                  WHERE entitysetname = lc_entityset
+                  AND   field         = lc_field.
+
+                IF sy-subrc = 0 AND lv_days IS NOT INITIAL.
+                  <lfsst_entity>-param_value = lv_days.
+                ENDIF. "/IF sy-subrc = 0 AND lv_days IS NOT INITIAL.
+
+              ENDIF. "/IF sy-subrc = 0.
+*EOC by ODS-PIYYAPPAN - ES1K903808.
 
               "/ Data Provider for ODATA Services
               GET REFERENCE OF gitii_entityset INTO ch_entityset.
             ENDIF. "/IF sy-subrc EQ 0.
+
           CATCH cx_sy_dynamic_osql_syntax. " Open SQL Error
             CHECK sy-subrc EQ 0.
         ENDTRY.

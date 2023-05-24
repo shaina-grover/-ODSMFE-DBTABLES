@@ -329,7 +329,7 @@ CLASS /ODSMFE/CL_MODEL IMPLEMENTATION.
     SELECT formid version oprnum formcategory AS category mandatory occur AS allowed
       FROM /odsmfe/tb_fmass
       APPENDING CORRESPONDING FIELDS OF TABLE lit_formass1
-      WHERE workordernum IN lrt_aufnr[]
+      WHERE workordernum IN lrt_aufnr[]                     "#EC CI_NOFIRST
         AND active       EQ abap_true
         AND deleted      NE abap_true.
 

@@ -140,7 +140,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
         EXPORTING
           iv_mobileuser = lv_mobileuser.
 
-      ASSIGN ('O_REF->GT_QMNUM_DELTA[]') TO <lfs_no>.
+      ASSIGN ('O_REF->GT_QMNUM_DELTA1[]') TO <lfs_no>.
       IF <lfs_no> IS ASSIGNED.
         lit_valid_nos[] = <lfs_no>.
       ENDIF.
@@ -162,7 +162,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
         ASSIGN lo_ref_exch_data->* TO <lfsit_delta_tab>.
         LOOP AT <lfsit_delta_tab> ASSIGNING <lfsst_delta_str>.
           IF <lfsst_delta_str>-action = lc_i OR <lfsst_delta_str>-action = lc_u.
-            lst_notification_header-aufnr = <lfsst_delta_str>-objkey.
+            lst_notification_header-qmnum = <lfsst_delta_str>-objkey.
             APPEND lst_notification_header TO lit_notif_header_temp.
             CLEAR lst_notification_header.
           ENDIF.
@@ -170,7 +170,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
 
         LOOP AT lit_notif_header_temp  INTO lst_notif_header_temp .
           MOVE-CORRESPONDING lst_notif_header_temp TO lst_notification_headers .
-          APPEND lst_notification_headers  TO lit_notification_headers .
+          APPEND lst_notification_headers TO lit_notification_headers .
           CLEAR : lst_notif_header_temp ,lst_notification_headers .
         ENDLOOP.
 
@@ -182,7 +182,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
               iv_mobileuser          = lv_mobileuser
               it_notification_header = lit_notification_headers.
 
-          ASSIGN ('O_REF->GT_QMNUM_DELTA[]') TO <lfs_no>.
+          ASSIGN ('O_REF->GT_QMNUM_DELTA1[]') TO <lfs_no>.
           IF <lfs_no> IS ASSIGNED.
             lit_valid_nos[] = <lfs_no>.
           ENDIF.

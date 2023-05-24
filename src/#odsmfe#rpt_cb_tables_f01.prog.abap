@@ -1,19 +1,16 @@
 *&---------------------------------------------------------------------*
 *&  Include           /ODSMFE/RPT_CB_TABLES_F01
 *&---------------------------------------------------------------------*
-
-
+*&---------------------------------------------------------------------*
+*&      Form  DOWNLOAD
+*&---------------------------------------------------------------------*
+*   download table data
+*----------------------------------------------------------------------*
 FORM download.
 
   IF p_table IS NOT INITIAL.
     CREATE DATA go_ref TYPE TABLE OF (p_table).
     ASSIGN go_ref->* TO <fs_table>.
-
-    "if we dont want to download any other table rather than '/ODSMFE/TB' uncomment the below code.
-**    lv_val = '/ODSMFE/TB_'.
-**    IF p_table CS lv_val.
-**      SELECT * FROM (p_table) INTO TABLE <fs_table>.
-**    ENDIF.
 
     TRY.
 
@@ -132,10 +129,13 @@ FORM download.
                   OTHERS                 = 10.
               IF sy-subrc <> 0.
                 MESSAGE 'NOT WORKING' TYPE 'I'.
+              ELSE.
+                MESSAGE 'Data downloaded successfully' TYPE 'S' DISPLAY LIKE 'S'.
               ENDIF.
             ENDIF.
+          ELSE.
+            MESSAGE 'Unable to download data' TYPE 'S' DISPLAY LIKE 'E'.
           ENDIF.
-          MESSAGE 'Data downloaded successfully' TYPE 'S' DISPLAY LIKE 'S'.
         ELSE.
           MESSAGE 'Table contains no records' TYPE 'S' DISPLAY LIKE 'E'.
         ENDIF.
@@ -147,62 +147,16 @@ FORM download.
     MESSAGE 'Please select any table' TYPE 'S' DISPLAY LIKE 'E'.
   ENDIF.
 ENDFORM.
-
-
-FORM upload.
-
-  IF p_file IS NOT INITIAL.
-    "Generate table
-    CREATE DATA git_dyn_tab TYPE TABLE OF (p_str).
-    ASSIGN git_dyn_tab->* TO <lfs_dyn_tab>.
-    TRY.
-        CALL FUNCTION 'ZFM_EXCEL_TO_ITAB'
-          EXPORTING
-            iv_filename         = p_file
-            iv_structure        = p_str
-          CHANGING
-            ct_return_table     = <lfs_dyn_tab>
-          EXCEPTIONS
-            structure_not_found = 1
-            field_not_found     = 2
-            OTHERS              = 3.
-        IF sy-subrc <> 0.
-          MESSAGE 'Unable to upload data' TYPE 'S' DISPLAY LIKE 'E'.
-        ELSE.
-*****        ">>>If needed the below line could be used to update the data to DB
-*****        MODIFY (p_str) FROM TABLE <lfs_dyn_tab>.
-          MESSAGE 'Data uploaded successfully' TYPE 'S' DISPLAY LIKE 'S'.
-        ENDIF.
-      CATCH cx_sy_conversion_no_number.
-    ENDTRY.
-
-    DATA : o_alv TYPE REF  TO  cl_salv_table.
-    DATA : lx_msg TYPE REF TO cx_salv_msg.
-    TRY.
-        cl_salv_table=>factory(
-        IMPORTING
-          r_salv_table = o_alv
-          CHANGING
-          t_table = <lfs_dyn_tab> ).
-      CATCH cx_salv_msg INTO
-    lx_msg.
-    ENDTRY.
-    IF o_alv IS BOUND.
-      o_alv->display( ).
-    ENDIF.
-
-  ELSE.
-    MESSAGE 'Please Choose a File' TYPE 'S' DISPLAY LIKE 'E'.
-  ENDIF.
-ENDFORM.
-
-
+*&---------------------------------------------------------------------*
+*&      Form  DOWNLOAD_STRU
+*&---------------------------------------------------------------------*
+*   download table structure
+*----------------------------------------------------------------------*
 FORM download_stru.
   IF p_table2 IS NOT INITIAL.
 
     CREATE DATA go_ref TYPE TABLE OF (p_table2).
     ASSIGN go_ref->* TO <fs_table>.
-
 
     TRY.
         SELECT * FROM (p_table2) INTO TABLE <fs_table>.
@@ -306,7 +260,6 @@ FORM download_stru.
             IF sy-subrc <> 0.
               MESSAGE 'Unable to download data' TYPE 'S' DISPLAY LIKE 'E'.
             ELSE.
-
               CALL METHOD cl_gui_frontend_services=>execute
                 EXPORTING
                   document               = gv_fullpath
@@ -323,15 +276,15 @@ FORM download_stru.
                   OTHERS                 = 10.
               IF sy-subrc <> 0.
                 MESSAGE 'NOT WORKING' TYPE 'I'.
+              ELSE.
+                MESSAGE 'Structure downloaded successfully' TYPE 'S' DISPLAY LIKE 'S'.
               ENDIF.
             ENDIF.
+          ELSE.
+            MESSAGE 'Unable to download structure' TYPE 'S' DISPLAY LIKE 'E'.
           ENDIF.
-          MESSAGE 'Structure saved successfully' TYPE 'S' DISPLAY LIKE 'S'.
         ELSE.
-          MESSAGE 'Unable to save structure' TYPE 'S' DISPLAY LIKE 'E'.
-        ENDIF.
-        IF sy-subrc = 0.
-
+          MESSAGE 'Structure does not exist' TYPE 'S' DISPLAY LIKE 'E'.
         ENDIF.
 
       CATCH cx_root INTO DATA(e_text).
@@ -339,5 +292,55 @@ FORM download_stru.
     ENDTRY.
   ELSE.
     MESSAGE 'Please select any table' TYPE 'S' DISPLAY LIKE 'E'.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  UPLOAD
+*&---------------------------------------------------------------------*
+*   Upload data from excel to DB table
+*----------------------------------------------------------------------*
+FORM upload.
+
+  IF p_file IS NOT INITIAL.
+    "Generate table
+    CREATE DATA go_dyn_tab TYPE TABLE OF (p_str).
+    ASSIGN go_dyn_tab->* TO <lfs_dyn_tab>.
+    TRY.
+*        CALL FUNCTION 'ZFM_EXCEL_TO_ITAB'
+        CALL FUNCTION '/ODSMFE/FM_EXCEL_TO_ITAB'
+          EXPORTING
+            iv_filename         = p_file
+            iv_structure        = p_str
+          CHANGING
+            ct_return_table     = <lfs_dyn_tab>
+          EXCEPTIONS
+            structure_not_found = 1
+            field_not_found     = 2
+            OTHERS              = 3.
+        IF sy-subrc <> 0.
+          MESSAGE 'Unable to upload data' TYPE 'S' DISPLAY LIKE 'E'.
+        ELSE.
+*****        ">>>If needed the below line could be used to update the data to DB
+*****        MODIFY (p_str) FROM TABLE <lfs_dyn_tab>.
+          MESSAGE 'Data uploaded successfully' TYPE 'S' DISPLAY LIKE 'S'.
+        ENDIF.
+      CATCH cx_sy_conversion_no_number.
+    ENDTRY.
+
+    TRY.
+        cl_salv_table=>factory(
+        IMPORTING
+          r_salv_table = go_alv
+          CHANGING
+          t_table = <lfs_dyn_tab> ).
+      CATCH cx_salv_msg INTO
+    go_msg.
+    ENDTRY.
+    IF go_alv IS BOUND.
+      go_alv->display( ).
+    ENDIF.
+
+  ELSE.
+    MESSAGE 'Please Choose a File' TYPE 'S' DISPLAY LIKE 'E'.
   ENDIF.
 ENDFORM.
