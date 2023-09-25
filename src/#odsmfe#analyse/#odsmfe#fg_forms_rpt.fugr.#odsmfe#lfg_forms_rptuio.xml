@@ -5,16 +5,10 @@
    <PROGDIR>
     <NAME>/ODSMFE/LFG_FORMS_RPTUIO</NAME>
     <SUBC>I</SUBC>
+    <APPL>S</APPL>
     <RLOAD>E</RLOAD>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
-   <TPOOL>
-    <item>
-     <ID>R</ID>
-     <ENTRY>jkl;lkn</ENTRY>
-     <LENGTH>7</LENGTH>
-    </item>
-   </TPOOL>
   </asx:values>
  </asx:abap>
 </abapGit>

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>/ODSMFE/CHANGEDTS_DTE</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>TZNTSTMPS</DOMNAME>
+    <HEADLEN>19</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>18</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>Changed time stamp - mFE</DDTEXT>
+    <REPTEXT>Changed Time Stamp</REPTEXT>
+    <SCRTEXT_S>Chng TS</SCRTEXT_S>
+    <SCRTEXT_M>Changed Time Stamp</SCRTEXT_M>
+    <SCRTEXT_L>Changed Time Stamp</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+    <ABAP_LANGUAGE_VERSION>5</ABAP_LANGUAGE_VERSION>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>D</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>D</DDLANGUAGE>
+     <DDTEXT>Zeitstempel Geändert</DDTEXT>
+     <REPTEXT>Zeitst. Geändert</REPTEXT>
+     <SCRTEXT_S>ZS Geänd.</SCRTEXT_S>
+     <SCRTEXT_M>Zeitst. Geändert</SCRTEXT_M>
+     <SCRTEXT_L>Zeitstempel Geändert</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

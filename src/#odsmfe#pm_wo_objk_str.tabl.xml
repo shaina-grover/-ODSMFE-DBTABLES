@@ -8,6 +8,8 @@
     <TABCLASS>INTTAB</TABCLASS>
     <LANGDEP>X</LANGDEP>
     <DDTEXT>ODS : Work Order - Object List  structure</DDTEXT>
+    <MASTERLANG>E</MASTERLANG>
+    <EXCLASS>4</EXCLASS>
    </DD02V>
    <DD03P_TABLE>
     <DD03P>
@@ -19,9 +21,9 @@
     <DD03P>
      <FIELDNAME>.INCLUDE</FIELDNAME>
      <ADMINFIELD>0</ADMINFIELD>
-     <PRECFIELD>RIWOL</PRECFIELD>
+     <PRECFIELD>/ODSMFE/ST_RIWOL</PRECFIELD>
      <MASK>      S</MASK>
-     <DDTEXT>Internal Table Object List Processing</DDTEXT>
+     <DDTEXT>ODSMFE: Internal Table Object List Processing</DDTEXT>
      <COMPTYPE>S</COMPTYPE>
     </DD03P>
     <DD03P>

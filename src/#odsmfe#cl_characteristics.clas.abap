@@ -1,22 +1,8 @@
 class /ODSMFE/CL_CHARACTERISTICS definition
   public
-  final
-  create public .
+  create private .
 
 public section.
-
-  methods EQUIPMENT_CHAR_UPDATE
-    importing
-      !IM_WORKORDER type AUFNR
-      !IM_CHAR type /ODSMFE/EQ_CHAR_TT
-    exporting
-      !EX_RETURN type BAPIRET2 .
-  methods UPDATE_CHARACTERSTICS
-    importing
-      value(LV_OBJECT) type BAPI1003_KEY-OBJECT
-      !LV_CLASSNUM type BAPI1003_KEY-CLASSNUM
-      !LV_KLART type BAPI1003_KEY-CLASSTYPE
-      !IM_CHAR type /ODSMFE/EQ_CHAR_TT .
 protected section.
 private section.
 ENDCLASS.

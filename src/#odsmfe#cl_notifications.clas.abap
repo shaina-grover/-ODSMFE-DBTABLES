@@ -4,11 +4,6 @@ class /ODSMFE/CL_NOTIFICATIONS definition
   create public .
 
 public section.
-  type-pools ABAP .
-
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC_EXT=>TS_NOTIFICATIONS .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC_EXT=>TT_NOTIFICATIONS .
-
   methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
     redefinition .
 protected section.
@@ -38,22 +33,44 @@ CLASS /ODSMFE/CL_NOTIFICATIONS IMPLEMENTATION.
 *                  D A T A    D E C L A R A T I O N                   *
 *---------------------------------------------------------------------*
 
-      "/ Tables and Structures
-      DATA: lst_filter_select_options TYPE /iwbep/s_mgw_select_option,
-            lst_key_tab               TYPE /iwbep/s_mgw_name_value_pair.
+     "/Types
+     TYPES: BEGIN OF ltys_data,
+                    wa(512) TYPE c,
+                 END OF ltys_data,
 
-      "/ Range Tabkes and Range Structures
-      DATA: lrs_filter_range TYPE /iwbep/s_cod_select_option,
-            lrs_filter       TYPE /iwbep/s_cod_select_option,
-            lrt_notification TYPE /iwbep/t_cod_select_options,
-            lrt_ordertype    TYPE /iwbep/t_cod_select_options.
+                 BEGIN OF ltys_options,
+                    text(72) TYPE c,
+                 END OF ltys_options,
+
+                 BEGIN OF ltys_fields,
+                    fieldname(30) TYPE c,
+                    offset(6)   TYPE n,
+                    length(6) TYPE n,
+                    type(1) TYPE c,
+                    fieldtext(60) TYPE c,
+                 END OF ltys_fields.
+
+      "/ Tables and Structures
+      DATA: lrt_notification TYPE TABLE OF /odsmfe/st_core_range_str,
+                lrt_ordertype     TYPE TABLE OF /odsmfe/st_core_range_str,
+                lit_notification   TYPE TABLE OF /odsmfe/ce_notification,
+                lst_notification  TYPE /odsmfe/ce_notification,
+                lit_options         TYPE TABLE OF ltys_options,
+                lit_fields            TYPE TABLE OF ltys_fields,
+                lit_data              TYPE TABLE OF ltys_data.
+
+      DATA: lr_rfc TYPE REF TO /odsmfe/cl_get_ent_super_bapi.
+
+      DATA: lv_rowskip  TYPE int4,
+                 lv_rowcount TYPE int4.
+
 
       "/ Constants
       CONSTANTS: lc_notification TYPE string VALUE 'NOTIFICATION',
                  lc_ordertype    TYPE string VALUE 'ORDERTYPE',
                  lc_notif        TYPE string VALUE 'Notification',
-                 lc_i            TYPE char1  VALUE 'I',
-                 lc_eq           TYPE char2  VALUE 'EQ'.
+                 lc_i            TYPE c LENGTH 1  VALUE 'I',
+                 lc_eq           TYPE c LENGTH 2  VALUE 'EQ'.
 
 *---------------------------------------------------------------------*
 *           E N D   O F   D A T A   D E C L A R A T I O N             *
@@ -64,77 +81,76 @@ CLASS /ODSMFE/CL_NOTIFICATIONS IMPLEMENTATION.
 
       "/ Read filter values
       IF im_filter_select_options IS NOT INITIAL.
-        LOOP AT im_filter_select_options INTO lst_filter_select_options.
-          TRANSLATE lst_filter_select_options-property TO UPPER CASE.
-          CASE lst_filter_select_options-property.
+        LOOP AT im_filter_select_options INTO DATA(lst_filter_select_options).
+          TRANSLATE lst_filter_select_options-name TO UPPER CASE.
+          CASE lst_filter_select_options-name.
 
             WHEN lc_notification.
-              READ TABLE lst_filter_select_options-select_options INTO lrs_filter_range INDEX 1.
-              IF sy-subrc = 0 AND lrs_filter_range IS NOT INITIAL.
-                lrs_filter-sign   = lc_i.
-                lrs_filter-option = lc_eq.
-                "/ Conversion exit for the Notification number
-                CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-                  EXPORTING
-                    input  = lrs_filter_range-low
-                  IMPORTING
-                    output = lrs_filter_range-low.
-
-                lrs_filter-low    = lrs_filter_range-low.
-                APPEND lrs_filter_range TO lrt_notification.
-              ENDIF.
+            lrt_notification = CORRESPONDING #( lst_filter_select_options-range ).
+            DELETE lrt_notification WHERE low IS INITIAL.
 
             WHEN lc_ordertype.
-              READ TABLE lst_filter_select_options-select_options INTO lrs_filter_range INDEX 1.
-              IF sy-subrc = 0 AND lrs_filter_range IS NOT INITIAL.
-                lrs_filter-sign   = lc_i.
-                lrs_filter-option = lc_eq.
-                lrs_filter-low    = lrs_filter_range-low.
-                APPEND lrs_filter_range TO lrt_ordertype.
-              ENDIF.
+              lrt_ordertype = CORRESPONDING #( lst_filter_select_options-range ).
+              DELETE lrt_ordertype WHERE low IS INITIAL.
 
           ENDCASE. "/ CASE lst_filter_select_options-property.
-          CLEAR: lrs_filter_range, lrs_filter, lst_filter_select_options.
+          CLEAR:  lst_filter_select_options.
         ENDLOOP. "/ LOOP AT im_filter_select_options INTO lst_filter_select_options.
       ENDIF. "/ IF im_filter_select_options IS NOT INITIAL.
 
-      "/ Read key values
-      IF im_key_tab IS NOT INITIAL.
-        READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_notif.
-        IF sy-subrc = 0 AND lst_key_tab IS NOT INITIAL.
-          lrs_filter-sign   = lc_i.
-          lrs_filter-option = lc_eq.
-          "/ Conversion exit for the Notification number
-          CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-            EXPORTING
-              input  = lrs_filter_range-low
-            IMPORTING
-              output = lrs_filter_range-low.
 
-          lrs_filter-low    = lrs_filter_range-low.
-          APPEND lrs_filter_range TO lrt_notification.
-          CLEAR: lrs_filter_range, lrs_filter, lst_key_tab.
-        ENDIF. "/ IF sy-subrc = 0 AND lst_key_tab IS NOT INITIAL.
-      ENDIF. "/ IF im_key_tab IS NOT INITIAL.
+      CREATE OBJECT lr_rfc
+          EXPORTING
+            im_entity_name           = im_entity_name .
 
-      "/ Get the Notification details from the relevant table
-      SELECT qmnum qmart qmtxt
-        FROM qmel
-        INTO TABLE gitib_entity
-        WHERE qmnum IN lrt_notification[]
-          AND qmart IN lrt_ordertype[].
+      CALL METHOD lr_rfc->get_cloud_dest
+        IMPORTING
+          ex_dest = DATA(lv_rfc) .
 
-      IF sy-subrc NE 0.
-        CLEAR gitib_entity.
+
+      DATA(lv_top)     = im_request->get_paging( )->get_page_size( ).
+      DATA(lv_skip)    = im_request->get_paging( )->get_offset( ).
+
+      lit_fields = VALUE #( ( fieldname = 'QMNUM' )
+                                        ( fieldname = 'QMART' )
+                                        ( fieldname = 'QMTXT' ) ).
+
+     if lrt_notification IS NOT INITIAL.
+       lit_options = VALUE #( ( text = |QMNUM| & | | & |{ lrt_notification[ 1 ]-option }| & | | & |'| & |{ lrt_notification[ 1 ]-low }| & |'| ) ).
+       DATA(lv_and) = 'AND'.
+     endif.
+
+     if lrt_ordertype IS NOT INITIAL.
+         APPEND VALUE #( text = |{ lv_and }| & | | & |QMART| & | | & |{ lrt_ordertype[ 1 ]-option }| & | | & |'| & |{ lrt_ordertype[ 1 ]-low }| & |'| )  TO lit_options.
+     endif.
+
+      lv_rowskip = lv_Skip.
+      IF lv_top > 0.
+        lv_rowcount = lv_top.
       ENDIF.
+
+      "/Call RFC to get work orders
+      CALL FUNCTION 'RFC_READ_TABLE'
+        DESTINATION lv_rfc
+        EXPORTING
+          query_table = 'QMEL'
+          rowskips    = lv_rowskip
+          rowcount    = lv_rowcount
+        TABLES
+          options     = lit_options
+          fields      = lit_fields
+          data        = lit_data.
+
+       LOOP AT lit_data INTO DATA(lst_data).
+            lst_notification-Notification = lst_data+0(12).
+            lst_notification-OrderType   = lst_data+12(15).
+            lst_notification-Description = lst_data+16(56).
+            APPEND lst_notification TO lit_notification.
+            clear: lst_notification.
+       ENDLOOP.
 
       "/ Mapping the properties to export in the gateway service.
-      IF im_key_tab IS NOT INITIAL.
-        READ TABLE gitib_entity INTO gstib_entity INDEX 1.
-        GET REFERENCE OF gstib_entity INTO ex_entity.
-      ELSE.
-        GET REFERENCE OF gitib_entity INTO ex_entityset.
-      ENDIF.
+      MOVE-CORRESPONDING lit_notification TO ex_response_data.
 
     ENDMETHOD.
 ENDCLASS.

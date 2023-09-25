@@ -1,17 +1,8 @@
 class /ODSMFE/CL_APPUSER definition
   public
-  inheriting from /ODSMFE/CL_GET_ENT_SUPER_BAPI
-  final
-  create public .
+  create private .
 
 public section.
-  type-pools ABAP .
-
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_MASTER_S_MPC_EXT=>TS_APPUSERTABLE .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_MASTER_S_MPC_EXT=>TT_APPUSERTABLE .
-
-  methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
-    redefinition .
 protected section.
 private section.
 ENDCLASS.

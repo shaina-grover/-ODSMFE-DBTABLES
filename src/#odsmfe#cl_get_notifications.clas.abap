@@ -1,39 +1,8 @@
 class /ODSMFE/CL_GET_NOTIFICATIONS definition
   public
-  create public .
+  create private .
 
 public section.
-  type-pools ABAP .
-
-  types:
-    BEGIN OF gtys_usrid,
-        pernr TYPE pernr_d,
-        usrid TYPE /odsmfe/de_createdby,
-      END OF gtys_usrid .
-  types:
-    BEGIN OF gtys_tech,
-        pernr TYPE pernr_d,
-        usrid TYPE sysid,
-      END OF gtys_tech .
-
-  data:
-    gitib_usrid TYPE STANDARD TABLE OF gtys_usrid .
-  data:
-    gitib_tech  TYPE STANDARD TABLE OF gtys_tech .
-
-  methods GMIB_GET_NOTIFICATION_DATA
-    importing
-      !IM_MOBILEUSER type STRING optional
-      !IM_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITYSET optional
-      !IM_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION optional
-      !IM_ENTITY_NAME type STRING optional
-    exporting
-      !EX_VALID_NOTIFICATIONS type /ODSMFE/PM_VALID_QMNUM_TAB .
-  methods GMIB_GET_TECHNICIAN_DATA
-    importing
-      !IM_MOBILEUSER type STRING optional
-    exporting
-      !EX_TECH_DATA like GITIB_TECH .
 protected section.
 private section.
 ENDCLASS.
@@ -140,7 +109,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
         EXPORTING
           iv_mobileuser = lv_mobileuser.
 
-      ASSIGN ('O_REF->GT_QMNUM_DELTA1[]') TO <lfs_no>.
+      ASSIGN ('O_REF->GT_QMNUM_DELTA[]') TO <lfs_no>.
       IF <lfs_no> IS ASSIGNED.
         lit_valid_nos[] = <lfs_no>.
       ENDIF.
@@ -162,7 +131,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
         ASSIGN lo_ref_exch_data->* TO <lfsit_delta_tab>.
         LOOP AT <lfsit_delta_tab> ASSIGNING <lfsst_delta_str>.
           IF <lfsst_delta_str>-action = lc_i OR <lfsst_delta_str>-action = lc_u.
-            lst_notification_header-qmnum = <lfsst_delta_str>-objkey.
+            lst_notification_header-aufnr = <lfsst_delta_str>-objkey.
             APPEND lst_notification_header TO lit_notif_header_temp.
             CLEAR lst_notification_header.
           ENDIF.
@@ -170,7 +139,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
 
         LOOP AT lit_notif_header_temp  INTO lst_notif_header_temp .
           MOVE-CORRESPONDING lst_notif_header_temp TO lst_notification_headers .
-          APPEND lst_notification_headers TO lit_notification_headers .
+          APPEND lst_notification_headers  TO lit_notification_headers .
           CLEAR : lst_notif_header_temp ,lst_notification_headers .
         ENDLOOP.
 
@@ -182,7 +151,7 @@ CLASS /ODSMFE/CL_GET_NOTIFICATIONS IMPLEMENTATION.
               iv_mobileuser          = lv_mobileuser
               it_notification_header = lit_notification_headers.
 
-          ASSIGN ('O_REF->GT_QMNUM_DELTA1[]') TO <lfs_no>.
+          ASSIGN ('O_REF->GT_QMNUM_DELTA[]') TO <lfs_no>.
           IF <lfs_no> IS ASSIGNED.
             lit_valid_nos[] = <lfs_no>.
           ENDIF.

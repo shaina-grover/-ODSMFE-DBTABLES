@@ -4,9 +4,10 @@
   <asx:values>
    <PROGDIR>
     <NAME>/ODSMFE/LFG_JOINCI00</NAME>
-    <SQLX>X</SQLX>
     <SUBC>I</SUBC>
+    <APPL>S</APPL>
     <RLOAD>E</RLOAD>
+    <UCCHECK>X</UCCHECK>
    </PROGDIR>
   </asx:values>
  </asx:abap>

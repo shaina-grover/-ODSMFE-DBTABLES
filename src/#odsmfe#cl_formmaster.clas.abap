@@ -4,10 +4,10 @@ class /ODSMFE/CL_FORMMASTER definition
   create public .
 
 public section.
-  type-pools ABAP .
+*type-pools ABAP .
 
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMASTER .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_FORMMASTER .
+*  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMASTER .
+*  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_FORMMASTER .
 
   methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_MODIFY_ENTITYSET
     redefinition .
@@ -46,18 +46,18 @@ CLASS /ODSMFE/CL_FORMMASTER IMPLEMENTATION.
 ************************************************************************
 * Main Section
 ************************************************************************
-* Read data from FE request
-    im_data_provider->read_entry_data( IMPORTING es_data = lst_formmaster ).
-
-    IF lst_formmaster IS NOT INITIAL.
-* Modify data as per data received from FE
-      MODIFY /odsmfe/tb_fomst FROM lst_formmaster.       "#EC CI_SUBRC.
-      IF sy-subrc = 0.
-        MOVE-CORRESPONDING lst_formmaster TO gstib_entity.
-      ENDIF.
-
-    ENDIF.
-    GET REFERENCE OF gstib_entity INTO ex_entity.
+** Read data from FE request
+*   " im_data_provider->read_entry_data( IMPORTING es_data = lst_formmaster ).
+*
+*    "IF lst_formmaster IS NOT INITIAL.
+** Modify data as per data received from FE
+*      MODIFY /odsmfe/tb_fomst FROM @lst_formmaster.       "#EC CI_SUBRC.
+*      IF sy-subrc = 0.
+*        MOVE-CORRESPONDING lst_formmaster TO gstib_entity.
+*      ENDIF.
+*
+*    ENDIF.
+*   " GET REFERENCE OF gstib_entity INTO ex_entity.
   ENDMETHOD.
 
 
@@ -84,55 +84,58 @@ CLASS /ODSMFE/CL_FORMMASTER IMPLEMENTATION.
 *-------------------------------------------------------------
 
     DATA:  lit_formmast  TYPE STANDARD TABLE OF /odsmfe/tb_fomst,
-           lit_mformmast TYPE STANDARD TABLE OF /odsmfe/tb_fomst,
-           lst_entity    TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmaster.
+           lst_formmast  TYPE  /odsmfe/tb_fomst,
+           lit_mformmast TYPE STANDARD TABLE OF /odsmfe/tb_fomst.
+           "lst_entity    TYPE /odsmfe/cl_pr_formui_mpc=>tt_formmaster.
 
-    DATA: lst_formmaster_get_entityset TYPE LINE OF /odsmfe/cl_pr_formui_mpc=>tt_formmaster,
-          lst_key_tab                  TYPE /iwbep/s_mgw_name_value_pair.
+*    DATA: "lst_formmaster_get_entityset TYPE LINE OF /odsmfe/cl_pr_formui_mpc=>tt_formmaster,
+*          lst_key_tab                  TYPE /iwbep/s_mgw_name_value_pair.
 
     DATA: lrt_formid       TYPE TABLE OF /odsmfe/st_core_range_str,
           lrs_it_formid    TYPE /odsmfe/st_core_range_str,
           lrs_it_version   TYPE /odsmfe/st_core_range_str,
           lrt_version      TYPE TABLE OF /odsmfe/st_core_range_str,
           lrs_it_codegroup TYPE /odsmfe/st_core_range_str,
-          lrt_codegroup    TYPE TABLE OF /odsmfe/st_core_range_str.
+          lrt_codegroup    TYPE TABLE OF /odsmfe/st_core_range_str,
+          GITIB_ENTITY     type table of /ODSMFE/CE_FORMMASTER,
+          GSTIB_ENTITY     TYPE /ODSMFE/CE_FORMMASTER.
 
 * Constants
     CONSTANTS:     lc_e         TYPE string VALUE 'E',
                    lc_i         TYPE string VALUE 'I',
                    lc_eq        TYPE string VALUE 'EQ',
-                   lc_formid    TYPE string VALUE 'FormID',
-                   lc_version   TYPE string VALUE 'Version',
-                   lc_codegroup TYPE string VALUE 'CodeGroup'.
+                   lc_formid    TYPE string VALUE 'FORMID',
+                   lc_version   TYPE string VALUE 'VERSION',
+                   lc_codegroup TYPE string VALUE 'CODEGROUP'.
 
 * field symbols
-    FIELD-SYMBOLS: <lfsst_form>    TYPE /odsmfe/tb_fomst,
-                   <lfsst_frmdefn> TYPE /odsmfe/tb_frmdf. "Added b Sravan
+    FIELD-SYMBOLS: <lfsst_form>    TYPE /odsmfe/tb_fomst.
+                   "<lfsst_frmdefn> TYPE /odsmfe/tb_frmdf. "Added b Sravan  "Commented by Priyanka
 * SOC Sravan kumar "++ ES1K902842
     TYPES: BEGIN OF ltys_fomst,
              formid        TYPE /odsmfe/de_formid,
              version       TYPE /odsmfe/de_version,
              form_name     TYPE /odsmfe/de_formname,
              formdesc      TYPE /odsmfe/de_formdesc,
-             fun_area_name TYPE /odsmfe/de_proc_name,
+             fun_area_name TYPE  c length 50,          "/odsmfe/de_proc_name,
              sub_area_name TYPE /odsmfe/de_description,
-             category_desc TYPE /odsmfe/de_cat_desc,
+             category_desc TYPE  c length 50,            " /odsmfe/de_cat_desc,
            END OF ltys_fomst.
     DATA: lst_form     TYPE  ltys_fomst,
-          lit_form     TYPE STANDARD TABLE OF ltys_fomst,
-          lit_formdefn TYPE STANDARD TABLE OF /odsmfe/tb_frmdf.
+          lit_form     TYPE STANDARD TABLE OF ltys_fomst.
+          "lit_formdefn TYPE STANDARD TABLE OF /odsmfe/tb_frmdf. commented by Priyanka
 
     TYPES:
       BEGIN OF ts_formmaster01,
         formid      TYPE /odsmfe/de_formid,
         version     TYPE /odsmfe/de_version,
-        codegruppe  TYPE qcodegrp,
+        codegruppe  TYPE c length 8,"qcodegrp,
         form_name   TYPE /odsmfe/de_formname,
         description TYPE /odsmfe/de_formdesc,
         formdata    TYPE string,
         formhtml    TYPE string,
         formmodel   TYPE string,
-        active      TYPE flag,
+        active      TYPE abap_boolean,"flag
         theme       TYPE /odsmfe/de_theme,
         stylesheet  TYPE /odsmfe/de_style,
         created_on  TYPE timestamp,
@@ -152,124 +155,142 @@ CLASS /ODSMFE/CL_FORMMASTER IMPLEMENTATION.
 *-------------------------------------------------------------
 
 ** Maps key fields to function module parameters
-    IF im_key_tab IS NOT INITIAL.
+*    IF im_key_tab IS NOT INITIAL.
+*
+*      LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
+*        CASE lst_key_tab-name.
+*          WHEN lc_formid.
+*            lrs_it_formid-sign = lc_i.
+*            lrs_it_formid-option = lc_eq.
+*            lrs_it_formid-low = lst_key_tab-value.
+*            APPEND lrs_it_formid TO lrt_formid.
+*            CLEAR lrs_it_formid.
+*
+*          WHEN lc_version.
+*            lrs_it_version-sign   = lc_i.
+*            lrs_it_version-option = lc_eq.
+*            lrs_it_version-low    = lst_key_tab-value.
+*            APPEND lrs_it_version TO lrt_version.
+*            CLEAR lrs_it_version.
+*
+*          WHEN lc_codegroup.
+*            lrs_it_codegroup-sign   = lc_i.
+*            lrs_it_codegroup-option = lc_eq.
+*            lrs_it_codegroup-low    = lst_key_tab-value.
+*            APPEND lrs_it_codegroup TO lrt_codegroup.
+*            CLEAR lrs_it_codegroup.
+*
+*        ENDCASE.
+*      ENDLOOP.
+*    ENDIF.
 
-      LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
-        CASE lst_key_tab-name.
-          WHEN lc_formid.
-            lrs_it_formid-sign = lc_i.
-            lrs_it_formid-option = lc_eq.
-            lrs_it_formid-low = lst_key_tab-value.
-            APPEND lrs_it_formid TO lrt_formid.
-            CLEAR lrs_it_formid.
+*SOC By Priyanka
 
-          WHEN lc_version.
-            lrs_it_version-sign   = lc_i.
-            lrs_it_version-option = lc_eq.
-            lrs_it_version-low    = lst_key_tab-value.
-            APPEND lrs_it_version TO lrt_version.
-            CLEAR lrs_it_version.
+         LOOP AT im_filter_select_options INTO DATA(ls_filter_select_options).
+          CASE ls_filter_select_options-name.
+              WHEN lc_formid.
+                 lrt_formid = CORRESPONDING #(  ls_filter_select_options-range ).
+                  DELETE lrt_formid WHERE low IS INITIAL.
+              when lc_version.
+                 lrt_version = CORRESPONDING #(  ls_filter_select_options-range ).
+                  DELETE lrt_version WHERE low IS INITIAL.
 
-          WHEN lc_codegroup.
-            lrs_it_codegroup-sign   = lc_i.
-            lrs_it_codegroup-option = lc_eq.
-            lrs_it_codegroup-low    = lst_key_tab-value.
-            APPEND lrs_it_codegroup TO lrt_codegroup.
-            CLEAR lrs_it_codegroup.
-
-        ENDCASE.
-      ENDLOOP.
-    ENDIF.
+               when lc_codegroup.
+                  lrt_codegroup = CORRESPONDING #(  ls_filter_select_options-range ).
+                  DELETE lrt_codegroup WHERE low IS INITIAL.
+                ENDCASE.
+                ENDLOOP.
 * Fetch data from FormMaster checking Form Assignment Tabe
     SELECT
-      /odsmfe/tb_fomst~formid
-      /odsmfe/tb_fomst~version
-      /odsmfe/tb_fomst~codegruppe
-      /odsmfe/tb_fomst~form_name
-      /odsmfe/tb_fomst~description
-      /odsmfe/tb_fomst~formdata
-      /odsmfe/tb_fomst~formhtml
-      /odsmfe/tb_fomst~formmodel
-      /odsmfe/tb_fomst~active
-      /odsmfe/tb_fomst~theme
-      /odsmfe/tb_fomst~stylesheet
-      /odsmfe/tb_fomst~created_on
-      /odsmfe/tb_fomst~created_by
-      /odsmfe/tb_fomst~modified_on
-      /odsmfe/tb_fomst~modified_by
-      /odsmfe/tb_fomst~plant
-      /odsmfe/tb_fomst~formcategory
-      /odsmfe/tb_fomst~funareaid
+      /odsmfe/tb_fomst~formid,
+      /odsmfe/tb_fomst~version,
+      /odsmfe/tb_fomst~codegruppe,
+      /odsmfe/tb_fomst~form_name,
+      /odsmfe/tb_fomst~description,
+      /odsmfe/tb_fomst~formdata,
+      /odsmfe/tb_fomst~formhtml,
+      /odsmfe/tb_fomst~formmodel,
+      /odsmfe/tb_fomst~active,
+      /odsmfe/tb_fomst~theme,
+      /odsmfe/tb_fomst~stylesheet,
+      /odsmfe/tb_fomst~created_on,
+      /odsmfe/tb_fomst~created_by,
+      /odsmfe/tb_fomst~modified_on,
+      /odsmfe/tb_fomst~modified_by,
+      /odsmfe/tb_fomst~plant,
+      /odsmfe/tb_fomst~formcategory,
+      /odsmfe/tb_fomst~funareaid,
       /odsmfe/tb_fomst~subareaid
        FROM /odsmfe/tb_fomst
      INNER JOIN /odsmfe/tb_foass
      ON /odsmfe/tb_fomst~formid EQ /odsmfe/tb_foass~formid
      AND /odsmfe/tb_fomst~version EQ /odsmfe/tb_foass~version
-     INTO CORRESPONDING FIELDS OF TABLE lit_formmast
-     WHERE /odsmfe/tb_foass~active EQ abap_true
-      AND /odsmfe/tb_fomst~formid IN lrt_formid
-      AND /odsmfe/tb_fomst~version IN lrt_version
-      AND /odsmfe/tb_fomst~codegruppe IN lrt_codegroup.
+     WHERE /odsmfe/tb_foass~active EQ @abap_true
+      AND /odsmfe/tb_fomst~formid IN @lrt_formid
+      AND /odsmfe/tb_fomst~version IN @lrt_version
+      AND /odsmfe/tb_fomst~codegruppe IN @lrt_codegroup INTO CORRESPONDING FIELDS OF TABLE @lit_formmast.
 
 * Fetch data from FormMaster checking Form Manual Assignment Tabe
-    SELECT
-       /odsmfe/tb_fomst~formid
-      /odsmfe/tb_fomst~version
-      /odsmfe/tb_fomst~codegruppe
-      /odsmfe/tb_fomst~form_name
-      /odsmfe/tb_fomst~description
-      /odsmfe/tb_fomst~formdata
-      /odsmfe/tb_fomst~formhtml
-      /odsmfe/tb_fomst~formmodel
-      /odsmfe/tb_fomst~active
-      /odsmfe/tb_fomst~theme
-      /odsmfe/tb_fomst~stylesheet
-      /odsmfe/tb_fomst~created_on
-      /odsmfe/tb_fomst~created_by
-      /odsmfe/tb_fomst~modified_on
-      /odsmfe/tb_fomst~modified_by
-      /odsmfe/tb_fomst~plant
-      /odsmfe/tb_fomst~formcategory
-      /odsmfe/tb_fomst~funareaid
+     SELECT
+       /odsmfe/tb_fomst~formid,
+      /odsmfe/tb_fomst~version,
+      /odsmfe/tb_fomst~codegruppe,
+      /odsmfe/tb_fomst~form_name,
+      /odsmfe/tb_fomst~description,
+      /odsmfe/tb_fomst~formdata,
+      /odsmfe/tb_fomst~formhtml,
+      /odsmfe/tb_fomst~formmodel,
+      /odsmfe/tb_fomst~active,
+      /odsmfe/tb_fomst~theme,
+      /odsmfe/tb_fomst~stylesheet,
+      /odsmfe/tb_fomst~created_on,
+      /odsmfe/tb_fomst~created_by,
+      /odsmfe/tb_fomst~modified_on,
+      /odsmfe/tb_fomst~modified_by,
+      /odsmfe/tb_fomst~plant,
+      /odsmfe/tb_fomst~formcategory,
+      /odsmfe/tb_fomst~funareaid,
       /odsmfe/tb_fomst~subareaid
        FROM /odsmfe/tb_fomst
              INNER JOIN /odsmfe/tb_fmass
       ON /odsmfe/tb_fomst~formid EQ /odsmfe/tb_fmass~formid
       AND /odsmfe/tb_fomst~version EQ /odsmfe/tb_fmass~version
-      INTO CORRESPONDING FIELDS OF TABLE lit_mformmast
-      WHERE /odsmfe/tb_fmass~active EQ abap_true
-      AND /odsmfe/tb_fomst~formid IN lrt_formid
-      AND /odsmfe/tb_fomst~version IN lrt_version
-      AND /odsmfe/tb_fomst~codegruppe IN lrt_codegroup.
+      WHERE /odsmfe/tb_fmass~active EQ @abap_true
+      AND /odsmfe/tb_fomst~formid IN @lrt_formid
+      AND /odsmfe/tb_fomst~version IN @lrt_version
+      AND /odsmfe/tb_fomst~codegruppe IN @lrt_codegroup INTO CORRESPONDING FIELDS OF TABLE @lit_mformmast.
 
 * Fetch UnAssigned Forms when requested
     IF lrt_formid IS NOT INITIAL AND lrt_version IS NOT INITIAL.
       SELECT
-       /odsmfe/tb_fomst~formid
-      /odsmfe/tb_fomst~version
-      /odsmfe/tb_fomst~codegruppe
-      /odsmfe/tb_fomst~form_name
-      /odsmfe/tb_fomst~description
-      /odsmfe/tb_fomst~formdata
-      /odsmfe/tb_fomst~formhtml
-      /odsmfe/tb_fomst~formmodel
-      /odsmfe/tb_fomst~active
-      /odsmfe/tb_fomst~theme
-      /odsmfe/tb_fomst~stylesheet
-      /odsmfe/tb_fomst~created_on
-      /odsmfe/tb_fomst~created_by
-      /odsmfe/tb_fomst~modified_on
-      /odsmfe/tb_fomst~modified_by
-      /odsmfe/tb_fomst~plant
-      /odsmfe/tb_fomst~formcategory
-      /odsmfe/tb_fomst~funareaid
+       /odsmfe/tb_fomst~formid,
+      /odsmfe/tb_fomst~version,
+      /odsmfe/tb_fomst~codegruppe,
+      /odsmfe/tb_fomst~form_name,
+      /odsmfe/tb_fomst~description,
+      /odsmfe/tb_fomst~formdata,
+      /odsmfe/tb_fomst~formhtml,
+      /odsmfe/tb_fomst~formmodel,
+      /odsmfe/tb_fomst~active,
+      /odsmfe/tb_fomst~theme,
+      /odsmfe/tb_fomst~stylesheet,
+      /odsmfe/tb_fomst~created_on,
+      /odsmfe/tb_fomst~created_by,
+      /odsmfe/tb_fomst~modified_on,
+      /odsmfe/tb_fomst~modified_by,
+      /odsmfe/tb_fomst~plant,
+      /odsmfe/tb_fomst~formcategory,
+       /odsmfe/tb_fomst~funareaid,
       /odsmfe/tb_fomst~subareaid
-         FROM /odsmfe/tb_fomst
-        APPENDING CORRESPONDING FIELDS OF TABLE lit_formmast
-        WHERE /odsmfe/tb_fomst~active EQ abap_true
-    AND /odsmfe/tb_fomst~formid IN lrt_formid
-    AND /odsmfe/tb_fomst~version IN lrt_version
-    AND /odsmfe/tb_fomst~codegruppe IN lrt_codegroup.
+       FROM /odsmfe/tb_fomst
+             INNER JOIN /odsmfe/tb_fmass
+      ON /odsmfe/tb_fomst~formid EQ /odsmfe/tb_fmass~formid
+      AND /odsmfe/tb_fomst~version EQ /odsmfe/tb_fmass~version
+      WHERE /odsmfe/tb_fmass~active EQ @abap_true
+      AND /odsmfe/tb_fomst~formid IN @lrt_formid
+      AND /odsmfe/tb_fomst~version IN @lrt_version
+      AND /odsmfe/tb_fomst~codegruppe IN @lrt_codegroup INTO CORRESPONDING FIELDS OF TABLE @lit_formmast.
+
     ENDIF.
 
     IF lit_mformmast IS NOT INITIAL.
@@ -333,7 +354,7 @@ CLASS /ODSMFE/CL_FORMMASTER IMPLEMENTATION.
 
     IF lit_formmast IS NOT INITIAL.
 * Display all data
-      LOOP AT lit_formmast ASSIGNING <lfsst_form>.
+*      LOOP AT lit_formmast ASSIGNING <lfsst_form>.
 
 * SOC Sravan kumar "++ ES1K902842
 *        READ TABLE lit_form INTO lst_form
@@ -349,17 +370,40 @@ CLASS /ODSMFE/CL_FORMMASTER IMPLEMENTATION.
 *        MOVE-CORRESPONDING <lfsst_form> TO lst_formmstr.
 * EOC Sravan kumar "++ ES1K902842
 
-        MOVE-CORRESPONDING <lfsst_form> TO gstib_entity.
-** Get Entity method is requested
-        IF im_key_tab IS NOT INITIAL.
-          GET REFERENCE OF gstib_entity INTO ex_entity.
-        ELSE.
-          APPEND gstib_entity TO gitib_entity.
-          CLEAR: gstib_entity.
-        ENDIF.
-      ENDLOOP.
-* Get EntitySet method is requested
-      GET REFERENCE OF gitib_entity INTO ex_entityset.
+*        MOVE-CORRESPONDING <lfsst_form> TO gstib_entity.
+*** Get Entity method is requested
+*        IF im_key_tab IS NOT INITIAL.
+*          GET REFERENCE OF gstib_entity INTO ex_entity.
+*        ELSE.
+*          APPEND gstib_entity TO gitib_entity.
+*          CLEAR: gstib_entity.
+*        ENDIF.
+*      ENDLOOP.
+** Get EntitySet method is requested
+*      GET REFERENCE OF gitib_entity INTO ex_entityset.
+    loop at lit_formmast INTO lst_formmast.
+    gstib_entity-Active = lst_formmast-active.
+    gstib_entity-Category = lst_formmast-formcategory.
+    gstib_entity-CodeGroup = lst_formmast-codegruppe.
+    gstib_entity-CreatedBy = lst_formmast-created_by.
+    gstib_entity-CreatedOn = lst_formmast-created_on.
+    gstib_entity-Description = lst_formmast-description.
+    gstib_entity-FormData = lst_formmast-formdata.
+    gstib_entity-FormHTML = lst_formmast-formhtml.
+    gstib_entity-FormID = lst_formmast-formid.
+    gstib_entity-FormModel = lst_formmast-formmodel.
+    gstib_entity-FormName = lst_formmast-form_name.
+    gstib_entity-FunctionalArea = lst_formmast-funareaid.
+    gstib_entity-ModifiedBy = lst_formmast-modified_by.
+    gstib_entity-ModifiedOn = lst_formmast-modified_on.
+    gstib_entity-Stylesheet = lst_formmast-stylesheet.
+    gstib_entity-SubArea = lst_formmast-subareaid.
+    gstib_entity-Theme = lst_formmast-theme.
+    gstib_entity-Version = lst_formmast-version.
+    APPEND gstib_entity to gitib_entity.
+    ENDLOOP.
+
+   MOVE-CORRESPONDING gitib_entity to ex_response_data.
     ENDIF.
 
   ENDMETHOD.

@@ -5,16 +5,10 @@
    <PROGDIR>
     <NAME>/ODSMFE/LFG_FORMS_UIO01</NAME>
     <SUBC>I</SUBC>
+    <APPL>S</APPL>
     <RLOAD>E</RLOAD>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
-   <TPOOL>
-    <item>
-     <ID>R</ID>
-     <ENTRY>formjsljl</ENTRY>
-     <LENGTH>9</LENGTH>
-    </item>
-   </TPOOL>
   </asx:values>
  </asx:abap>
 </abapGit>

@@ -1,18 +1,16 @@
-class /ODSMFE/CL_WORKORDER definition
-  public
-  inheriting from /ODSMFE/CL_GET_ENT_SUPER_BAPI
-  create public .
+"! <p class="shorttext synchronized" lang="en">Abstract Class For Getting the Data Based on Entityset</p>
+CLASS /odsmfe/cl_workorder DEFINITION
+  PUBLIC
+   INHERITING FROM /odsmfe/cl_get_ent_super_bapi
+  CREATE PUBLIC.
 
-public section.
-  type-pools ABAP .
+  PUBLIC SECTION.
+    TYPES: tab TYPE STANDARD TABLE OF REF TO /odsmfe/cl_workorder WITH DEFAULT KEY.
 
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_WORKORDER .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_WORKORDER .
-
-  methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
-    redefinition .
-protected section.
-private section.
+    METHODS /odsmfe/if_get_entityset_bapi~gmib_read_entityset
+        REDEFINITION .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
@@ -39,94 +37,115 @@ CLASS /ODSMFE/CL_WORKORDER IMPLEMENTATION.
 *  Data declaration
 *-------------------------------------------------------------
 
-    DATA: lst_key_tab       TYPE /iwbep/s_mgw_name_value_pair,
-          lo_filter         TYPE  REF TO /iwbep/if_mgw_req_filter,
-          lrs_filter_values TYPE /odsmfe/st_workorder_fil_vals,
-          lv_aufnr          TYPE aufnr,
-          lrs_workorder     TYPE /odsmfe/st_core_range_str,
-          lit_return        TYPE /iwbep/t_mgw_select_option.
+    TYPES:
+      BEGIN OF ty_data,
+        wa(512) TYPE c,
+      END OF ty_data.
 
+    TYPES: BEGIN OF ty_options,
+             text(72) TYPE c,
+           END OF ty_options.
+    TYPES: BEGIN OF ty_fields,
+             fieldname(30) TYPE c,
+             offset(6)     TYPE n,
+             length(6)     TYPE n,
+             type(1)       TYPE c,
+             fieldtext(60) TYPE c,
+           END OF ty_fields.
 
-    DATA: lit_select_options TYPE /iwbep/t_cod_select_options,
-          lst_select_options TYPE /iwbep/s_cod_select_option.
-*    field-SYMBOLS
-    FIELD-SYMBOLS : <lfsst_ls_return> TYPE /iwbep/s_mgw_select_option.
+    DATA:   lt_options TYPE TABLE OF ty_options,
+                lt_fields  TYPE TABLE OF ty_fields,
+                lt_data    TYPE TABLE OF ty_data.
+
+    DATA: lrs_filter_values TYPE /odsmfe/st_workorder_fil_vals,
+              lv_aufnr          TYPE aufnr,
+             lrs_workorder     TYPE /odsmfe/st_core_range_str,
+            lit_table         TYPE TABLE OF /odsmfe/ce_workorder.
+
+    DATA: lt_workorder  TYPE STANDARD TABLE OF /odsmfe/cds_workorder,
+             lit_WoNum     TYPE TABLE of /odsmfe/st_core_range_str,
+             lit_wotyp     type TABLE of /odsmfe/st_core_range_str,
+             lit_workorder TYPE TABLE OF  /odsmfe/ce_workorder,
+            lst_workorder TYPE  /odsmfe/ce_workorder.
+
+    data: lr_rfc TYPE REF TO /odsmfe/cl_get_ent_super_bapi.
+
+    DATA: lv_rowskip  TYPE int4,
+          lv_rowcount TYPE int4.
+
+    DATA: lo_filter  TYPE REF TO if_rap_query_filter,
+               lit_return TYPE  if_rap_query_filter=>tt_name_range_pairs.
+
 * constants
-    CONSTANTS: lc_workordernumber TYPE string VALUE 'WorkOrderNumber', "WorkOrderNumber
-               lc_ordertype       TYPE string VALUE 'OrderType',
-               lc_i               TYPE char1  VALUE 'I',
-               lc_eq              TYPE char2  VALUE 'EQ'.
+    CONSTANTS: lc_workordernumber TYPE string VALUE 'WORKORDERNUMBER',
+               lc_ordertype       TYPE string VALUE 'ORDERTYPE'.
 *-------------------------------------------------------------
 * Main Section
 *-------------------------------------------------------------
 
-    IF im_tech_request_context IS SUPPLIED.
-      REFRESH : lit_return, lit_select_options.
-      lo_filter = im_tech_request_context->get_filter( ).
-      lit_return = lo_filter->get_filter_select_options( ).
-      READ TABLE  lit_return ASSIGNING <lfsst_ls_return> INDEX 1.
+      LOOP AT im_filter_select_options INTO DATA(ls_filter_select_options).
+        CASE ls_filter_select_options-name.
+          WHEN lc_workordernumber.
+            lit_WoNum = CORRESPONDING #( ls_filter_select_options-range ).
+            DELETE lit_WoNum WHERE low IS INITIAL.
 
-      IF <lfsst_ls_return>-property IS ASSIGNED.
-        lit_select_options =  <lfsst_ls_return>-select_options.
-        IF lit_select_options IS NOT INITIAL.
-          CLEAR: lrs_filter_values.
-          LOOP AT lit_select_options INTO lst_select_options.
+          WHEN lc_ordertype.
+           lit_wotyp = CORRESPONDING #( ls_filter_select_options-range ).
+            DELETE lit_wotyp WHERE low IS INITIAL.
+        ENDCASE.
 
-            IF lst_select_options-low IS NOT INITIAL.
-              lv_aufnr = lst_select_options-low.
-              CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-                EXPORTING
-                  input  = lv_aufnr
-                IMPORTING
-                  output = lv_aufnr.
+      ENDLOOP.
 
-              lrs_workorder-sign   = lc_i.
-              lrs_workorder-option = lc_eq.
-              lrs_workorder-low    = lv_aufnr.
-              APPEND lrs_workorder TO lrs_filter_values-aufnr[].
-              CLEAR: lst_select_options, lv_aufnr.
-            ENDIF.
-          ENDLOOP.
-        ENDIF.
+      CREATE OBJECT lr_rfc
+        EXPORTING
+          im_entity_name           = im_entity_name.
+
+      call METHOD lr_rfc->get_cloud_dest
+        IMPORTING
+          ex_dest = DATA(lv_rfc).
+
+      DATA(lv_top)     = im_request->get_paging( )->get_page_size( ).
+      DATA(lv_skip)    = im_request->get_paging( )->get_offset( ).
+
+      lt_fields = VALUE #( ( fieldname = 'AUFNR' )
+                           ( fieldname = 'AUART' )
+                           ( fieldname = 'KTEXT' ) ).
+
+      IF lit_WoNum IS NOT INITIAL.
+        lt_options = VALUE #( ( text = |AUFNR| & | | & |{ lit_WoNum[ 1 ]-option }| & | | & |'| & |{ lit_WoNum[ 1 ]-low }| & |'|  ) ).
+        DATA(lv_and) = 'AND'.
       ENDIF.
-    ENDIF.
 
-    "/ Maps key fields to function module parameters
-    IF im_key_tab IS NOT INITIAL.
-      READ TABLE im_key_tab INTO lst_key_tab WITH KEY name = lc_workordernumber.
-      IF sy-subrc = 0 AND lst_key_tab-value IS NOT INITIAL.
-        lv_aufnr = lst_key_tab-value.
-
-        IF lv_aufnr IS NOT INITIAL.
-          CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
-            EXPORTING
-              input  = lv_aufnr
-            IMPORTING
-              output = lv_aufnr.
-        ENDIF.
-        lrs_workorder-sign   = lc_i.
-        lrs_workorder-option = lc_eq.
-        lrs_workorder-low    = lv_aufnr.
-        APPEND lrs_workorder TO lrs_filter_values-aufnr[].
+      IF lit_wotyp IS NOT INITIAL.
+        APPEND VALUE #( text = |{ lv_and }| & | | & |AUART| & | | & |{ lit_wotyp[ 1 ]-option }| & | | & |'| & |{ lit_wotyp[ 1 ]-low }| & |'| )  TO lt_options.
       ENDIF.
-    ENDIF.
 
-    SELECT DISTINCT aufnr auart ktext
-           FROM aufk
-           INTO TABLE gitib_entity
-           WHERE aufnr IN lrs_filter_values-aufnr[].
+      lv_rowskip = lv_Skip.
+      IF lv_top > 0.
+        lv_rowcount = lv_top.
+      ENDIF.
 
-    IF sy-subrc NE 0.
-      CLEAR gitib_entity.
-    ENDIF.
+      "Call RFC to get work orders
+      CALL FUNCTION 'RFC_READ_TABLE'
+        DESTINATION lv_rfc
+        EXPORTING
+          query_table = 'AUFK'
+          rowskips    = lv_rowskip
+          rowcount    = lv_rowcount
+        TABLES
+          options     = lt_options
+          fields      = lt_fields
+          data        = lt_data.
 
-    IF im_key_tab IS NOT INITIAL.
-      READ TABLE gitib_entity INTO gstib_entity INDEX 1.
-      GET REFERENCE OF gstib_entity INTO ex_entity.
-    ELSE.
-      GET REFERENCE OF gitib_entity INTO ex_entityset.
-    ENDIF.
+      LOOP AT lt_data INTO DATA(ls_Data).
+        lst_workorder-WorkOrderNumber = ls_Data+0(12).
+        lst_workorder-OrderType = ls_Data+12(15).
+        lst_workorder-Description = ls_Data+16(56).
+        APPEND lst_workorder TO lit_workorder.
+        CLEAR lst_workorder.
+      ENDLOOP.
 
+      MOVE-CORRESPONDING lit_workorder TO ex_response_data.
 
   ENDMETHOD.
 ENDCLASS.

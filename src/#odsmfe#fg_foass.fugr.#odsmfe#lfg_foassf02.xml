@@ -4,19 +4,11 @@
   <asx:values>
    <PROGDIR>
     <NAME>/ODSMFE/LFG_FOASSF02</NAME>
-    <SQLX>X</SQLX>
     <SUBC>I</SUBC>
     <APPL>S</APPL>
     <RLOAD>E</RLOAD>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
-   <TPOOL>
-    <item>
-     <ID>R</ID>
-     <ENTRY>Include /ODSMFE/LFG_FOASSF02</ENTRY>
-     <LENGTH>28</LENGTH>
-    </item>
-   </TPOOL>
   </asx:values>
  </asx:abap>
 </abapGit>

@@ -4,8 +4,13 @@
   <asx:values>
    <PROGDIR>
     <NAME>/ODSMFE/LTB_CVMSTT00</NAME>
+    <DBAPL>S</DBAPL>
+    <DBNA>D$</DBNA>
     <SUBC>I</SUBC>
-    <RLOAD>E</RLOAD>
+    <APPL>S</APPL>
+    <FIXPT>X</FIXPT>
+    <LDBNAME>D$S</LDBNAME>
+    <UCCHECK>X</UCCHECK>
    </PROGDIR>
   </asx:values>
  </asx:abap>

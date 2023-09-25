@@ -4,11 +4,6 @@ class /ODSMFE/CL_NONOBJECTFORMS definition
   create public .
 
 public section.
-  type-pools ABAP .
-
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_NONOBJECTFORMS .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_NONOBJECTFORMS .
-
   methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
     redefinition .
 protected section.
@@ -41,18 +36,16 @@ CLASS /ODSMFE/CL_NONOBJECTFORMS IMPLEMENTATION.
 
     "/ Tables and Structures
     DATA :lit_foass                 TYPE TABLE OF /odsmfe/tb_foass,            "Internal table for ODS : Form Assignment Table
-          lit_fomst                 TYPE TABLE OF /odsmfe/tb_fomst,            "Internal table for FORM Master Table
-          lst_fomst                 TYPE /odsmfe/tb_fomst,                     "Structure type for FORM Master Table
-          lst_key_tab               TYPE /iwbep/s_mgw_name_value_pair,         "name value pair for mgw
-          lst_filter_select_options TYPE /iwbep/s_mgw_select_option.           "MGW Framework: Selection Option Parameters for db selects
+          lit_fomst                 TYPE TABLE OF /odsmfe/tb_fomst.            "Internal table for FORM Master Table
 
     "/ Range Table and Range Structures
     DATA :lrt_formid       TYPE TABLE OF /odsmfe/st_core_range_str,            "FormId Range Structure
           lrt_version      TYPE TABLE OF /odsmfe/st_core_range_str,            "Version Range Structure
           lrt_codegroup    TYPE TABLE OF /odsmfe/st_core_range_str,            "CodeGroup Range Structure
-          lrs_filter       TYPE /odsmfe/st_core_range_str,                     "Core Range structure
-          lrs_filter_range TYPE /iwbep/s_cod_select_option.                    "MGW Framework: Select Options for Queries
+          lrs_filter       TYPE /odsmfe/st_core_range_str.                    "Core Range structure
 
+data : gstib_entity TYPE /odsmfe/ce_nonobjectforms,
+       gitib_entity TYPE TABLE OF /odsmfe/ce_nonobjectforms.
     "/ Field symbols
     FIELD-SYMBOLS : <lfsst_form> TYPE /odsmfe/tb_fomst.                        "Form Master Table
 
@@ -75,64 +68,25 @@ CLASS /ODSMFE/CL_NONOBJECTFORMS IMPLEMENTATION.
 *            M A I N            S E C T I O N                            *
 *------------------------------------------------------------------------*
 
-    "/ Read key values
-    IF im_key_tab IS NOT INITIAL.
-      LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
-        CASE lst_key_tab-name.
-          WHEN lc_formid.
-            lrs_filter-sign   = lc_i.
-            lrs_filter-option = lc_eq.
-            lrs_filter-low    = lst_key_tab-value.
-            APPEND lrs_filter TO lrt_formid.
-
-          WHEN lc_version.
-            lrs_filter-sign   = lc_i.
-            lrs_filter-option = lc_eq.
-            lrs_filter-low    = lst_key_tab-value.
-            APPEND lrs_filter TO lrt_version.
-
-          WHEN lc_codegroup.
-            lrs_filter-sign   = lc_i.
-            lrs_filter-option = lc_eq.
-            lrs_filter-low    = lst_key_tab-value.
-            APPEND lrs_filter TO lrt_codegroup.
-        ENDCASE. "/ CASE lst_key_tab-name.
-        CLEAR: lrs_filter.
-      ENDLOOP. "/ LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
-    ENDIF. "/ IF im_key_tab IS NOT INITIAL.
-
     "/ Read filter values
     IF im_filter_select_options IS NOT INITIAL.
-      LOOP AT im_filter_select_options INTO lst_filter_select_options.
-        TRANSLATE lst_filter_select_options-property TO UPPER CASE.
+      LOOP AT im_filter_select_options INTO data(lst_filter_select_options).
+        TRANSLATE lst_filter_select_options-name TO UPPER CASE.
 
-        CASE lst_filter_select_options-property.
+        CASE lst_filter_select_options-name.
           WHEN lc_form_id.
-            READ TABLE lst_filter_select_options-select_options  INTO lrs_filter_range INDEX 1.
-            IF sy-subrc = 0 AND lrs_filter_range-low IS NOT INITIAL.
-              lrs_filter-sign   = lc_i.
-              lrs_filter-option = lc_eq.
-              lrs_filter-low    = lrs_filter_range-low.
-              APPEND lrs_filter TO lrt_formid.
-            ENDIF. "/ IF sy-subrc = 0 AND lrs_filter_range-low IS NOT INITIAL.
+           lrt_formid = CORRESPONDING #( lst_filter_select_options-range ).
+            delete lrt_formid where low is initial.
 
           WHEN lc_vers.
-            READ TABLE lst_filter_select_options-select_options  INTO lrs_filter_range INDEX 1.
-            IF sy-subrc = 0 AND lrs_filter_range-low IS NOT INITIAL.
-              lrs_filter-sign   = lc_i.
-              lrs_filter-option = lc_eq.
-              lrs_filter-low    = lrs_filter_range-low.
-              APPEND lrs_filter TO lrt_version.
-            ENDIF. "/ IF sy-subrc = 0 AND lrs_filter_range-low IS NOT INITIAL.
+          lrt_version = CORRESPONDING #( lst_filter_select_options-range ).
+            delete lrt_version where low is initial.
+
 
           WHEN lc_code_grp.
-            READ TABLE lst_filter_select_options-select_options  INTO lrs_filter_range INDEX 1.
-            IF sy-subrc = 0 AND lrs_filter_range-low IS NOT INITIAL.
-              lrs_filter-sign   = lc_i.
-              lrs_filter-option = lc_eq.
-              lrs_filter-low    = lrs_filter_range-low.
-              APPEND lrs_filter TO lrt_codegroup.
-            ENDIF. "/ IF sy-subrc = 0 AND lrs_filter_range-low IS NOT INITIAL.
+          lrt_codegroup = CORRESPONDING #( lst_filter_select_options-range ).
+            delete lrt_codegroup where low is initial.
+
         ENDCASE. "/ CASE lst_filter_select_options-property.
 
         CLEAR: lrs_filter.
@@ -140,51 +94,44 @@ CLASS /ODSMFE/CL_NONOBJECTFORMS IMPLEMENTATION.
     ENDIF. "/ IF im_filter_select_options IS NOT INITIAL.
 
     "/ Get the NonObject Forms from Form Assignment Table
-    SELECT * FROM /odsmfe/tb_foass INTO TABLE lit_foass
-      WHERE category = lc_category
-        AND formid  IN lrt_formid[]
-        AND version IN lrt_version[].
+    SELECT * FROM /odsmfe/tb_foass
+      WHERE category = @lc_category
+        AND formid  IN @lrt_formid[]
+        AND version IN @lrt_version[]  INTO TABLE @lit_foass.
 
     IF sy-subrc = 0 AND lit_foass[] IS NOT INITIAL.
       "/ Get the NonObject Forms details from the Form Master table
-      SELECT * FROM /odsmfe/tb_fomst INTO TABLE lit_fomst FOR ALL ENTRIES IN lit_foass
-        WHERE formid  = lit_foass-formid
-          AND version = lit_foass-version.
+      SELECT * FROM /odsmfe/tb_fomst  FOR ALL ENTRIES IN @lit_foass
+        WHERE formid  = @lit_foass-formid
+          AND version = @lit_foass-version INTO TABLE @lit_fomst.
     ENDIF. "/ IF sy-subrc = 0 AND lit_foass[] IS NOT INITIAL.
 
     "/ Map the Form details to the final table
     IF lit_fomst[] IS NOT INITIAL.
-      LOOP AT lit_fomst INTO lst_fomst.
-        gstib_entity-formid         = lst_fomst-formid.
-        gstib_entity-version        = lst_fomst-version.
-        gstib_entity-codegroup      = lst_fomst-codegruppe.
-        gstib_entity-formname       = lst_fomst-form_name.
-        gstib_entity-description    = lst_fomst-description.
-        gstib_entity-formdata       = lst_fomst-formdata.
-        gstib_entity-formhtml       = lst_fomst-formhtml.
-        gstib_entity-formmodel      = lst_fomst-formmodel.
-        gstib_entity-active         = lst_fomst-active.
-        gstib_entity-theme          = lst_fomst-theme.
-        gstib_entity-stylesheet     = lst_fomst-stylesheet.
-        gstib_entity-createdon      = lst_fomst-created_on.
-        gstib_entity-createdby      = lst_fomst-created_by.
-        gstib_entity-modifiedon     = lst_fomst-modified_on.
-        gstib_entity-modifiedby     = lst_fomst-modified_by.
-        gstib_entity-category       = lst_fomst-formcategory.
-        gstib_entity-functionalarea = lst_fomst-funareaid.
-        gstib_entity-subarea        = lst_fomst-subareaid.
-        APPEND gstib_entity TO gitib_entity.
-        CLEAR gstib_entity.
-      ENDLOOP. "/ LOOP AT lit_fomst INTO lst_fomst.
+    gitib_entity      = VALUE #( FOR lst_fomst in lit_fomst
+   (   formid           = lst_fomst-formid
+        version         = lst_fomst-version
+        codegroup     = lst_fomst-codegruppe
+        formname      = lst_fomst-form_name
+        description    = lst_fomst-description
+        formdata       = lst_fomst-formdata
+        formhtml       = lst_fomst-formhtml
+        formmodel    = lst_fomst-formmodel
+        active            = lst_fomst-active
+        theme           = lst_fomst-theme
+        stylesheet     = lst_fomst-stylesheet
+        createdon     = lst_fomst-created_on
+        createdby     = lst_fomst-created_by
+        modifiedon   = lst_fomst-modified_on
+        modifiedby   = lst_fomst-modified_by
+        category       = lst_fomst-formcategory
+        functionalarea = lst_fomst-funareaid
+        subarea           = lst_fomst-subareaid ) ).
     ENDIF. "/ IF lit_fomst[] IS NOT INITIAL.
 
     "/ Mapping properties from the backend to the Gateway output response table
-    IF im_key_tab[] IS NOT INITIAL.
-      READ TABLE gitib_entity INTO gstib_entity INDEX 1.
-      GET REFERENCE OF gstib_entity INTO ex_entity.
-    ELSE. "/ IF im_key_tab[] IS NOT INITIAL.
-      GET REFERENCE OF gitib_entity INTO ex_entityset.
-    ENDIF. "/ IF im_key_tab[] IS NOT INITIAL.
+    ex_response_data = CORRESPONDING #( gitib_entity ).
+
 
   ENDMETHOD.
 ENDCLASS.

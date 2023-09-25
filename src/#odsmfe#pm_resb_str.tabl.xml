@@ -8,14 +8,16 @@
     <TABCLASS>INTTAB</TABCLASS>
     <LANGDEP>X</LANGDEP>
     <DDTEXT>ODS : Plant Maintenance Work Order Component view</DDTEXT>
+    <MASTERLANG>E</MASTERLANG>
+    <EXCLASS>4</EXCLASS>
    </DD02V>
    <DD03P_TABLE>
     <DD03P>
      <FIELDNAME>.INCLUDE</FIELDNAME>
      <ADMINFIELD>0</ADMINFIELD>
-     <PRECFIELD>RESB</PRECFIELD>
+     <PRECFIELD>/ODSMFE/ST_RESB</PRECFIELD>
      <MASK>      S</MASK>
-     <DDTEXT>Reservation/dependent requirements</DDTEXT>
+     <DDTEXT>ODSMFE: Structure for Reservation/dependent requirements</DDTEXT>
      <COMPTYPE>S</COMPTYPE>
     </DD03P>
     <DD03P>
@@ -27,9 +29,12 @@
     </DD03P>
     <DD03P>
      <FIELDNAME>MAKTX</FIELDNAME>
-     <ROLLNAME>MAKTX</ROLLNAME>
      <ADMINFIELD>0</ADMINFIELD>
-     <COMPTYPE>E</COMPTYPE>
+     <INTTYPE>C</INTTYPE>
+     <INTLEN>000080</INTLEN>
+     <DATATYPE>CHAR</DATATYPE>
+     <LENG>000040</LENG>
+     <MASK>  CHAR</MASK>
     </DD03P>
     <DD03P>
      <FIELDNAME>PSPEL_EXT</FIELDNAME>

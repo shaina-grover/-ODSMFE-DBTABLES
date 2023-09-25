@@ -1,61 +1,57 @@
-class /ODSMFE/CL_GET_ENTITYSET_SUP definition
-  public
-  create public .
+CLASS /odsmfe/cl_get_entityset_sup DEFINITION
+  PUBLIC
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces /ODSMFE/IF_GET_ENTITYSET .
-  interfaces /ODSMFE/IF_GET_ENTITYSET_MAIN .
+    INTERFACES /odsmfe/if_get_entityset .
+    INTERFACES /odsmfe/if_get_entityset_main .
 
-  class-data GVSB_NOTE_ID_FUNC_IMPORT_0_1 type /IWBEP/MGW_SAP_NOTE_ID .
-  class-data GVSB_NOTE_ID_CACHE_CONTROL type /IWBEP/MGW_SAP_NOTE_ID .
+    CLASS-DATA gvsb_note_id_func_import_0_1(10) TYPE n.
+    CLASS-DATA gvsb_note_id_cache_control(10) TYPE n.
+    METHODS constructor
+      IMPORTING
+        !im_entity_name TYPE string
+        !im_entity_set_name TYPE string OPTIONAL
+        !im_data_ext_class TYPE REF TO object OPTIONAL
+        !im_request               TYPE REF TO if_rap_query_request OPTIONAL      !im_service_document_name TYPE REF TO string OPTIONAL
+        !im_service_version TYPE REF TO numc4 OPTIONAL
+        !im_service_namespace TYPE REF TO string OPTIONAL.
+  PROTECTED SECTION.
 
-  methods CONSTRUCTOR
-    importing
-      !IM_ENTITY_NAME type STRING
-      !IM_ENTITY_SET_NAME type STRING optional
-      !IM_DATA_EXT_CLASS type ref to OBJECT optional
-      !IM_CONTEXT type ref to /IWBEP/IF_MGW_CONTEXT optional
-      !IM_REQUEST_DETAILS type ref to /IWBEP/IF_MGW_CORE_SRV_RUNTIME=>TY_S_MGW_REQUEST_CONTEXT optional
-      !IM_SERVICE_DOCUMENT_NAME type ref to STRING optional
-      !IM_SERVICE_VERSION type ref to NUMC4 optional
-      !IM_SERVICE_NAMESPACE type ref to STRING optional
-      !IM_INJECTION type ref to /IWBEP/IF_SB_GEN_DPC_INJECTION optional .
-PROTECTED SECTION.
+    TYPES:
+      BEGIN OF gtys_select,
+        select TYPE REF TO data,
+      END OF gtys_select .
+    TYPES:
+      BEGIN OF gtys_from,
+        query_count TYPE int2,
+        from        TYPE string,
+      END OF gtys_from .
+    TYPES:
+      BEGIN OF gtys_where,
+        query_count TYPE int2,
+        where       TYPE string,
+      END OF gtys_where .
 
-  TYPES:
-    BEGIN OF gtys_select,
-      select TYPE REF TO data,
-    END OF gtys_select .
-  TYPES:
-    BEGIN OF gtys_from,
-      query_count TYPE int2,
-      from        TYPE string,
-    END OF gtys_from .
-  TYPES:
-    BEGIN OF gtys_where,
-      query_count TYPE int2,
-      where       TYPE string,
-    END OF gtys_where .
-
-  DATA:
-    gitio_fetch_config TYPE TABLE OF /odsmfe/tb_fetch .
-  DATA:
-    gitio_join_config TYPE TABLE OF /odsmfe/tb_joinc .
-  DATA goio_model TYPE REF TO /iwbep/cl_mgw_odata_model .
-  DATA gvio_entityset_name TYPE /iwbep/if_mgw_med_odata_types=>ty_e_med_internal_name .
-  DATA gvio_entity_name TYPE /iwbep/if_mgw_med_odata_types=>ty_e_med_internal_name .
-  DATA goio_data_ext_class TYPE REF TO /iwbep/cl_mgw_abs_data .
-  DATA goio_context TYPE REF TO /iwbep/if_mgw_context .
-  DATA goio_request_details TYPE REF TO /iwbep/if_mgw_core_srv_runtime=>ty_s_mgw_request_context .
-  DATA goio_service_document_name TYPE REF TO string .
-  DATA goio_service_version TYPE REF TO numc4 .
-  DATA goio_service_namespace TYPE REF TO string .
-  DATA goio_injection TYPE REF TO /iwbep/if_sb_gen_dpc_injection .
-  DATA gvio_where_clause TYPE c .
-  DATA gvio_select TYPE c .
-  DATA gvio_from TYPE c .
-private section.
+    DATA:
+      gitio_fetch_config TYPE TABLE OF /odsmfe/tb_fetch .
+    DATA:
+      gitio_join_config TYPE TABLE OF /odsmfe/tb_joinc .
+*    DATA goio_model TYPE REF TO /iwbep/cl_mgw_odata_model .
+    DATA gvio_entityset_name(40) TYPE c .
+    DATA gvio_entity_name(40) TYPE c ..
+*    DATA goio_data_ext_class TYPE REF TO /iwbep/cl_mgw_abs_data .
+*    DATA goio_context TYPE REF TO /iwbep/if_mgw_context .
+    DATA goio_request_details TYPE REF TO if_rap_query_request.
+    DATA goio_service_document_name TYPE REF TO string .
+    DATA goio_service_version TYPE REF TO numc4 .
+    DATA goio_service_namespace TYPE REF TO string .
+*    DATA goio_injection TYPE REF TO /iwbep/if_sb_gen_dpc_injection .
+    DATA gvio_where_clause TYPE c .
+    DATA gvio_select TYPE c .
+    DATA gvio_from TYPE c .
+  PRIVATE SECTION.
 ENDCLASS.
 
 
@@ -63,7 +59,7 @@ ENDCLASS.
 CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET_MAIN~GMIB_GET_ENTITYSET_CONFIG_DATA.
+  METHOD /odsmfe/if_get_entityset_main~gmib_get_entityset_config_data.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -87,14 +83,14 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 *            E N D   O F   D A T A   D E C L A R A T I O N             *
 * -----------------------------------------------------------------------*
 
-    SELECT SINGLE param_value FROM /odsmfe/tb_apcon INTO lv_param_value WHERE param_name EQ im_param_name. "#EC CI_NOFIELD
+    SELECT SINGLE param_value FROM /odsmfe/tb_apcon WHERE param_name EQ @im_param_name INTO @lv_param_value. "#EC CI_NOFIELD
     IF sy-subrc = 0.
       ex_param_value = lv_param_value.
     ENDIF.
-  endmethod.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET_MAIN~GMIB_GET_ENTITYSET_DATA.
+  METHOD /odsmfe/if_get_entityset_main~gmib_get_entityset_data.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -114,22 +110,23 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
       EXPORTING
         im_entity_name           = im_entity_name
         im_entity_set_name       = im_entity_set_name
-        im_source_name           = im_source_name
+*       im_source_name           = im_source_name
         im_filter_select_options = im_filter_select_options
-        im_paging                = im_paging
-        im_key_tab               = im_key_tab
-        im_navigation_path       = im_navigation_path
-        im_order                 = im_order
+*       im_paging                = im_paging
+*       im_key_tab               = im_key_tab
+*       im_navigation_path       = im_navigation_path
+*       im_order                 = im_order
         im_filter_string         = im_filter_string
-        im_search_string         = im_search_string
-        im_tech_request_context  = im_tech_request_context
-        im_data_ext_class        = im_data_ext_class
+*       im_search_string         = im_search_string
+*       im_tech_request_context  = im_tech_request_context
+*       im_data_ext_class        = im_data_ext_class
       IMPORTING
-        ex_entityset             = ex_entityset.
-  endmethod.
+        !ex_response             = ex_response
+        !ex_response_data        = ex_response_data.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET_MAIN~GMIB_GET_ENTITYSET_FILTER_DATA.
+  METHOD /odsmfe/if_get_entityset_main~gmib_get_entityset_filter_data.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -166,11 +163,11 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
     IF ex_filter_values IS SUPPLIED.
 
       "/Select all the filters from config table for the respective entityset
-      SELECT mandt entitysetname tabname field recordno field_descr sign options low high active
+      SELECT mandt, entitysetname, tabname, field, recordno, field_descr, sign, options, low, high, active
          FROM /odsmfe/tb_filtr
-                INTO TABLE lit_filters
-                WHERE active = lc_abap_on
-                AND   entitysetname = im_entity_set_name .
+                WHERE active = @lc_abap_on
+                AND   entitysetname = @im_entity_set_name
+                INTO TABLE @lit_filters .
 
       IF sy-subrc EQ 0.
         GET REFERENCE OF ex_filter_values INTO lo_filter_values.
@@ -200,21 +197,21 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
               UNASSIGN <lfsst_field>.
             ENDIF.
 
-            REFRESH lit_filter_val[].
+            CLEAR lit_filter_val[].
           ENDLOOP.
 
           ex_filter_values = <lfsst_filter_values>.
         ENDIF.
       ENDIF.
     ENDIF.
-  endmethod.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET_MAIN~GMIB_GET_ENTITYSET_SERV_CONFIG.
-  endmethod.
+  METHOD /odsmfe/if_get_entityset_main~gmib_get_entityset_serv_config.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET_MAIN~GMIB_SET_GLOBAL_VARIABLE.
+  METHOD /odsmfe/if_get_entityset_main~gmib_set_global_variable.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -229,13 +226,13 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 * Change Description     :
 ***********************************************************************
 
-    goio_context                 =     im_context                 .
-    goio_request_details         =     im_request_details         .
-    goio_service_document_name   =     im_service_document_name   .
-    goio_service_version         =     im_service_version         .
-    goio_service_namespace       =     im_service_namespace       .
-    goio_injection               =     im_injection               .
-  endmethod.
+*    goio_context                 =     im_context                 .
+*    goio_request_details         =     im_request_details         .
+*    goio_service_document_name   =     im_service_document_name   .
+*    goio_service_version         =     im_service_version         .
+*    goio_service_namespace       =     im_service_namespace       .
+*    goio_injection               =     im_injection               .
+  ENDMETHOD.
 
 
   METHOD /odsmfe/if_get_entityset~gmib_get_additional_where.
@@ -267,7 +264,7 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_GET_ENTITYSET_DATA.
+  METHOD /odsmfe/if_get_entityset~gmib_get_entityset_data.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -287,23 +284,25 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
       EXPORTING
         im_entity_name           = im_entity_name
         im_entity_set_name       = im_entity_set_name
-        im_source_name           = im_source_name
+*       im_source_name           = im_source_name
         im_filter_select_options = im_filter_select_options
-        im_paging                = im_paging
-        im_key_tab               = im_key_tab
-        im_navigation_path       = im_navigation_path
-        im_order                 = im_order
+*       im_paging                = im_paging
+*       im_key_tab               = im_key_tab
+*       im_navigation_path       = im_navigation_path
+*       im_order                 = im_order
         im_filter_string         = im_filter_string
-        im_search_string         = im_search_string
-        im_tech_request_context  = im_tech_request_context
-        im_data_ext_class        = im_data_ext_class
+*       im_search_string         = im_search_string
+*       im_tech_request_context  = im_tech_request_context
+*       im_data_ext_class        = im_data_ext_class
         im_query_index           = 1
-      CHANGING
-        ch_entityset             = ex_entityset.
-  endmethod.
+        im_request               = im_request
+      IMPORTING
+        !ex_response             = !ex_response
+        !ex_response_data        = ex_response_data.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_GET_FROM_CLAUSE.
+  METHOD /odsmfe/if_get_entityset~gmib_get_from_clause.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -321,8 +320,8 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 *                   D A T A   D E C L A R A T I O N                    *
 * -----------------------------------------------------------------------*
 
-    DATA:    lv_first_on  TYPE abap_bool VALUE abap_true,
-             lv_join_rank TYPE int4.
+    DATA: lv_first_on  TYPE abap_bool VALUE abap_true,
+          lv_join_rank TYPE int4.
 
     FIELD-SYMBOLS :<lfsst_join> TYPE /odsmfe/tb_joinc.
 
@@ -363,10 +362,10 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
                INTO re_from.
 
     ENDLOOP.
-  endmethod.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_GET_MODEL_INSTANCE.
+  METHOD /odsmfe/if_get_entityset~gmib_get_model_instance.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -383,35 +382,35 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 * -----------------------------------------------------------------------*
 *                   D A T A   D E C L A R A T I O N                    *
 * -----------------------------------------------------------------------*
-
-    DATA:  lo_metadata_provider TYPE  REF TO /iwbep/if_mgw_med_provider,
-           lo_model             TYPE REF TO /iwbep/if_mgw_odata_fw_model.
+*
+*    DATA: lo_metadata_provider TYPE  REF TO /iwbep/if_mgw_med_provider,
+*          lo_model             TYPE REF TO /iwbep/if_mgw_odata_fw_model.
 
 * -----------------------------------------------------------------------*
 *            E N D   O F   D A T A   D E C L A R A T I O N             *
 * -----------------------------------------------------------------------*
-    IF goio_model IS NOT BOUND.
-
-      lo_metadata_provider = /iwbep/cl_mgw_med_provider=>get_med_provider( ).
-
-      lo_model = lo_metadata_provider->get_service_model(
-            iv_svc_ext_name  = goio_service_document_name->*
-            iv_svc_namespace = goio_service_namespace->*
-            iv_svc_version   = goio_service_version->*
-            iv_do_check_for_extension = abap_true  ).
-
-      CHECK lo_model IS BOUND.
-      goio_model ?= lo_model.
-    ENDIF.
-  endmethod.
-
-
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_GET_ODATA_PARAMETER.
-
-  endmethod.
+*    IF goio_model IS NOT BOUND.
+*
+*      lo_metadata_provider = /iwbep/cl_mgw_med_provider=>get_med_provider( ).
+*
+*      lo_model = lo_metadata_provider->get_service_model(
+*            iv_svc_ext_name  = goio_service_document_name->*
+*            iv_svc_namespace = goio_service_namespace->*
+*            iv_svc_version   = goio_service_version->*
+*            iv_do_check_for_extension = abap_true  ).
+*
+*      CHECK lo_model IS BOUND.
+*      goio_model ?= lo_model.
+*    ENDIF.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_GET_SELECTION_FIELDS.
+  METHOD /odsmfe/if_get_entityset~gmib_get_odata_parameter.
+
+  ENDMETHOD.
+
+
+  METHOD /odsmfe/if_get_entityset~gmib_get_selection_fields.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -429,56 +428,56 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 *                   D A T A   D E C L A R A T I O N                    *
 * -----------------------------------------------------------------------*
 
-    DATA: lit_select        TYPE TABLE OF edpline,
-          lst_sublist       TYPE edpline,
-          lst_entity_detail TYPE /iwbep/if_mgw_med_odata_types=>ty_s_med_entity_type.
-
-    DATA: lo_model          TYPE REF TO /iwbep/cl_mgw_odata_model.
-
-    DATA: lv_entity         TYPE /iwbep/if_mgw_med_odata_types=>ty_e_med_entity_id,
-          lv_ent_properties TYPE  /iwbep/if_mgw_med_odata_types=>ty_t_med_properties,
-          lv_sublist        TYPE edpline,
-          lv_lines          TYPE i.
-
-    FIELD-SYMBOLS :<lfsst_fetch> TYPE /odsmfe/tb_fetch,
-                   <lfsst_prop>  TYPE /iwbep/if_mgw_med_odata_types=>ty_s_med_property,
-                   <lfsst_comp>  TYPE edpline.
+*    DATA: lit_select        TYPE TABLE OF edpline,
+*          lst_sublist       TYPE edpline,
+*          lst_entity_detail TYPE /iwbep/if_mgw_med_odata_types=>ty_s_med_entity_type.
+*
+*    DATA: lo_model          TYPE REF TO /iwbep/cl_mgw_odata_model.
+*
+*    DATA: lv_entity         TYPE /iwbep/if_mgw_med_odata_types=>ty_e_med_entity_id,
+*          lv_ent_properties TYPE  /iwbep/if_mgw_med_odata_types=>ty_t_med_properties,
+*          lv_sublist        TYPE edpline,
+*          lv_lines          TYPE i.
+*
+*    FIELD-SYMBOLS :<lfsst_fetch> TYPE /odsmfe/tb_fetch,
+*                   <lfsst_prop>  TYPE /iwbep/if_mgw_med_odata_types=>ty_s_med_property,
+*                   <lfsst_comp>  TYPE edpline.
 
 * -----------------------------------------------------------------------*
 *            E N D   O F   D A T A   D E C L A R A T I O N             *
 * -----------------------------------------------------------------------*
 
-    CHECK goio_model IS BOUND.
+*    CHECK goio_model IS BOUND.
+*
+*    lv_entity = im_entity.
+*    lo_model = goio_model.
+*
+*
+*    READ TABLE lo_model->mt_entities INTO lst_entity_detail
+*          WITH KEY name = im_entity.
+*
+*    lv_ent_properties = lst_entity_detail-properties .
+*
+*    LOOP AT lst_entity_detail-properties ASSIGNING <lfsst_prop>.
+*
+*      "/ Very Low number of fields so sorting and binary search not required
+*      READ TABLE gitio_fetch_config ASSIGNING <lfsst_fetch> WITH KEY properties = <lfsst_prop>-name .
+*
+*      CHECK sy-subrc IS INITIAL.
+*
+*      CONCATENATE <lfsst_fetch>-tabname '~' <lfsst_fetch>-fieldname ` as ` <lfsst_prop>-name  INTO lst_sublist.
+*
+*      APPEND lst_sublist TO lit_select.
+*      CLEAR lst_sublist.
+*    ENDLOOP.
+*
+*
+*    "/ Export the select fields
+*    ch_select_fld =  lit_select .
+  ENDMETHOD.
 
-    lv_entity = im_entity.
-    lo_model = goio_model.
 
-
-    READ TABLE lo_model->mt_entities INTO lst_entity_detail
-          WITH KEY name = im_entity.
-
-    lv_ent_properties = lst_entity_detail-properties .
-
-    LOOP AT lst_entity_detail-properties ASSIGNING <lfsst_prop>.
-
-      "/ Very Low number of fields so sorting and binary search not required
-      READ TABLE gitio_fetch_config ASSIGNING <lfsst_fetch> WITH KEY properties = <lfsst_prop>-name .
-
-      CHECK sy-subrc IS INITIAL.
-
-      CONCATENATE <lfsst_fetch>-tabname '~' <lfsst_fetch>-fieldname ` as ` <lfsst_prop>-name  INTO lst_sublist.
-
-      APPEND lst_sublist TO lit_select.
-      CLEAR lst_sublist.
-    ENDLOOP.
-
-
-    "/ Export the select fields
-    ch_select_fld =  lit_select .
-  endmethod.
-
-
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_GET_WHERE_CLAUSE.
+  METHOD /odsmfe/if_get_entityset~gmib_get_where_clause.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -494,12 +493,12 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 ***********************************************************************
 
 
-    re_where_cls = im_tech_request_context->get_osql_where_clause_convert( ).
+*    re_where_cls = im_tech_request_context->get_osql_where_clause_convert( ).
 
-  endmethod.
+  ENDMETHOD.
 
 
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_SET_GLOBAL_VARIABLE.
+  METHOD /odsmfe/if_get_entityset~gmib_set_global_variable.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :ODS
@@ -513,18 +512,18 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 * Transport No.          :
 * Change Description     :
 ***********************************************************************
+*
+*    goio_context                 =     im_context                 .
+*    goio_request_details         =     im_request_details         .
+*    goio_service_document_name   =     im_service_document_name   .
+*    goio_service_version         =     im_service_version         .
+*    goio_service_namespace       =     im_service_namespace       .
+*    goio_injection               =     im_injection               .
+  ENDMETHOD.
 
-    goio_context                 =     im_context                 .
-    goio_request_details         =     im_request_details         .
-    goio_service_document_name   =     im_service_document_name   .
-    goio_service_version         =     im_service_version         .
-    goio_service_namespace       =     im_service_namespace       .
-    goio_injection               =     im_injection               .
-  endmethod.
 
-
-  method /ODSMFE/IF_GET_ENTITYSET~GMIB_SORT_DATA.
-  endmethod.
+  METHOD /odsmfe/if_get_entityset~gmib_sort_data.
+  ENDMETHOD.
 
 
   METHOD constructor.
@@ -548,7 +547,7 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
     DATA: lit_joinc   TYPE TABLE OF /odsmfe/tb_joinc,
           lit_tb_fetc TYPE TABLE OF /odsmfe/tb_fetch.
 
-    DATA: lv_entity_set_name  TYPE /iwbep/if_mgw_med_odata_types=>ty_e_med_internal_name.
+    DATA: lv_entity_set_name(40)  TYPE c.
 
 * -----------------------------------------------------------------------*
 *            E N D   O F   D A T A   D E C L A R A T I O N             *
@@ -556,22 +555,22 @@ CLASS /ODSMFE/CL_GET_ENTITYSET_SUP IMPLEMENTATION.
 
     gvio_entityset_name  = im_entity_set_name.
     gvio_entity_name     = im_entity_name.
-    goio_data_ext_class ?= im_data_ext_class.
+*    goio_data_ext_class ?= im_data_ext_class.
 
     "/ Fetch the Config data for the Select Query
 
     lv_entity_set_name = gvio_entityset_name.
 
     SELECT * FROM  /odsmfe/tb_joinc
-    INTO TABLE lit_joinc
-    WHERE entityset    = lv_entity_set_name.
+    WHERE entityset    = @lv_entity_set_name
+    INTO TABLE @lit_joinc.
     IF sy-subrc EQ 0.
       gitio_join_config = lit_joinc.
     ENDIF.
 
     SELECT * FROM  /odsmfe/tb_fetch
-    INTO TABLE lit_tb_fetc
-    WHERE entityset    = lv_entity_set_name.
+    WHERE entityset    = @lv_entity_set_name
+    INTO TABLE @lit_tb_fetc.
     IF sy-subrc EQ 0.
       gitio_fetch_config = lit_tb_fetc.
     ENDIF.

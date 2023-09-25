@@ -3,7 +3,7 @@ class /ODSMFE/CL_MODEL_FACTORY definition
   create private .
 
 public section.
-  type-pools ABAP .
+  "type-pools ABAP .
 
   interfaces /ODSMFE/IF_MODEL_FACTORY
       all methods final .
@@ -40,7 +40,7 @@ CLASS /ODSMFE/CL_MODEL_FACTORY IMPLEMENTATION.
 *  Data declaration
 *-------------------------------------------------------------
 
-    DATA: lv_entity TYPE char30,
+    DATA: lv_entity TYPE c LENGTH 30,
           lo_obj    TYPE REF TO object,
           lo_exref  TYPE REF TO cx_root,        "-EC NEEDED
           lv_mesg   TYPE string.
@@ -54,7 +54,7 @@ CLASS /ODSMFE/CL_MODEL_FACTORY IMPLEMENTATION.
     IF /odsmfe/if_model_factory~gitsb_handler IS INITIAL.
 
       SELECT *  FROM /odsmfe/tb_model                   "#EC CI_NOWHERE
-      INTO TABLE /odsmfe/if_model_factory~gitsb_handler.
+      INTO TABLE @/odsmfe/if_model_factory~gitsb_handler.
 
     ENDIF.
 
@@ -75,12 +75,12 @@ CLASS /ODSMFE/CL_MODEL_FACTORY IMPLEMENTATION.
           CREATE OBJECT lo_obj TYPE (<lfsst_clss_config>-clsname)
           EXPORTING
             im_entity_name     =   im_entity_name
-            im_entity_set_name =   im_entity_set_name
-            im_data_ext_class  =   im_data_ext_class.
+            im_entity_set_name =   im_entity_set_name.
+            "im_data_ext_class  =   im_data_ext_class.
 
         CATCH cx_sy_create_object_error.
           lv_mesg = lo_exref->get_text( ).
-          MESSAGE lv_mesg TYPE lc_i.
+          "MESSAGE lv_mesg TYPE lc_i.
       ENDTRY.
 
       CHECK lo_obj IS BOUND.
@@ -91,7 +91,7 @@ CLASS /ODSMFE/CL_MODEL_FACTORY IMPLEMENTATION.
   ENDMETHOD.
 
 
-METHOD class_constructor.
+METHOD CLASS_CONSTRUCTOR.
 ***********************************************************************
 ********************** CREATED HISTORY **********************
 * Program Author (SID)   :  SKAMMARI

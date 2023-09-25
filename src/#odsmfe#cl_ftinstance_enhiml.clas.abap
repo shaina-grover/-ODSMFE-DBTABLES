@@ -1,12 +1,8 @@
 class /ODSMFE/CL_FTINSTANCE_ENHIML definition
   public
-  final
-  create public .
+  create private .
 
 public section.
-
-  interfaces /ODSMFE/FTINSTANCE_IF .
-  interfaces IF_BADI_INTERFACE .
 protected section.
 private section.
 ENDCLASS.

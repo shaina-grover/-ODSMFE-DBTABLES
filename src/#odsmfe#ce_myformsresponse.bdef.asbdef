@@ -1,0 +1,13 @@
+unmanaged implementation in class /odsmfe/bp_ce_myformsresponse unique;
+//strict ( 1 ); //Uncomment this line in order to enable strict mode 2. The strict mode has two variants (strict(1), strict(2)) and is prerequisite to be future proof regarding syntax and to be able to release your BO.
+
+define behavior for /ODSMFE/CE_MYFORMSRESPONSE alias myformsresponse
+//late numbering
+//lock master
+//authorization master ( instance )
+//etag master <field_name>
+{
+  create;
+  update;
+  delete;
+}

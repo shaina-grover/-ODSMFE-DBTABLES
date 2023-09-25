@@ -1,63 +1,8 @@
 class /ODSMFE/CL_FORM_DATA_PARSE definition
   public
-  create public .
+  create private .
 
 public section.
-
-  types:
-    BEGIN OF gtys_response_data,
-        formid         TYPE /odsmfe/de_formid,
-        version        TYPE /odsmfe/de_version,
-        instanceid     TYPE /odsmfe/de_instanceid,
-        wo_num         TYPE aufnr,
-        vornr          TYPE vornr,
-        equnr          TYPE equnr,
-        tplnr          TYPE tplnr,
-        created_date   TYPE dats,
-        created_by     TYPE /odsmfe/de_createdby,
-        group          TYPE string,
-        repeat_group   TYPE string,
-        sub_group      TYPE string,
-        question_id    TYPE string,
-        question_index TYPE string,
-        questionname   TYPE string,
-        responsedata   TYPE string,
-      END OF gtys_response_data .
-  types:
-    gtyt_response_data TYPE STANDARD TABLE OF gtys_response_data .
-  types:
-    BEGIN OF gtys_form_data,
-        lang              TYPE string,
-        label             TYPE string,
-        pre_group_id      TYPE string,
-        group_id          TYPE string,
-        repeat_group_id   TYPE string,
-        question_id       TYPE string,
-        question_index    TYPE string,
-        pre_group_name    TYPE string,
-        group_name        TYPE string,
-        repeat_group_name TYPE string,
-        question          TYPE string,
-      END OF gtys_form_data .
-  types:
-    gtyt_form_data TYPE STANDARD TABLE OF gtys_form_data .
-
-  methods GMIB_GET_ALL_QUESTIONS
-    importing
-      !IM_FORMID type /ODSMFE/DE_FORMID
-      !IM_VERSION type /ODSMFE/DE_VERSION optional
-    exporting
-      !EX_FORM_DATA type GTYT_FORM_DATA .
-  methods GMIB_GET_RESPONSE_DATA
-    importing
-      !IM_FORMID type /ODSMFE/DE_FORMID optional
-      !IM_VERSION type /ODSMFE/DE_VERSION optional
-      !IM_INSTANCEID type /ODSMFE/DE_INSTANCEID
-    exporting
-      !EX_RESPONSE_DATA type GTYT_RESPONSE_DATA
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
 protected section.
 private section.
 ENDCLASS.

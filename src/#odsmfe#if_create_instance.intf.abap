@@ -8,8 +8,9 @@ interface /ODSMFE/IF_CREATE_INSTANCE
     importing
       !IM_ENTITY type STRING
     returning
-      value(RE_OBJ) type ref to OBJECT
-    raising
-      /IWBEP/CX_MGW_BUSI_EXCEPTION
-      /IWBEP/CX_MGW_TECH_EXCEPTION .
+      value(RE_OBJ) type ref to OBJECT.
+*    raising
+*      /IWBEP/CX_MGW_BUSI_EXCEPTION
+*      /IWBEP/CX_MGW_TECH_EXCEPTION .
+
 endinterface.

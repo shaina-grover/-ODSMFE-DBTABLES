@@ -1,0 +1,6 @@
+@EndUserText.label: 'service def for appstore'
+define service /ODSMFE/SD_APPSTORE {
+  expose /ODSMFE/CE_ApplicationConfig as ApplicationConfigSet;
+  expose /ODSMFE/CE_AppStore as AppStoreSet;
+  expose /ODSMFE/CE_ServiceConfig as ServiceConfigSet;
+}

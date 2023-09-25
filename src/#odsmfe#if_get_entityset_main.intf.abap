@@ -1,81 +1,93 @@
-interface /ODSMFE/IF_GET_ENTITYSET_MAIN
-  public .
+INTERFACE /odsmfe/if_get_entityset_main
+  PUBLIC .
 
-
-  types:
+  TYPES:
     BEGIN OF gtys_instance,
-      entity_name    TYPE char50,
-      entityset_name TYPE char50,
-      instance       TYPE REF TO /odsmfe/if_get_entityset_main,
-      content_id     TYPE string,
-      content_id_ref TYPE string,
+      entity_name(50)    TYPE c,
+      entityset_name(50) TYPE c,
+      instance           TYPE REF TO /odsmfe/if_get_entityset_main,
+      content_id         TYPE string,
+      content_id_ref     TYPE string,
     END OF gtys_instance .
 
-  class-data:
+  CLASS-DATA:
     gitsb_instance TYPE TABLE OF gtys_instance .
-  data GVIB_ENTITYSET_NAME type STRING .
+  DATA gvib_entityset_name TYPE string .
 
-  methods GMIB_GET_ENTITYSET_DATA
-    importing
-      !IM_ENTITY_NAME type STRING
-      !IM_ENTITY_SET_NAME type STRING
-      !IM_SOURCE_NAME type STRING optional
-      !IM_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION optional
-      !IM_PAGING type /IWBEP/S_MGW_PAGING optional
-      !IM_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR optional
-      !IM_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH optional
-      !IM_ORDER type /IWBEP/T_MGW_SORTING_ORDER optional
-      !IM_FILTER_STRING type STRING optional
-      !IM_SEARCH_STRING type STRING optional
-      !IM_TECH_REQUEST_CONTEXT_ENT_C type ref to /IWBEP/IF_MGW_REQ_ENTITY_C optional
-      !IM_TECH_REQUEST_CONTEXT_ENTITY type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
-      !IM_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITYSET optional
-      !IM_TECH_REQUEST_CONTEXT_ENT_U type ref to /IWBEP/IF_MGW_REQ_ENTITY_U optional
-      !IM_TECH_REQUEST_CONTEXT_ENT_D type ref to /IWBEP/IF_MGW_REQ_ENTITY_D optional
-      !IM_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
-      !IM_DATA_EXT_CLASS type ref to OBJECT
-      !IM_CHANGESET_REQUEST type /IWBEP/IF_MGW_APPL_TYPES=>TY_T_CHANGESET_REQUEST optional
-      !IM_CHANGESET_ST_REQUEST type /IWBEP/IF_MGW_APPL_TYPES=>TY_S_CHANGESET_REQUEST optional
-    exporting
-      !EX_ENTITYSET type ref to DATA
-      !EX_RESPONSE_CONTEXT_ENTITY type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
-      !EX_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
-      !EX_ENTITY type ref to DATA
-      !EX_DEEP_ENTITY type ref to DATA
-      !EX_CHANGESET_RESPONSE type /IWBEP/IF_MGW_APPL_TYPES=>TY_T_CHANGESET_RESPONSE
-      !EX_DELETED_ENTITYSET type ref to DATA
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
-  methods GMIB_SET_GLOBAL_VARIABLE
-    importing
-      !IM_CONTEXT type ref to /IWBEP/IF_MGW_CONTEXT
-      !IM_REQUEST_DETAILS type ref to /IWBEP/IF_MGW_CORE_SRV_RUNTIME=>TY_S_MGW_REQUEST_CONTEXT
-      !IM_SERVICE_DOCUMENT_NAME type ref to STRING
-      !IM_SERVICE_VERSION type ref to NUMC4
-      !IM_SERVICE_NAMESPACE type ref to STRING
-      !IM_INJECTION type ref to /IWBEP/IF_SB_GEN_DPC_INJECTION
-      !IM_HTTP_METHOD type STRING optional .
-  methods GMIB_GET_ENTITYSET_FILTER_DATA
-    importing
-      !IM_ENTITY_SET_NAME type STRING
-    exporting
-      !EX_FILTER_VALUES type ANY .
-  methods GMIB_GET_USER_PARAMETERS
-    importing
-      !IM_USER type SYUNAME
-      !IM_PARAMETER type MEMORYID optional
-    exporting
-      !EX_PARAMETER_VALUE type XUVALUE
-      !EX_PARAMETER_VALUES type /ODSMFE/TT_CORE_RANGE_TAB .
-  methods GMIB_GET_ENTITYSET_CONFIG_DATA
-    importing
-      !IM_PARAM_NAME type /ODSMFE/DE_MFE_KEY
-    exporting
-      !EX_PARAM_VALUE type /ODSMFE/DE_MFE_VALUE .
-  methods GMIB_GET_ENTITYSET_SERV_CONFIG
-    importing
-      !IM_ENTITY_SET_NAME type STRING optional
-    exporting
-      !EX_ACTIVE type STRING .
-endinterface.
+  METHODS gmib_get_entityset_data
+    IMPORTING
+      !im_entity_name           TYPE string
+      !im_entity_set_name       TYPE string
+*      !im_source_name          TYPE string OPTIONAL
+      !im_filter_select_options TYPE if_rap_query_filter=>tt_name_range_pairs OPTIONAL
+      !im_paging                TYPE REF TO if_rap_query_paging OPTIONAL
+*      !im_key_tab              TYPE /iwbep/t_mgw_name_value_pair OPTIONAL
+*      !im_navigation_path      TYPE /iwbep/t_mgw_navigation_path OPTIONAL
+*      !im_order                TYPE /iwbep/t_mgw_sorting_order OPTIONAL
+      !im_filter_string         TYPE string OPTIONAL
+*      !im_search_string        TYPE string OPTIONAL
+      !im_request               TYPE REF TO if_rap_query_request OPTIONAL
+*      !im_tech_request_context_ent_c  TYPE REF TO /iwbep/if_mgw_req_entity_c OPTIONAL
+*      !im_tech_request_context_entity TYPE REF TO /iwbep/if_mgw_req_entity OPTIONAL
+*      !im_tech_request_context        TYPE REF TO /iwbep/if_mgw_req_entityset OPTIONAL
+*      !im_tech_request_context_ent_u  TYPE REF TO /iwbep/if_mgw_req_entity_u OPTIONAL
+*      !im_tech_request_context_ent_d  TYPE REF TO /iwbep/if_mgw_req_entity_d OPTIONAL
+*      !im_data_provider               TYPE REF TO /iwbep/if_mgw_entry_provider OPTIONAL
+*      !im_data_ext_class              TYPE REF TO object
+*      !im_changeset_request           TYPE /iwbep/if_mgw_appl_types=>ty_t_changeset_request OPTIONAL
+*      !im_changeset_st_request        TYPE /iwbep/if_mgw_appl_types=>ty_s_changeset_request OPTIONAL
+    EXPORTING
+      !ex_response              TYPE REF TO if_rap_query_response
+      !ex_response_data         TYPE STANDARD TABLE
+*      !ex_entityset             TYPE REF TO data
+*      !ex_response_context_entity    TYPE /iwbep/if_mgw_appl_srv_runtime=>ty_s_mgw_response_entity_cntxt
+*      !ex_response_context           TYPE /iwbep/if_mgw_appl_srv_runtime=>ty_s_mgw_response_context
+*      !ex_entity                TYPE REF TO data
+*      !ex_deep_entity           TYPE REF TO data
+*      !ex_changeset_response         TYPE /iwbep/if_mgw_appl_types=>ty_t_changeset_response
+*      !ex_deleted_entityset     TYPE REF TO data
+    RAISING
+      cx_rap_query_prov_not_impl
+      cx_rap_query_provider.
+
+*  METHODS gmib_set_global_variable
+*    IMPORTING
+*      !im_context               TYPE REF TO /iwbep/if_mgw_context
+*      !im_request_details       TYPE REF TO /iwbep/if_mgw_core_srv_runtime=>ty_s_mgw_request_context
+*      !im_service_document_name TYPE REF TO string
+*      !im_service_version       TYPE REF TO numc4
+*      !im_service_namespace     TYPE REF TO string
+*      !im_injection             TYPE REF TO /iwbep/if_sb_gen_dpc_injection
+*      !im_http_method           TYPE string OPTIONAL .
+
+  METHODS gmib_get_entityset_filter_data
+    IMPORTING
+      !im_entity_set_name TYPE string
+    EXPORTING
+      !ex_filter_values   TYPE any .
+
+  METHODS gmib_get_user_parameters
+    IMPORTING
+      !im_user             TYPE syuname
+      !im_parameter        TYPE /odsmfe/de_parid OPTIONAL
+    EXPORTING
+      !ex_parameter_value  TYPE /odsmfe/de_parva
+      !ex_parameter_values TYPE /odsmfe/tt_core_range_tab
+    RAISING
+      cx_rfc_dest_provider_error .
+
+  METHODS gmib_get_entityset_config_data
+    IMPORTING
+      !im_param_name  TYPE /odsmfe/de_mfe_key
+    EXPORTING
+      !ex_param_value TYPE /odsmfe/de_mfe_value .
+
+  METHODS gmib_get_entityset_serv_config
+    IMPORTING
+      !im_entity_set_name TYPE string OPTIONAL
+    EXPORTING
+      !ex_active          TYPE string .
+
+
+
+ENDINTERFACE.

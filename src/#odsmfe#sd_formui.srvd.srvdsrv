@@ -1,0 +1,22 @@
+@EndUserText.label: 'Service Defination for Forms UI Store'
+define service /ODSMFE/SD_FORMUI {
+  expose /ODSMFE/CE_FORMIMAGE           as FormImageSet;
+  expose /ODSMFE/CE_FOMAASSIGN          as FormManualAssignmentSet;
+  expose /ODSMFE/CE_FORMMASTER          as FormMasterSet;
+  expose /ODSMFE/CE_FOMASMETDATA        as FormMasterMetaDataSet;
+  expose /ODSMFE/CE_FORM_METADATA       as FormMetaDataSet;
+  expose /ODSMFE/CE_FORESP_APPR_STATUS  as FormResponseApprovalStatusSet;
+  expose /ODSMFE/CE_RESPONSECAPTURE     as ResponseCaptureSet;
+  expose /ODSMFE/CE_REVIEWERFORMRESP    as ReviewerFormResponseSet;
+  expose /ODSMFE/CE_WORKORDER           as WorkOrderSet;
+  expose /ODSMFE/CE_FormAttachment      as FormAttachmentSet;
+  expose /ODSMFE/CE_DeptMasterData      as DeptMasterDataSet;
+  expose /ODSMFE/CE_FormApprover        as FormApproverSet;
+  expose /ODSMFE/CE_ApproverMasterData  as ApproverMasterDataSet;
+  expose /ODSMFE/CE_FORMASSIGNMENT      as FormAssignmnetSet;
+  expose /ODSMFE/CE_MYFORMSRESPONSE     as myFormsResponseCaptureSet;
+  expose /ODSMFE/CE_NONOBJECTFORMS      as NonObjectFormsSet;
+  expose /ODSMFE/CE_MYFORMSRESPAPPROVAL as myFormsRespApprovalSet;
+  expose /ODSMFE/CE_INSTANCE_METADATA   as InstanceMetadataSet;
+  expose /ODSMFE/CE_NOTIFICATION        as NotificationSet;
+}

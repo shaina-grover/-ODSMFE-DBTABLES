@@ -1,19 +1,23 @@
-class /ODSMFE/CL_APPROVERMASTERDATA definition
-  public
-  inheriting from /ODSMFE/CL_GET_ENT_SUPER_BAPI
-  create public .
+CLASS /odsmfe/cl_approvermasterdata DEFINITION
+  PUBLIC
+  INHERITING FROM /odsmfe/cl_get_ent_super_bapi
+  CREATE PUBLIC .
 
-public section.
-  type-pools ABAP .
+  PUBLIC SECTION.
 
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_APPROVERMASTERDATA .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_APPROVERMASTERDATA .
-  data GVIB_USER type USNAM .
+    "SOC BY LMETTA
+*  type-pools ABAP .
+*
+*  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_APPROVERMASTERDATA .
+*  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_APPROVERMASTERDATA .
+    "EOC BY LMETTA
 
-  methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
-    redefinition .
-protected section.
-private section.
+    DATA gvib_user TYPE usnam .
+
+    METHODS /odsmfe/if_get_entityset_bapi~gmib_read_entityset
+        REDEFINITION .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
@@ -43,73 +47,98 @@ CLASS /ODSMFE/CL_APPROVERMASTERDATA IMPLEMENTATION.
           lrt_usersystemid   TYPE TABLE OF /odsmfe/st_core_range_str,
           lrt_personnelnum   TYPE TABLE OF /odsmfe/st_core_range_str,
           lrs_usersystemid   TYPE /odsmfe/st_core_range_str,
-          lrs_personnelnum   TYPE /odsmfe/st_core_range_str,
-          lst_key_tab        TYPE /iwbep/s_mgw_name_value_pair.
+          lrs_personnelnum   TYPE /odsmfe/st_core_range_str.
+
+*          lt_tab             TYPE TABLE OF /ODSMFE/CE_ServiceConfig,
+*          lt_approvemaster   type table of /ODSMFE/CE_ServiceConfig.
+*          lst_key_tab        TYPE /iwbep/s_mgw_name_value_pair.
 
 * Constants
-    CONSTANTS: lc_e            TYPE string VALUE 'E',
-               lc_i            TYPE string VALUE 'I',
-               lc_eq           TYPE string VALUE 'EQ',
-               lc_usersystemid TYPE string VALUE 'UserID',
-               lc_personnelnum TYPE string VALUE 'UserPersonnelNum'.
+    CONSTANTS:   "lc_e            TYPE string VALUE 'E',
+*               "lc_i            TYPE string VALUE 'I',
+*               "lc_eq           TYPE string VALUE 'EQ',
+      lc_usersystemid TYPE string VALUE 'USERID',
+      lc_personnelnum TYPE string VALUE 'PERSONNELNUM'.
 
 * Field Symbols
     FIELD-SYMBOLS <lfsst_form> TYPE /odsmfe/tb_aprmd.
 *-------------------------------------------------------------
 * Main Section
 *-------------------------------------------------------------
+*SOC BY LMETTA
 
-    IF im_key_tab IS NOT INITIAL.
+*    IF im_key_tab IS NOT INITIAL.
+*
+*      LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
+*        CASE lst_key_tab-name.
+*          WHEN lc_usersystemid.
+*            lrs_usersystemid-sign = lc_i.
+*            lrs_usersystemid-option = lc_eq.
+*            lrs_usersystemid-low = lst_key_tab-value.
+*            APPEND lrs_usersystemid TO lrt_usersystemid.
+*            CLEAR lrs_usersystemid.
+*
+*          WHEN lc_personnelnum.
+*            lrs_personnelnum-sign   = lc_i.
+*            lrs_personnelnum-option = lc_eq.
+*            lrs_personnelnum-low    = lst_key_tab-value.
+*            APPEND lrs_personnelnum TO lrt_personnelnum.
+*            CLEAR lrs_personnelnum.
+*        ENDCASE.
+*      ENDLOOP.
+*    ENDIF.
+*EOC BY LMETTA
 
-      LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
-        CASE lst_key_tab-name.
-          WHEN lc_usersystemid.
-            lrs_usersystemid-sign = lc_i.
-            lrs_usersystemid-option = lc_eq.
-            lrs_usersystemid-low = lst_key_tab-value.
-            APPEND lrs_usersystemid TO lrt_usersystemid.
-            CLEAR lrs_usersystemid.
+**SOC BY LMETTA
+    LOOP AT im_filter_select_options INTO DATA(ls_filter_select_options).
 
-          WHEN lc_personnelnum.
-            lrs_personnelnum-sign   = lc_i.
-            lrs_personnelnum-option = lc_eq.
-            lrs_personnelnum-low    = lst_key_tab-value.
-            APPEND lrs_personnelnum TO lrt_personnelnum.
-            CLEAR lrs_personnelnum.
-        ENDCASE.
-      ENDLOOP.
-    ENDIF.
+      CASE ls_filter_select_options-name.
+        WHEN lc_usersystemid.
+          lrt_usersystemid = CORRESPONDING #(  ls_filter_select_options-range ).
+          DELETE lrt_usersystemid WHERE low IS INITIAL.
+        WHEN lc_personnelnum.
+          lrt_personnelnum = CORRESPONDING #(  ls_filter_select_options-range ).
+          DELETE lrt_personnelnum WHERE low IS INITIAL.
+
+      ENDCASE.
+    ENDLOOP.
+**EOC BY LMETTA
+
 
 * Fetching Approver Master Data
-    SELECT usersystemid personnelnum emailid active firstname lastname  contact
-           departmentid departmentname role approverlevel  plant workcenter
+    SELECT usersystemid, personnelnum, emailid, active, firstname, lastname, contact,
+           departmentid, departmentname, role,approverlevel,plant,workcenter
            FROM /odsmfe/tb_aprmd
-           INTO CORRESPONDING FIELDS OF TABLE lit_approvermaster
-           WHERE /odsmfe/tb_aprmd~usersystemid IN lrt_usersystemid
-           AND /odsmfe/tb_aprmd~personnelnum IN lrt_personnelnum.
+*           INTO CORRESPONDING FIELDS OF TABLE @lit_approvermaster
+           WHERE /odsmfe/tb_aprmd~usersystemid IN @lrt_usersystemid
+           AND /odsmfe/tb_aprmd~personnelnum IN @lrt_personnelnum  INTO CORRESPONDING FIELDS OF TABLE @lit_approvermaster.
+
+    IF sy-subrc EQ 0.
+
 
 * Sorting & Deleting duplicates Forms
-    IF sy-subrc = 0  AND lit_approvermaster IS NOT INITIAL.
-      SORT lit_approvermaster BY usersystemid personnelnum.
-      DELETE ADJACENT DUPLICATES FROM lit_approvermaster COMPARING usersystemid personnelnum.
+      IF sy-subrc = 0  AND lit_approvermaster IS NOT INITIAL.
+        SORT lit_approvermaster BY usersystemid personnelnum.
+        DELETE ADJACENT DUPLICATES FROM lit_approvermaster COMPARING usersystemid personnelnum.
+      ENDIF.
     ENDIF.
-
     IF lit_approvermaster IS NOT INITIAL.
 * Display all data
       LOOP AT lit_approvermaster ASSIGNING <lfsst_form>.
-        MOVE-CORRESPONDING <lfsst_form> TO gstib_entity.
+*       MOVE-CORRESPONDING <lfsst_form> TO gstib_entity.
 * Get Entity method is requested
-        IF im_key_tab IS NOT INITIAL.
-          GET REFERENCE OF gstib_entity INTO ex_entity.
-        ELSE.
-          APPEND gstib_entity TO gitib_entity.
-          CLEAR gstib_entity.
-        ENDIF.
+*        IF im_key_tab IS NOT INITIAL.
+*          GET REFERENCE OF gstib_entity INTO ex_entity.
+*        ELSE.
+*          APPEND gstib_entity TO gitib_entity.
+*          CLEAR gstib_entity.
+*        ENDIF.
       ENDLOOP.
 
 * Get EntitySet method is requested
-      GET REFERENCE OF gitib_entity INTO ex_entityset.
+*      GET REFERENCE OF gitib_entity INTO ex_entityset.
     ENDIF.
-
+*   ex_response_data[] = lit_approvermaster[].
+    MOVE-CORRESPONDING lit_approvermaster TO ex_response_data[].             "BY LMETTA
   ENDMETHOD.
 ENDCLASS.

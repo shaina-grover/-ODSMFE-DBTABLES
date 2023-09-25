@@ -4,7 +4,7 @@ class /ODSMFE/CL_SERVICECONFIG definition
   create public .
 
 public section.
-  type-pools ABAP .
+  "type-pools ABAP .  "Changed by Pratheesh
 
   methods /ODSMFE/IF_GET_ENTITYSET~GMIB_EXECUTE_QUERY
     redefinition .
@@ -15,7 +15,7 @@ public section.
 protected section.
 private section.
 
-  data GITII_ENTITYSET type /ODSMFE/CL_PR_APPSTORE_MPC=>TT_SERVICECONFIG .
+  "data GITII_ENTITYSET type /ODSMFE/CL_PR_APPSTORE_MPC=>TT_SERVICECONFIG . "Changed by Pratheesh
 ENDCLASS.
 
 
@@ -40,16 +40,17 @@ CLASS /ODSMFE/CL_SERVICECONFIG IMPLEMENTATION.
 * -----------------------------------------------------------------------*
 *                   D A T A   D E C L A R A T I O N                    *
 * -----------------------------------------------------------------------*
-    DATA: lv_user          TYPE usnam,
-          lv_select        TYPE /odsmfe/if_get_entityset~gtyt_select,
-          lv_where_clause  TYPE string,
-          lv_from          TYPE string,
-          lst_filter       TYPE /iwbep/s_mgw_select_option,
-          lst_filter_range TYPE /iwbep/s_cod_select_option,
-          lit_appstore     TYPE /odsmfe/cl_pr_appstore_mpc=>tt_serviceconfig.
+   DATA:  "lv_user          TYPE usnam,
+*          lv_select        TYPE /odsmfe/if_get_entityset~gtyt_select,
+*          lv_where_clause  TYPE string,
+*          lv_from          TYPE string,
+          lit_serviceconfig TYPE TABLE of /ODSMFE/CE_ServiceConfig.
+*          lst_filter       TYPE /iwbep/s_mgw_select_option,
+*          lst_filter_range TYPE /iwbep/s_cod_select_option.
+         " lit_appstore     TYPE /odsmfe/cl_pr_appstore_mpc=>tt_serviceconfig.
 
     "/Field Symbols
-    FIELD-SYMBOLS: <lfsst_select> TYPE /odsmfe/if_get_entityset~gtyt_select.
+    FIELD-SYMBOLs:  <lfsst_select>  TYPE /odsmfe/if_get_entityset~gtyt_select.
 
     DATA: lv_active  TYPE string.
 
@@ -58,7 +59,7 @@ CLASS /ODSMFE/CL_SERVICECONFIG IMPLEMENTATION.
 *            E N D   O F   D A T A   D E C L A R A T I O N             *
 * -----------------------------------------------------------------------*
 
-    TRY.
+    "TRY.
         "/Instantiate super class
         CREATE OBJECT lo_super
           EXPORTING
@@ -73,44 +74,60 @@ CLASS /ODSMFE/CL_SERVICECONFIG IMPLEMENTATION.
         IF lv_active IS INITIAL.
           RETURN.
         ENDIF. " IF lv_active IS INITIAL.
+ "SOC Prateesh
 
         "/ Fetch The Model Instance
-        me->/odsmfe/if_get_entityset~gmib_get_model_instance( ).
+*        me->/odsmfe/if_get_entityset~gmib_get_model_instance( ).
+*
+*        "/ Get The Wehre Clause
+*        lv_where_clause = /odsmfe/if_get_entityset~gmib_get_where_clause( im_request ). "im_tech_request_context ).
+*
+*        "/ Get The Fields For Selection From The Config Table
+*        me->/odsmfe/if_get_entityset~gmib_get_selection_fields(
+*        EXPORTING
+*          im_entity     = im_entity_name
+*        CHANGING
+*          ch_select_fld = lv_select ).
+*
+*        "/ Build From Clause From The Config Table
+*        "lv_from = /odsmfe/if_get_entityset~gmib_get_from_clause( im_entity_name ).
+*
+*        "/ Get the fields for selection from the config table
+*        "TRY .
+*            SELECT (lv_select)
+*            FROM (lv_from)
+*            WHERE (lv_where_clause)
+*            INTO CORRESPONDING FIELDS OF TABLE @ex_response_data.  "gitii_entityset.
+*          CATCH cx_sy_dynamic_osql_syntax.
+*            CHECK sy-subrc EQ 0.
+*        ENDTRY.
 
-        "/ Get The Wehre Clause
-        lv_where_clause = /odsmfe/if_get_entityset~gmib_get_where_clause( im_tech_request_context ).
-
-        "/ Get The Fields For Selection From The Config Table
-        me->/odsmfe/if_get_entityset~gmib_get_selection_fields(
-        EXPORTING
-          im_entity     = im_entity_name
-        CHANGING
-          ch_select_fld = lv_select ).
-
-        "/ Build From Clause From The Config Table
-        lv_from = /odsmfe/if_get_entityset~gmib_get_from_clause( im_entity_name ).
-
-        "/ Get the fields for selection from the config table
-        TRY .
-            SELECT (lv_select)
-            INTO CORRESPONDING FIELDS OF TABLE gitii_entityset
-            FROM (lv_from)
-            WHERE (lv_where_clause).
-          CATCH cx_sy_dynamic_osql_syntax.
-            CHECK sy-subrc EQ 0.
-        ENDTRY.
+             SELECT
+                ReqID, entityset_name, AppStoreName, RoleID, EnteredBy, entity_type,  ClassName, Object,
+                AppStoreID, AppStore, Url, DisplayName, Active, Keys
+                from /ODSMFE/TB_SRCON  into TABLE @lit_serviceconfig .
 
         IF sy-subrc EQ 0.
-          me->/odsmfe/if_get_entityset~gmib_sort_data( ).
-          GET REFERENCE OF gitii_entityset INTO ch_entityset.
+
+        sort lit_serviceconfig by appstoreid.
+
+        MOVE-CORRESPONDING lit_serviceconfig TO ex_response_data.
+
+        "ex_response_data[] = lt_tab[].
+
+
+        "  me->/odsmfe/if_get_entityset~gmib_sort_data( ).
+            "GET REFERENCE OF gitii_entityset INTO ch_entityset.
         ENDIF. "/IF sy-subrc EQ 0.
         "/ Business Exception
-      CATCH /iwbep/cx_mgw_busi_exception .
-        CHECK sy-subrc EQ 0.
+      "CATCH /iwbep/cx_mgw_busi_exception .
+       " CHECK sy-subrc EQ 0.
         "/ Technical Exception
-      CATCH /iwbep/cx_mgw_tech_exception .
-        CHECK sy-subrc EQ 0.
-    ENDTRY.
+      "CATCH /iwbep/cx_mgw_tech_exception .
+      "  CHECK sy-subrc EQ 0.
+   "ENDTRY.
+
+ "EOC Pratheesh
   endmethod.
 
 
@@ -130,7 +147,7 @@ CLASS /ODSMFE/CL_SERVICECONFIG IMPLEMENTATION.
 ***********************************************************************
     TRY.
         "/ Data Provider for ODATA Services
-        re_where_cls = super->/odsmfe/if_get_entityset~gmib_get_where_clause( im_tech_request_context ).
+        re_where_cls = super->/odsmfe/if_get_entityset~gmib_get_where_clause( IO_REQUEST ). "im_tech_request_context ).
 
         "/get additional where condition for query
         me->/odsmfe/if_get_entityset~gmib_get_additional_where(
@@ -157,6 +174,6 @@ CLASS /ODSMFE/CL_SERVICECONFIG IMPLEMENTATION.
 * Change Description     :
 ***********************************************************************
 
-    SORT gitii_entityset BY appstoreid.
+    "SORT  gitii_entityset  BY appstoreid.
   ENDMETHOD.
 ENDCLASS.

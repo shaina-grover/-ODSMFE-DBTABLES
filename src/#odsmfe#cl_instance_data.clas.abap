@@ -1,16 +1,8 @@
 class /ODSMFE/CL_INSTANCE_DATA definition
   public
-  inheriting from /ODSMFE/CL_GET_ENT_SUPER_BAPI
-  create public .
+  create private .
 
 public section.
-  type-pools ABAP .
-
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_INSTANCEDATA .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_INSTANCEDATA .
-
-  methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
-    redefinition .
 protected section.
 private section.
 ENDCLASS.

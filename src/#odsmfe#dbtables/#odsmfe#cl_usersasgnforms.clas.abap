@@ -1,17 +1,8 @@
 class /ODSMFE/CL_USERSASGNFORMS definition
   public
-  inheriting from /ODSMFE/CL_GET_ENT_SUPER_BAPI
-  final
-  create public .
+  create private .
 
 public section.
-  type-pools ABAP .
-
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_TRANSSTO_MPC=>TS_USERSASGNFORMS .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_TRANSSTO_MPC=>TT_USERSASGNFORMS .
-
-  methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
-    redefinition .
 protected section.
 private section.
 ENDCLASS.
@@ -39,18 +30,9 @@ CLASS /ODSMFE/CL_USERSASGNFORMS IMPLEMENTATION.
 *                   D A T A   D E C L A R A T I O N                      *
 * -----------------------------------------------------------------------*
 
-    "/ Types
-    TYPES: BEGIN OF ltys_foass,
-             formid      TYPE /odsmfe/de_formid,
-             version     TYPE /odsmfe/de_version,
-             category    TYPE /odsmfe/de_formcategory,
-             multiplesub TYPE /odsmfe/de_multiplesub,
-             occur       TYPE /odsmfe/de_occur,
-           END OF ltys_foass.
-
     "/ Tables and Structures
-    DATA: lit_foass                 TYPE TABLE OF ltys_foass,
-          lst_foass                 TYPE ltys_foass,
+    DATA: lit_foass                 TYPE TABLE OF /odsmfe/tb_foass,
+          lst_foass                 TYPE /odsmfe/tb_foass,
           lit_fomst                 TYPE TABLE OF /odsmfe/tb_fomst,
           lst_fomst                 TYPE /odsmfe/tb_fomst,
           lst_catid                 TYPE /odsmfe/st_core_range_str,
@@ -112,21 +94,29 @@ CLASS /ODSMFE/CL_USERSASGNFORMS IMPLEMENTATION.
       ENDCASE.
     ENDLOOP.
 
-    "/ Get all the form assignment data
-    SELECT formid version category multiplesub occur
-      FROM /odsmfe/tb_foass
-      INTO TABLE lit_foass
-      WHERE category IN lit_catid[].
+    "/ Get all functional areas
+    SELECT * FROM /odsmfe/tb_funar INTO TABLE lit_funar.
+    SORT lit_funar BY funareaid.
 
-    SORT lit_foass BY formid version.
-    DELETE ADJACENT DUPLICATES FROM lit_foass COMPARING formid version.
+    "/ Get all sub areas
+    SELECT * FROM /odsmfe/tb_subar INTO TABLE lit_subar.
+    SORT lit_subar BY subareaid.
+
+    "/ Get all categories
+    SELECT * FROM /odsmfe/tb_fmcat INTO TABLE lit_fmcat.
+    SORT lit_fmcat BY catid.
+
+    "/ Get all the form assignment data
+    SELECT * FROM /odsmfe/tb_foass
+      INTO TABLE lit_foass
+      WHERE category IN lit_catid.
 
     "/ Get all the form Response data.
     IF lit_foass[] IS NOT INITIAL.
       SELECT * FROM /odsmfe/tb_forsp
       INTO TABLE lit_total_forms FOR ALL ENTRIES IN lit_foass
       WHERE formid  = lit_foass-formid
-        AND version = lit_foass-version.
+      AND version   = lit_foass-version.
 
       SORT lit_total_forms BY formid version.
 
@@ -134,39 +124,16 @@ CLASS /ODSMFE/CL_USERSASGNFORMS IMPLEMENTATION.
       SELECT * FROM /odsmfe/tb_fomst
         INTO TABLE lit_fomst
         FOR ALL ENTRIES IN lit_foass
-        WHERE formid  = lit_foass-formid
-          AND version = lit_foass-version.
+        WHERE formid = lit_foass-formid AND
+        version = lit_foass-version .
 
       SORT lit_fomst BY formid version.
 
-      IF lit_fomst[] IS NOT INITIAL.
-        "/ Get the functional areas
-        SELECT * FROM /odsmfe/tb_funar
-          INTO TABLE lit_funar
-          FOR ALL ENTRIES IN lit_fomst
-          WHERE funareaid = lit_fomst-funareaid.
-
-        SORT lit_funar BY funareaid.
-
-        "/ Get sub areas
-        SELECT * FROM /odsmfe/tb_subar
-          INTO TABLE lit_subar
-          FOR ALL ENTRIES IN lit_fomst
-          WHERE subareaid = lit_fomst-subareaid.
-
-        SORT lit_subar BY subareaid.
-
-        "/ Get the categories
-        SELECT * FROM /odsmfe/tb_fmcat
-          INTO TABLE lit_fmcat
-          FOR ALL ENTRIES IN lit_fomst
-          WHERE catid = lit_fomst-formcategory.
-
-        SORT lit_fmcat BY catid.
-      ENDIF. "/ IF lit_fomst[] IS NOT INITIAL.
+      SORT lit_foass BY formid version.
+      DELETE ADJACENT DUPLICATES FROM lit_foass COMPARING formid version.
 
       "/ Mapping properties to the final table.
-      LOOP AT lit_foass INTO lst_foass.
+      LOOP AT lit_foass  INTO lst_foass.
         READ TABLE  lit_fomst INTO lst_fomst WITH KEY formid = lst_foass-formid version = lst_foass-version BINARY SEARCH.
         IF sy-subrc = 0.
           gstib_entity-formid      = lst_foass-formid.
@@ -227,12 +194,12 @@ CLASS /ODSMFE/CL_USERSASGNFORMS IMPLEMENTATION.
             DESCRIBE TABLE lit_all_submited LINES lv_submited.
             gstib_entity-total_submissions = lv_submited.
 
-          ENDIF. "/ IF sy-subrc = 0.
+          ENDIF.
           APPEND gstib_entity TO gitib_entity.
           CLEAR: gstib_entity, lst_foass, lst_fomst, lst_forsp, lv_total, lv_draft, lv_submited.
         ENDIF.
       ENDLOOP.
-    ENDIF. "/ IF lit_foass[] IS NOT INITIAL.
+    ENDIF.
 
     "/ Get EntitySet method is requested
     IF gitib_entity IS NOT INITIAL.

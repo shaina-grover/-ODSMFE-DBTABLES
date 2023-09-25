@@ -1,17 +1,17 @@
-class /ODSMFE/CL_FORMMASTERMETADATA definition
-  public
-  inheriting from /ODSMFE/CL_GET_ENT_SUPER_BAPI
-  create public .
+CLASS /odsmfe/cl_formmastermetadata DEFINITION
+  PUBLIC
+  INHERITING FROM /odsmfe/cl_get_ent_super_bapi
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMASTERMETADATA .
-  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_FORMMASTERMETADATA .
+*  data GSTIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TS_FORMMASTERMETADATA .
+*  data GITIB_ENTITY type /ODSMFE/CL_PR_FORMUI_MPC=>TT_FORMMASTERMETADATA .
 
-  methods /ODSMFE/IF_GET_ENTITYSET_BAPI~GMIB_READ_ENTITYSET
-    redefinition .
-protected section.
-private section.
+    METHODS /odsmfe/if_get_entityset_bapi~gmib_read_entityset
+        REDEFINITION .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 ENDCLASS.
 
 
@@ -40,9 +40,12 @@ CLASS /ODSMFE/CL_FORMMASTERMETADATA IMPLEMENTATION.
 *-------------------------------------------------------------
 * Internal Table
     DATA: lit_formmaster TYPE  STANDARD TABLE OF /odsmfe/tb_fomst,
+          lst_formmaster TYPE  /odsmfe/tb_fomst,
+          gitib_entity   TYPE STANDARD TABLE OF /odsmfe/ce_fomasmetdata,
+          gstib_entity   TYPE /odsmfe/ce_fomasmetdata,
           lrt_version    TYPE TABLE OF /odsmfe/st_core_range_str,
           lrt_formid     TYPE TABLE OF /odsmfe/st_core_range_str,
-          lst_key_tab    TYPE /iwbep/s_mgw_name_value_pair,
+*          lst_key_tab    TYPE /iwbep/s_mgw_name_value_pair,
           lrs_it_formid  TYPE /odsmfe/st_core_range_str,
           lrs_it_version TYPE /odsmfe/st_core_range_str.
 
@@ -50,12 +53,12 @@ CLASS /ODSMFE/CL_FORMMASTERMETADATA IMPLEMENTATION.
     CONSTANTS: lc_e       TYPE string VALUE 'E',
                lc_i       TYPE string VALUE 'I',
                lc_eq      TYPE string VALUE 'EQ',
-               lc_formid  TYPE string VALUE 'FormID',
-               lc_version TYPE string VALUE 'Version'.
+               lc_formid  TYPE string VALUE 'FORMID',
+               lc_version TYPE string VALUE 'VERSION'.
 
 * Field Symbols
-    FIELD-SYMBOLS: <lfsst_form>    TYPE /odsmfe/tb_fomst,
-                   <lfsst_frmdefn> TYPE /odsmfe/tb_frmdf. "Added b Sravan
+    FIELD-SYMBOLS: <lfsst_form>    TYPE /odsmfe/tb_fomst.
+*                   <lfsst_frmdefn> TYPE /odsmfe/tb_frmdf. "Added b Sravan
 
 ** SOC Sravan kumar "++ ES1K902842
 *    TYPES: BEGIN OF ltys_fomst,
@@ -91,34 +94,56 @@ CLASS /ODSMFE/CL_FORMMASTERMETADATA IMPLEMENTATION.
 * Main Section
 *-------------------------------------------------------------
 
-    IF im_key_tab IS NOT INITIAL.
+*    IF im_key_tab IS NOT INITIAL.
+*
+*      LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
+*        CASE lst_key_tab-name.
+*          WHEN lc_formid.
+*            lrs_it_formid-sign = lc_i.
+*            lrs_it_formid-option = lc_eq.
+*            lrs_it_formid-low = lst_key_tab-value.
+*            APPEND lrs_it_formid TO lrt_formid.
+*            CLEAR lrs_it_formid.
+*
+*          WHEN lc_version.
+*            lrs_it_version-sign   = lc_i.
+*            lrs_it_version-option = lc_eq.
+*            lrs_it_version-low    = lst_key_tab-value.
+*            APPEND lrs_it_version TO lrt_version.
+*            CLEAR lrs_it_version.
+*        ENDCASE.
+*      ENDLOOP.
+*    ENDIF.
+*SOC BY PRIYANKA
+    LOOP AT im_filter_select_options INTO DATA(ls_filter_select_options).
+      CASE ls_filter_select_options-name.
 
-      LOOP AT im_key_tab INTO lst_key_tab WHERE value IS NOT INITIAL.
-        CASE lst_key_tab-name.
-          WHEN lc_formid.
-            lrs_it_formid-sign = lc_i.
-            lrs_it_formid-option = lc_eq.
-            lrs_it_formid-low = lst_key_tab-value.
-            APPEND lrs_it_formid TO lrt_formid.
-            CLEAR lrs_it_formid.
+        WHEN lc_formid.
+          lrt_formid = CORRESPONDING #(  ls_filter_select_options-range ).
+          DELETE lrt_formid WHERE low IS INITIAL.
 
-          WHEN lc_version.
-            lrs_it_version-sign   = lc_i.
-            lrs_it_version-option = lc_eq.
-            lrs_it_version-low    = lst_key_tab-value.
-            APPEND lrs_it_version TO lrt_version.
-            CLEAR lrs_it_version.
-        ENDCASE.
-      ENDLOOP.
-    ENDIF.
+        WHEN lc_version.
+          lrt_version = CORRESPONDING #(  ls_filter_select_options-range ).
+          DELETE lrt_version WHERE low IS INITIAL.
+
+      ENDCASE.
+    ENDLOOP.
+*EOC BY PRIYANKA
 
 * Fetching Active Forms from FormMaster Table
-    SELECT formid version form_name description active formcategory created_by funareaid subareaid "Added description/funareaid/subareaid "ES1K902842
-    FROM /odsmfe/tb_fomst
-    INTO CORRESPONDING FIELDS OF TABLE lit_formmaster
-    WHERE /odsmfe/tb_fomst~active EQ abap_true
-     AND /odsmfe/tb_fomst~formid  IN lrt_formid
-     AND /odsmfe/tb_fomst~version IN lrt_version.
+    SELECT formid,
+           version,
+           form_name,
+          description,
+          active,
+          formcategory,
+          created_by,
+           funareaid,
+           subareaid                      "Added description/funareaid/subareaid "ES1K902842
+     FROM /odsmfe/tb_fomst
+     WHERE active EQ @abap_true
+      AND formid  IN @lrt_formid[]
+      AND version IN @lrt_version[] INTO CORRESPONDING FIELDS OF TABLE @lit_formmaster.
 
 * Sorting & Deleting duplicates Forms
     IF sy-subrc = 0  AND lit_formmaster IS NOT INITIAL.
@@ -177,7 +202,7 @@ CLASS /ODSMFE/CL_FORMMASTERMETADATA IMPLEMENTATION.
 
     IF lit_formmaster IS NOT INITIAL.
 * Display all data
-      LOOP AT lit_formmaster ASSIGNING <lfsst_form>.
+*      LOOP AT lit_formmaster ASSIGNING <lfsst_form>.
 ** SOC Sravan kumar "++ ES1K902842
 *        READ TABLE lit_form INTO lst_form
 *        WITH KEY formid    = <lfsst_form>-formid
@@ -192,18 +217,35 @@ CLASS /ODSMFE/CL_FORMMASTERMETADATA IMPLEMENTATION.
 *        MOVE-CORRESPONDING <lfsst_form> TO lst_formmstr.
 ** EOC Sravan kumar "++ ES1K902842
 
-        MOVE-CORRESPONDING <lfsst_form> TO gstib_entity.
+*       MOVE-CORRESPONDING <lfsst_form> TO gstib_entity.
+*
+** Get Entity method is requested
+*        IF im_key_tab IS NOT INITIAL.
+*          GET REFERENCE OF gstib_entity INTO ex_entity.
+*        ELSE.
+*          APPEND gstib_entity TO gitib_entity.
+*        ENDIF.
+*      ENDLOOP.
+*
+** Get EntitySet method is requested
+*      GET REFERENCE OF gitib_entity INTO ex_entityset.
 
-* Get Entity method is requested
-        IF im_key_tab IS NOT INITIAL.
-          GET REFERENCE OF gstib_entity INTO ex_entity.
-        ELSE.
-          APPEND gstib_entity TO gitib_entity.
-        ENDIF.
+      LOOP AT lit_formmaster INTO lst_formmaster.
+        gstib_entity-Active = lst_formmaster-active.
+        gstib_entity-CreatedBy = lst_formmaster-created_by.
+        gstib_entity-Description = lst_formmaster-description.
+        gstib_entity-FormCategory = lst_formmaster-formcategory.
+        gstib_entity-FormID  = lst_formmaster-formid.
+        gstib_entity-FormName = lst_formmaster-form_name.
+        gstib_entity-FunctionalArea = lst_formmaster-funareaid.
+        gstib_entity-SubArea = lst_formmaster-subareaid.
+        gstib_entity-Version = lst_formmaster-version.
+
+        APPEND gstib_entity TO gitib_entity.
+        CLEAR gstib_entity .
+
       ENDLOOP.
-
-* Get EntitySet method is requested
-      GET REFERENCE OF gitib_entity INTO ex_entityset.
+      MOVE-CORRESPONDING gitib_entity TO ex_response_data. "BY PRIYANKA"
     ENDIF.
 
   ENDMETHOD.

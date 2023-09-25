@@ -1,113 +1,88 @@
-interface /ODSMFE/IF_GET_ENTITYSET_BAPI
-  public .
+INTERFACE /odsmfe/if_get_entityset_bapi
+  PUBLIC .
 
 
-  methods GMIB_CREATE_ENTITYSET
-    importing
-      !IM_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION optional
-      !IM_PAGING type /IWBEP/S_MGW_PAGING optional
-      !IM_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR optional
-      !IM_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH optional
-      !IM_ORDER type /IWBEP/T_MGW_SORTING_ORDER optional
-      !IM_FILTER_STRING type STRING optional
-      !IM_SEARCH_STRING type STRING optional
-      !IM_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_C optional
-      !IM_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
-      !IM_DATA_EXT_CLASS type ref to OBJECT optional
-      !IM_ENTITY_NAME type STRING optional
-      !IM_ENTITY_SET_NAME type STRING optional
-      !IM_SOURCE_NAME type STRING optional
-      !IM_CHANGESET_REQUEST type /IWBEP/IF_MGW_APPL_TYPES=>TY_T_CHANGESET_REQUEST optional
-    exporting
-      !EX_ENTITYSET type ref to DATA
-      !EX_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
-      !EX_ENTITY type ref to DATA
-      !EX_DEEP_ENTITY type ref to DATA
-      !EX_CHANGESET_RESPONSE type /IWBEP/IF_MGW_APPL_TYPES=>TY_T_CHANGESET_RESPONSE
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
-  methods GMIB_READ_ENTITYSET
-    importing
-      !IM_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION optional
-      !IM_PAGING type /IWBEP/S_MGW_PAGING optional
-      !IM_SOURCE_NAME type STRING optional
-      !IM_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR optional
-      !IM_ORDER type /IWBEP/T_MGW_SORTING_ORDER optional
-      !IM_FILTER_STRING type STRING optional
-      !IM_SEARCH_STRING type STRING optional
-      !IM_TECH_REQUEST_CONTEXT_ENTITY type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
-      !IM_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITYSET optional
-      !IM_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
-      !IM_DATA_EXT_CLASS type ref to OBJECT optional
-      !IM_ENTITY_NAME type STRING optional
-      !IM_ENTITY_SET_NAME type STRING optional
-      !IM_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH optional
-    exporting
-      !EX_ENTITYSET type ref to DATA
-      !EX_RESPONSE_CONTEXT_ENTITY type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
-      !EX_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
-      !EX_ENTITY type ref to DATA
-      !EX_DEEP_ENTITY type ref to DATA
-      !EX_DELETED_ENTITYSET type ref to DATA
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
-  methods GMIB_DELETE_ENTITYSET
-    importing
-      !IM_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION optional
-      !IM_PAGING type /IWBEP/S_MGW_PAGING optional
-      !IM_SOURCE_NAME type STRING optional
-      !IM_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR optional
-      !IM_ORDER type /IWBEP/T_MGW_SORTING_ORDER optional
-      !IM_FILTER_STRING type STRING optional
-      !IM_SEARCH_STRING type STRING optional
-      !IM_TECH_REQUEST_CONTEXT_ENT_D type ref to /IWBEP/IF_MGW_REQ_ENTITY_D optional
-      !IM_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
-      !IM_DATA_EXT_CLASS type ref to OBJECT optional
-      !IM_ENTITY_NAME type STRING optional
-      !IM_ENTITY_SET_NAME type STRING optional
-    exporting
-      !EX_ENTITYSET type ref to DATA
-      !EX_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
-      !EX_ENTITY type ref to DATA
-      !EX_DEEP_ENTITY type ref to DATA
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
-  methods GMIB_MODIFY_ENTITYSET
-    importing
-      !IM_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION optional
-      !IM_PAGING type /IWBEP/S_MGW_PAGING optional
-      !IM_SOURCE_NAME type STRING optional
-      !IM_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR optional
-      !IM_ORDER type /IWBEP/T_MGW_SORTING_ORDER optional
-      !IM_FILTER_STRING type STRING optional
-      !IM_SEARCH_STRING type STRING optional
-      !IM_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_U optional
-      !IM_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
-      !IM_DATA_EXT_CLASS type ref to OBJECT optional
-      !IM_ENTITY_NAME type STRING optional
-      !IM_ENTITY_SET_NAME type STRING optional
-      !IM_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH optional
-      !IM_CHANGESET_REQUEST type /IWBEP/IF_MGW_APPL_TYPES=>TY_T_CHANGESET_REQUEST optional
-    exporting
-      !EX_ENTITYSET type ref to DATA
-      !EX_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
-      !EX_ENTITY type ref to DATA
-      !EX_DEEP_ENTITY type ref to DATA
-      !EX_CHANGESET_RESPONSE type /IWBEP/IF_MGW_APPL_TYPES=>TY_T_CHANGESET_RESPONSE
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
-  methods GMIB_ERROR_HANDLING
-    importing
-      !IM_RETURN type BAPIRET2_T optional
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
-  methods GMIB_BAPI_TRANSACTION_COMMIT
-    raising
-      /IWBEP/CX_MGW_TECH_EXCEPTION
-      /IWBEP/CX_MGW_BUSI_EXCEPTION .
-endinterface.
+  METHODS gmib_create_entityset
+    IMPORTING
+      !im_filter_select_options TYPE if_rap_query_filter=>tt_name_range_pairs OPTIONAL
+      !im_paging                TYPE REF TO if_rap_query_paging OPTIONAL
+      !im_filter_string         TYPE string OPTIONAL
+      !im_entity_name           TYPE string OPTIONAL
+      !im_entity_set_name       TYPE string OPTIONAL
+      !im_source_name           TYPE string OPTIONAL
+      !im_request               TYPE REF TO if_rap_query_request OPTIONAL
+    EXPORTING
+*      !EX_ENTITYSET type ref to DATA
+*      !EX_ENTITY type ref to DATA
+      !ex_response              TYPE REF TO if_rap_query_response
+    RAISING
+      cx_rap_query_prov_not_impl
+      cx_rap_query_provider
+     .
+
+  METHODS gmib_read_entityset
+    IMPORTING
+      !im_filter_select_options TYPE if_rap_query_filter=>tt_name_range_pairs OPTIONAL
+      !im_paging                TYPE REF TO if_rap_query_paging OPTIONAL
+      !im_source_name           TYPE string OPTIONAL
+      !im_filter_string         TYPE string OPTIONAL
+      !im_entity_name           TYPE string OPTIONAL
+      !im_entity_set_name       TYPE string OPTIONAL
+      !im_request               TYPE REF TO if_rap_query_request OPTIONAL
+    EXPORTING
+      !ex_response              TYPE REF TO if_rap_query_response
+      !ex_response_data         TYPE STANDARD TABLE
+*      !EX_ENTITYSET type ref to DATA
+*      !EX_ENTITY type ref to DATA
+    RAISING
+      cx_rap_query_prov_not_impl
+      cx_rap_query_provider
+      cx_rap_query_filter_no_range
+      cx_rfc_dest_provider_error.
+
+
+  METHODS gmib_delete_entityset
+    IMPORTING
+      !im_filter_select_options TYPE if_rap_query_filter=>tt_name_range_pairs OPTIONAL
+      !im_paging                TYPE REF TO if_rap_query_paging OPTIONAL
+      !im_source_name           TYPE string OPTIONAL
+      !im_filter_string         TYPE string OPTIONAL
+      !im_entity_name           TYPE string OPTIONAL
+      !im_entity_set_name       TYPE string OPTIONAL
+      !im_request               TYPE REF TO if_rap_query_request OPTIONAL
+    EXPORTING
+      !ex_response              TYPE REF TO if_rap_query_response
+*      !EX_ENTITYSET type ref to DATA
+*      !EX_ENTITY type ref to DATA
+    RAISING
+      cx_rap_query_prov_not_impl
+      cx_rap_query_provider
+      .
+
+  METHODS gmib_modify_entityset
+    IMPORTING
+      !im_filter_select_options TYPE if_rap_query_filter=>tt_name_range_pairs OPTIONAL
+      !im_paging                TYPE REF TO if_rap_query_paging OPTIONAL
+      !im_source_name           TYPE string OPTIONAL
+      !im_filter_string         TYPE string OPTIONAL
+      !im_entity_name           TYPE string OPTIONAL
+      !im_entity_set_name       TYPE string OPTIONAL
+      !im_request               TYPE REF TO if_rap_query_request OPTIONAL
+    EXPORTING
+*      !EX_ENTITYSET type ref to DATA
+*      !EX_ENTITY type ref to DATA
+      !ex_response              TYPE REF TO if_rap_query_response
+    RAISING
+      cx_rap_query_prov_not_impl
+      cx_rap_query_provider
+      .
+
+  METHODS gmib_error_handling
+    IMPORTING
+      !im_return TYPE /odsmfe/tt_bapiret2 OPTIONAL
+    RAISING
+      cx_rap_query_prov_not_impl
+      cx_rap_query_provider.
+  METHODS gmib_bapi_transaction_commit.
+
+ENDINTERFACE.

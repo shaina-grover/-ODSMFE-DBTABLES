@@ -4,7 +4,6 @@
   <asx:values>
    <PROGDIR>
     <NAME>/ODSMFE/SAPLFG_FETCH</NAME>
-    <SQLX>X</SQLX>
     <DBAPL>S</DBAPL>
     <DBNA>D$</DBNA>
     <SUBC>F</SUBC>
@@ -12,7 +11,7 @@
     <RLOAD>E</RLOAD>
     <FIXPT>X</FIXPT>
     <LDBNAME>D$S</LDBNAME>
-    <UCCHECK>X</UCCHECK>
+    <UCCHECK>5</UCCHECK>
    </PROGDIR>
   </asx:values>
  </asx:abap>

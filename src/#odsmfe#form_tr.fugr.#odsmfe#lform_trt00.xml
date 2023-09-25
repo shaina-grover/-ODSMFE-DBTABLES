@@ -5,7 +5,9 @@
    <PROGDIR>
     <NAME>/ODSMFE/LFORM_TRT00</NAME>
     <SUBC>I</SUBC>
+    <APPL>S</APPL>
     <RLOAD>E</RLOAD>
+    <UCCHECK>X</UCCHECK>
    </PROGDIR>
   </asx:values>
  </asx:abap>

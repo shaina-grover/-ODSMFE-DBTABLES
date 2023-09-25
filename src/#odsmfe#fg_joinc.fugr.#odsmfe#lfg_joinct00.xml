@@ -5,7 +5,9 @@
    <PROGDIR>
     <NAME>/ODSMFE/LFG_JOINCT00</NAME>
     <SUBC>I</SUBC>
+    <APPL>S</APPL>
     <RLOAD>E</RLOAD>
+    <UCCHECK>X</UCCHECK>
    </PROGDIR>
   </asx:values>
  </asx:abap>

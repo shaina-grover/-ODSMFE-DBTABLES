@@ -1,4 +1,5 @@
 interface /ODSMFE/IF_MODEL_FACTORY
+
   public .
 
 
@@ -12,4 +13,5 @@ interface /ODSMFE/IF_MODEL_FACTORY
       !IM_DATA_EXT_CLASS type ref to OBJECT optional
     returning
       value(RE_OBJ) type ref to /ODSMFE/IF_GET_ENTITYSET_MAIN .
+
 endinterface.
